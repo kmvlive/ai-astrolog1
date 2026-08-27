@@ -10,31 +10,43 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
-    libpq-dev \
-    && docker-php-ext-install pdo_pgsql pgsql \
-    && docker-php-ext-install mysqli \
-    && docker-php-ext-install mbstring exif pcntl bcmath gd zip \
-    && apt-get clean \
+    nginx \
     && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Create system user
-RUN useradd -G www-data,root -u 1000 -d /home/www-data www-data || true
-RUN mkdir -p /home/www-data && chown -R www-data:www-data /home/www-data
+RUN useradd -G www-data,root -u 1000 -d /home/laravel laravel
+RUN mkdir -p /home/laravel/.composer && \
+    chown -R laravel:laravel /home/laravel
 
+# Set working directory
 WORKDIR /var/www/html
 
-# Copy existing application code (will be mounted as volume)
+# Copy application code
 COPY . .
 
+# Install PHP dependencies
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+# Copy nginx configuration
+COPY docker/nginx/default.conf /etc/nginx/sites-available/default
+
 # Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage
+RUN chown -R laravel:laravel /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache
 
-USER www-data
+# Expose port
+EXPOSE 80
 
-EXPOSE 9000
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
 
-CMD ["php-fpm"]
+# Start services
+CMD ["sh", "-c", "nginx && php-fpm"]
