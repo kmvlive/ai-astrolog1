@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 16
+  postgres:
+    image: postgres:16-alpine
+    container_name: ai-astrolog1-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-ai_astrolog1}
+      POSTGRES_USER: ${DB_USERNAME:-ai_astrolog1}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    networks:
+      - ai-astrolog1-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-ai_astrolog1}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: ai-astrolog1-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - ai-astrolog1-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Laravel Backend (PHP 8.3 + FPM)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ai-astrolog1-backend
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+      - ./backend/vendor:/var/www/html/vendor
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-ai_astrolog1}
+      - DB_USERNAME=${DB_USERNAME:-ai_astrolog1}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ai-astrolog1-network
+
+  # Nginx для Backend
+  backend-nginx:
+    image: nginx:alpine
+    container_name: ai-astrolog1-backend-nginx
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-8000}:80"
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/nginx/backend.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+    networks:
+      - ai-astrolog1-network
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: ai-astrolog1-frontend
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:${BACKEND_PORT:-8000}/api
+      - NODE_ENV=development
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    networks:
+      - ai-astrolog1-network
+
+  # Python Astro Service (FastAPI)
+  astro-service:
+    build:
+      context: ./astro-service
+      dockerfile: Dockerfile
+    container_name: ai-astrolog1-astro-service
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./astro-service:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "${ASTRO_SERVICE_PORT:-8001}:8000"
+    networks:
+      - ai-astrolog1-network
+
+volumes:
+  postgres_data:
+
+networks:
+  ai-astrolog1-network:
+    driver: bridge
