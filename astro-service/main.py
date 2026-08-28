@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any
-from kerykeion import AstrologicalSubject, KrChartRise
+from kerykeion import AstrologicalSubject, KerykeionChartSVG
 import redis
 import json
 import hashlib

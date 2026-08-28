@@ -69,4 +69,4 @@ frontend/out/
 # Astro service specific
 astro-service/venv/
 
-```
+```.env
