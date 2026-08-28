@@ -1,0 +1,55 @@
+services:
+  backend:
+    container_name: astro-neiro-backend
+    ports:
+      - "8002:80"
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=astro_neiro_db
+      - DB_USERNAME=astro_neiro_user
+      - DB_PASSWORD=N3ir0Astro_Secur3Pass_2024!
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    container_name: astro-neiro-frontend
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./frontend:/app
+
+  astro-service:
+    container_name: astro-neiro-python
+    ports:
+      - "8003:8000"
+    volumes:
+      - ./astro-service:/app
+
+  db:
+    container_name: astro-neiro-db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: astro_neiro_db
+      POSTGRES_USER: astro_neiro_user
+      POSTGRES_PASSWORD: N3ir0Astro_Secur3Pass_2024!
+    volumes:
+      - astro-pgdata:/var/lib/postgresql/data
+
+  redis:
+    container_name: astro-neiro-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - astro-redisdata:/data
+
+volumes:
+  astro-pgdata:
+  astro-redisdata:
