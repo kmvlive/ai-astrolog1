@@ -18,6 +18,9 @@ services:
     environment:
       - DB_HOST=db
       - REDIS_HOST=redis
+      - TIMEWEB_AI_BASE_URL=https://api.timeweb.ai/v1
+      - TIMEWEB_AI_API_KEY=sk-PyIqBw7PvNPDaJp-kqv75w
+      - TIMEWEB_AI_MODEL=dashscope/qwen3.5-flash
 
   # Frontend (Next.js)
   frontend:
@@ -51,6 +54,9 @@ services:
       - redis
     environment:
       - REDIS_HOST=redis
+      - TIMEWEB_AI_BASE_URL=https://api.timeweb.ai/v1
+      - TIMEWEB_AI_API_KEY=sk-PyIqBw7PvNPDaJp-kqv75w
+      - TIMEWEB_AI_MODEL=dashscope/qwen3.5-flash
       - REDIS_PORT=6379
 
   # Database (PostgreSQL 16)
