@@ -22,6 +22,12 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::defaults()],
+            'birth_date' => ['nullable', 'date'],
+            'birth_time' => ['nullable', 'date_format:H:i'],
+            'birth_city' => ['nullable', 'string', 'max:255'],
+            'horoscope_types' => ['nullable', 'array'],
+            'horoscope_types.*' => ['string'],
+            'frequency' => ['nullable', 'in:daily,weekly'],
         ]);
 
         $user = User::create([
@@ -30,10 +36,34 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Создаём профиль пользователя
-        $user->profile()->create([
+        // Создаём профиль с данными рождения
+        $profileData = [
             'timezone' => 'Europe/Moscow',
-        ]);
+        ];
+
+        if ($request->filled('birth_date')) {
+            $profileData['birth_date'] = $request->birth_date;
+        }
+        if ($request->filled('birth_time')) {
+            $profileData['birth_time'] = $request->birth_time;
+        }
+        if ($request->filled('birth_city')) {
+            $profileData['city'] = $request->birth_city;
+            // Геокодинг координат через Nominatim (OpenStreetMap, бесплатно)
+            $coords = $this->geocodeCity($request->birth_city);
+            if ($coords) {
+                $profileData['latitude'] = $coords['lat'];
+                $profileData['longitude'] = $coords['lon'];
+            }
+        }
+
+        $user->profile()->create($profileData);
+
+        // Привязываем типы гороскопов
+        if ($request->filled('horoscope_types')) {
+            $typeIds = \App\Models\HoroscopeType::whereIn('slug', $request->horoscope_types)->pluck('id');
+            $user->horoscopeTypes()->sync($typeIds);
+        }
 
         // Создаём подписку с триалом 7 дней
         Subscription::create([
@@ -45,7 +75,7 @@ class AuthController extends Controller
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => $user->load('profile'),
             'token' => $token,
         ], 201);
     }
@@ -70,7 +100,7 @@ class AuthController extends Controller
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => $user->load('profile'),
             'token' => $token,
         ]);
     }
@@ -91,5 +121,35 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         return response()->json($request->user()->load(['profile', 'horoscopeTypes', 'channels', 'subscription']));
+    }
+
+    /**
+     * Геокодинг города через Nominatim (OpenStreetMap).
+     */
+    private function geocodeCity(string $city): ?array
+    {
+        try {
+            $url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' . urlencode($city);
+            $response = file_get_contents($url, false, stream_context_create([
+                'http' => [
+                    'header' => "User-Agent: AI-Astrolog1/1.0\r\n",
+                    'timeout' => 5,
+                ],
+            ]));
+
+            if ($response === false) return null;
+
+            $data = json_decode($response, true);
+            if (!empty($data[0])) {
+                return [
+                    'lat' => (float) $data[0]['lat'],
+                    'lon' => (float) $data[0]['lon'],
+                ];
+            }
+        } catch (\Exception $e) {
+            // Игнорируем ошибки геокодинга
+        }
+
+        return null;
     }
 }
