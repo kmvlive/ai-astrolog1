@@ -44,10 +44,7 @@ class AiService
         }
     }
 
-    /**
-     * Общий гороскоп для знака зодиака на дату (по типам)
-     */
-    public function generateDailyHoroscope(string $signCode, string $signRu, $date, string $type = 'general'): ?string
+    public function generateDailyHoroscope(string $signCode, string $signRu, $date, string $type = 'general', string $period = 'today'): ?string
     {
         $baseUrl = rtrim(env('TIMEWEB_AI_BASE_URL', 'https://api.timeweb.ai/v1'), '/');
         $apiKey = env('TIMEWEB_AI_API_KEY');
@@ -55,8 +52,9 @@ class AiService
 
         if (!$apiKey) return null;
 
-        $dateRu = $date->locale('ru')->isoFormat('D MMMM YYYY');
         $typeRu = $this->dailyTypeRu($type);
+        $periodRu = $this->periodRu($period, $date);
+        $length = $this->periodLength($period);
 
         try {
             $response = Http::timeout(60)
@@ -67,11 +65,11 @@ class AiService
                 ->post("{$baseUrl}/chat/completions", [
                     'model' => $model,
                     'messages' => [
-                        ['role' => 'system', 'content' => 'Ты — профессиональный астролог. Составляй ежедневные гороскопы для знаков зодиака на русском языке. Тёплый, поддерживающий тон. Формат: 2-3 абзаца связного текста, без заголовков, списков и эмодзи. Обращайся на "вы".'],
-                        ['role' => 'user', 'content' => "Составь {$typeRu} на {$dateRu} для знака {$signRu}. Учитывай характер знака и типичные планетарные влияния. 2-3 абзаца."],
+                        ['role' => 'system', 'content' => 'Ты — профессиональный астролог. Составляй гороскопы для знаков зодиака на русском языке. Тёплый, поддерживающий тон. Без заголовков, списков и эмодзи. Обращайся на "вы".'],
+                        ['role' => 'user', 'content' => "Составь {$typeRu} {$periodRu} для знака {$signRu}. Учитывай характер знака и планетарные влияния. {$length}"],
                     ],
                     'temperature' => 0.9,
-                    'max_tokens' => 600,
+                    'max_tokens' => $this->periodMaxTokens($period),
                 ]);
 
             if ($response->successful()) {
@@ -79,7 +77,7 @@ class AiService
                 return $text ? trim($text) : null;
             }
 
-            Log::error('Daily horoscope error', ['sign' => $signCode, 'type' => $type, 'status' => $response->status()]);
+            Log::error('Daily horoscope error', ['sign' => $signCode, 'type' => $type, 'period' => $period, 'status' => $response->status()]);
             return null;
         } catch (\Exception $e) {
             Log::error('Daily horoscope exception', ['error' => $e->getMessage()]);
@@ -95,6 +93,41 @@ class AiService
             'financial' => 'финансовый гороскоп',
             'health' => 'гороскоп здоровья и самочувствия',
             default => 'общий гороскоп',
+        };
+    }
+
+    private function periodRu(string $period, $date): string
+    {
+        $dateRu = $date->locale('ru')->isoFormat('D MMMM YYYY');
+        return match ($period) {
+            'today' => "на сегодня ({$dateRu})",
+            'tomorrow' => "на завтра (" . $date->copy()->addDay()->locale('ru')->isoFormat('D MMMM YYYY') . ")",
+            'week' => 'на текущую неделю (с понедельника по воскресенье)',
+            'month' => 'на текущий месяц',
+            'year' => 'на текущий год',
+            default => "на {$dateRu}",
+        };
+    }
+
+    private function periodLength(string $period): string
+    {
+        return match ($period) {
+            'today', 'tomorrow' => '2-3 абзаца.',
+            'week' => '4-5 абзацев, раздели на будни и выходные.',
+            'month' => '6-7 абзацев, упомяни ключевые недели.',
+            'year' => '8-10 абзацев, раздели по сезонам.',
+            default => '2-3 абзаца.',
+        };
+    }
+
+    private function periodMaxTokens(string $period): int
+    {
+        return match ($period) {
+            'today', 'tomorrow' => 600,
+            'week' => 900,
+            'month' => 1200,
+            'year' => 1800,
+            default => 600,
         };
     }
 

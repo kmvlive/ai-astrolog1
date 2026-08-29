@@ -25,6 +25,7 @@ class DailyHoroscopeController extends Controller
     ];
 
     private const TYPES = ['general', 'love', 'career', 'financial', 'health'];
+    private const PERIODS = ['today', 'tomorrow', 'week', 'month', 'year'];
 
     public function index()
     {
@@ -50,9 +51,10 @@ class DailyHoroscopeController extends Controller
         }
 
         $type = $request->query('type', 'general');
-        if (!in_array($type, self::TYPES)) {
-            $type = 'general';
-        }
+        $period = $request->query('period', 'today');
+        
+        if (!in_array($type, self::TYPES)) $type = 'general';
+        if (!in_array($period, self::PERIODS)) $period = 'today';
 
         $sign = self::SIGNS[$slug];
         $date = now()->startOfDay();
@@ -60,16 +62,17 @@ class DailyHoroscopeController extends Controller
         $horoscope = DailyHoroscope::where('date', $date)
             ->where('zodiac_sign', $sign['code'])
             ->where('type', $type)
+            ->where('period', $period)
             ->first();
 
-        // Ленивая генерация при первом запросе
         if (!$horoscope) {
-            $content = app(AiService::class)->generateDailyHoroscope($sign['code'], $sign['name'], $date, $type);
+            $content = app(AiService::class)->generateDailyHoroscope($sign['code'], $sign['name'], $date, $type, $period);
             if ($content) {
                 $horoscope = DailyHoroscope::create([
                     'date' => $date,
                     'zodiac_sign' => $sign['code'],
                     'type' => $type,
+                    'period' => $period,
                     'content' => $content,
                 ]);
             }
@@ -83,6 +86,7 @@ class DailyHoroscopeController extends Controller
             'horoscope' => $horoscope,
             'sign' => $sign,
             'type' => $type,
+            'period' => $period,
             'date' => $date->toDateString(),
         ]);
     }
