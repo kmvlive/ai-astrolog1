@@ -5,31 +5,27 @@ import Link from "next/link";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
-type Sign = {
-  slug: string;
-  name: string;
-  emoji: string;
-};
+const PERIODS = [
+  { slug: "today", name: "Сегодня", icon: "🌞" },
+  { slug: "tomorrow", name: "Завтра", icon: "🌙" },
+  { slug: "week", name: "Неделя", icon: "📅" },
+  { slug: "month", name: "Месяц", icon: "🗓" },
+  { slug: "year", name: "Год", icon: "🎊" },
+];
 
-const SIGN_DATES = {
-  oven: "21 марта — 19 апреля",
-  telec: "20 апреля — 20 мая",
-  bliznecy: "21 мая — 20 июня",
-  rak: "21 июня — 22 июля",
-  lev: "23 июля — 22 августа",
-  deva: "23 августа — 22 сентября",
-  vesy: "23 сентября — 22 октября",
-  skorpion: "23 октября — 21 ноября",
-  strelec: "22 ноября — 21 декабря",
-  kozerog: "22 декабря — 19 января",
-  vodoley: "20 января — 18 февраля",
-  ryby: "19 февраля — 20 марта",
+const PERIOD_LABELS: Record<string, string> = {
+  today: "на сегодня",
+  tomorrow: "на завтра",
+  week: "на неделю",
+  month: "на месяц",
+  year: "на год",
 };
 
 export default function HoroscopesPage() {
-  const [signs, setSigns] = useState<Sign[]>([]);
+  const [signs, setSigns] = useState<any[]>([]);
   const [date, setDate] = useState("");
   const [loading, setLoading] = useState(true);
+  const [selectedPeriod, setSelectedPeriod] = useState("today");
 
   useEffect(() => {
     fetch(`${API_URL}/api/daily-horoscopes`)
@@ -45,13 +41,30 @@ export default function HoroscopesPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            Гороскоп на {date && new Date(date).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })}
+            Гороскоп {PERIOD_LABELS[selectedPeriod]}
           </h1>
           <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Выберите свой знак зодиака и узнайте, что звёзды приготовили для вас сегодня
+            Выберите свой знак зодиака и читайте прогноз на нужный период
           </p>
+        </div>
+
+        {/* Табы периодов */}
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
+          {PERIODS.map((p) => (
+            <button
+              key={p.slug}
+              onClick={() => setSelectedPeriod(p.slug)}
+              className={`px-5 py-2.5 rounded-xl border text-sm font-medium transition ${
+                selectedPeriod === p.slug
+                  ? "bg-violet-600 border-violet-500 text-white"
+                  : "bg-slate-900 border-white/10 text-slate-300 hover:border-violet-500/50"
+              }`}
+            >
+              {p.icon} {p.name}
+            </button>
+          ))}
         </div>
 
         {loading ? (
@@ -61,13 +74,13 @@ export default function HoroscopesPage() {
             {signs.map((sign) => (
               <Link
                 key={sign.slug}
-                href={`/horoscopes/${sign.slug}`}
+                href={`/horoscopes/${sign.slug}?period=${selectedPeriod}`}
                 className="group relative bg-gradient-to-br from-slate-900 to-slate-800 hover:from-violet-900/40 hover:to-indigo-900/40 border border-white/10 hover:border-violet-500/50 rounded-2xl p-6 transition-all duration-300 hover:scale-105"
               >
                 <div className="text-5xl mb-3">{sign.emoji}</div>
                 <h3 className="text-xl font-semibold mb-1">{sign.name}</h3>
                 <p className="text-xs text-slate-500">
-                  {SIGN_DATES[sign.slug as keyof typeof SIGN_DATES] || ""}
+                  {PERIOD_LABELS[selectedPeriod]}
                 </p>
                 <div className="absolute top-4 right-4 text-slate-600 group-hover:text-violet-400 transition">
                   →

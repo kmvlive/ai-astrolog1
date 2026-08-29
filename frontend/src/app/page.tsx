@@ -39,6 +39,14 @@ function zodiacSign(month: number, day: number) {
   return SIGNS[9];
 }
 
+const PERIOD_LINKS = [
+  { slug: "today", name: "На сегодня", icon: "🌞", color: "from-yellow-500/20 to-orange-500/20" },
+  { slug: "tomorrow", name: "На завтра", icon: "🌙", color: "from-blue-500/20 to-indigo-500/20" },
+  { slug: "week", name: "На неделю", icon: "📅", color: "from-emerald-500/20 to-teal-500/20" },
+  { slug: "month", name: "На месяц", icon: "🗓", color: "from-purple-500/20 to-pink-500/20" },
+  { slug: "year", name: "На 2026 год", icon: "🎊", color: "from-red-500/20 to-pink-500/20" },
+];
+
 export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [birthDate, setBirthDate] = useState("");
@@ -56,7 +64,6 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      {/* ===== HEADER ===== */}
       <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur border-b border-white/10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-xl font-bold">
@@ -74,24 +81,19 @@ export default function HomePage() {
               </Link>
             ) : (
               <>
-                <Link href="/login" className="hidden sm:block text-sm text-slate-300 hover:text-white transition">
-                  Войти
-                </Link>
-                <Link href="/register" className="bg-violet-600 hover:bg-violet-500 rounded-xl px-5 py-2.5 text-sm font-semibold transition">
-                  Регистрация
-                </Link>
+                <Link href="/login" className="hidden sm:block text-sm text-slate-300 hover:text-white transition">Войти</Link>
+                <Link href="/register" className="bg-violet-600 hover:bg-violet-500 rounded-xl px-5 py-2.5 text-sm font-semibold transition">Регистрация</Link>
               </>
             )}
           </div>
         </div>
       </header>
 
-      {/* ===== HERO ===== */}
+      {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-violet-900/20 via-transparent to-transparent" />
         <div className="absolute top-20 left-10 text-4xl opacity-20 animate-pulse">✦</div>
         <div className="absolute top-40 right-20 text-3xl opacity-20 animate-pulse" style={{ animationDelay: "0.5s" }}>✦</div>
-        <div className="absolute bottom-20 left-1/4 text-2xl opacity-10 animate-pulse" style={{ animationDelay: "1s" }}>✦</div>
 
         <div className="relative max-w-6xl mx-auto px-4 py-20 sm:py-28 text-center">
           <div className="inline-block bg-violet-500/10 border border-violet-500/30 rounded-full px-4 py-1.5 text-sm text-violet-300 mb-6">
@@ -108,7 +110,6 @@ export default function HomePage() {
             Не общие фразы — а расчёт по вашей дате, времени и месту рождения.
           </p>
 
-          {/* Интерактив: узнай свой знак */}
           <div className="max-w-md mx-auto bg-slate-900/70 border border-white/10 rounded-2xl p-6 backdrop-blur">
             <div className="text-sm text-slate-400 mb-3">Узнайте свой знак зодиака</div>
             <div className="flex gap-2">
@@ -118,10 +119,7 @@ export default function HomePage() {
                 onChange={(e) => { setBirthDate(e.target.value); setMySign(null); }}
                 className="flex-1 rounded-xl bg-slate-800 border border-white/10 px-4 py-3 outline-none focus:border-violet-500 text-white"
               />
-              <button
-                onClick={checkSign}
-                className="bg-violet-600 hover:bg-violet-500 rounded-xl px-5 py-3 font-semibold transition whitespace-nowrap"
-              >
+              <button onClick={checkSign} className="bg-violet-600 hover:bg-violet-500 rounded-xl px-5 py-3 font-semibold transition whitespace-nowrap">
                 Узнать
               </button>
             </div>
@@ -130,16 +128,10 @@ export default function HomePage() {
                 <div className="text-3xl mb-1">{mySign.emoji}</div>
                 <div className="font-bold text-lg">Вы — {mySign.name}!</div>
                 <div className="flex gap-2 justify-center mt-3">
-                  <Link
-                    href={`/horoscopes/${mySign.slug}`}
-                    className="bg-violet-600 hover:bg-violet-500 rounded-lg px-4 py-2 text-sm font-semibold transition"
-                  >
+                  <Link href={`/horoscopes/${mySign.slug}`} className="bg-violet-600 hover:bg-violet-500 rounded-lg px-4 py-2 text-sm font-semibold transition">
                     Гороскоп на сегодня
                   </Link>
-                  <Link
-                    href="/register"
-                    className="bg-slate-800 hover:bg-slate-700 border border-white/10 rounded-lg px-4 py-2 text-sm font-semibold transition"
-                  >
+                  <Link href="/register" className="bg-slate-800 hover:bg-slate-700 border border-white/10 rounded-lg px-4 py-2 text-sm font-semibold transition">
                     Персональный прогноз
                   </Link>
                 </div>
@@ -155,7 +147,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== ЗНАКИ ЗОДИАКА ===== */}
+      {/* БЫСТРЫЕ ССЫЛКИ НА ПЕРИОДЫ */}
+      <section className="max-w-6xl mx-auto px-4 pb-12">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+          {PERIOD_LINKS.map((p) => (
+            <Link
+              key={p.slug}
+              href={`/horoscopes?period=${p.slug}`}
+              className={`bg-gradient-to-br ${p.color} border border-white/10 hover:border-violet-500/50 rounded-2xl p-5 text-center transition hover:scale-105`}
+            >
+              <div className="text-3xl mb-2">{p.icon}</div>
+              <div className="font-semibold text-sm">Гороскоп</div>
+              <div className="text-xs text-slate-400">{p.name}</div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ЗНАКИ ЗОДИАКА */}
       <section className="max-w-6xl mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-2">Гороскоп на сегодня</h2>
         <p className="text-slate-400 text-center mb-10">Выберите знак — читайте бесплатно, без регистрации</p>
@@ -174,7 +183,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== КАК РАБОТАЕТ ===== */}
+      {/* КАК РАБОТАЕТ */}
       <section id="how" className="bg-slate-900/50 py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Как это работает</h2>
@@ -201,7 +210,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== ПРЕИМУЩЕСТВА ===== */}
+      {/* ПРЕИМУЩЕСТВА */}
       <section className="max-w-6xl mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">Почему нам доверяют</h2>
         <div className="grid sm:grid-cols-2 gap-6">
@@ -236,7 +245,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== ТАРИФЫ ===== */}
+      {/* ТАРИФЫ */}
       <section id="pricing" className="bg-slate-900/50 py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Простые тарифы</h2>
@@ -265,32 +274,26 @@ export default function HomePage() {
                 <li>✓ Приоритетная генерация ИИ</li>
               </ul>
               <Link href="/register" className="block text-center bg-violet-600 hover:bg-violet-500 rounded-xl px-6 py-3 font-semibold transition shadow-lg shadow-violet-600/30">
-                Попробать 7 дней бесплатно
+                Попробовать 7 дней бесплатно
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ===== FINAL CTA ===== */}
+      {/* Финальный CTA */}
       <section className="max-w-4xl mx-auto px-4 py-20 text-center">
         <div className="text-5xl mb-6">🌟</div>
         <h2 className="text-3xl sm:text-4xl font-bold mb-4">Звёзды уже знают ваше завтра</h2>
         <p className="text-slate-400 text-lg mb-8">Присоединяйтесь — первый персональный гороскоп будет готов через минуту после регистрации.</p>
-        <Link
-          href="/register"
-          className="inline-block bg-violet-600 hover:bg-violet-500 rounded-xl px-10 py-4 text-lg font-semibold transition shadow-lg shadow-violet-600/30"
-        >
+        <Link href="/register" className="inline-block bg-violet-600 hover:bg-violet-500 rounded-xl px-10 py-4 text-lg font-semibold transition shadow-lg shadow-violet-600/30">
           Создать аккаунт бесплатно →
         </Link>
       </section>
 
-      {/* ===== FOOTER ===== */}
       <footer className="border-t border-white/10 py-8">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🔮</span> AI Астролог © 2026
-          </div>
+          <div className="flex items-center gap-2"><span className="text-xl">🔮</span> AI Астролог © 2026</div>
           <div className="flex gap-6">
             <Link href="/horoscopes" className="hover:text-white transition">Гороскопы</Link>
             <Link href="/login" className="hover:text-white transition">Войти</Link>
