@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
+import SubscriptionSettings from "@/components/SubscriptionSettings";
 
 type Horoscope = {
   id: number;
@@ -149,6 +150,10 @@ export default function DashboardPage() {
     return (
       <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
         <div className="text-xl">Загрузка...</div>
+        {/* ===== Секция управления подписками ===== */}
+        <div className="max-w-2xl mx-auto mt-12">
+          <SubscriptionSettings />
+        </div>
       </main>
     );
   }
@@ -355,6 +360,10 @@ export default function DashboardPage() {
           </Link>
         </div>
       </div>
+        {/* ===== Секция управления подписками ===== */}
+        <div className="max-w-2xl mx-auto mt-12">
+          <SubscriptionSettings />
+        </div>
     </main>
   );
 }

@@ -9,8 +9,8 @@ use Illuminate\Console\Command;
 
 class SendDailyHoroscopeEmails extends Command
 {
-    protected $signature = 'horoscope:send-daily-emails {--test= : Отправить тестовое письмо на указанный email}';
-    protected $description = 'Рассылка утренних гороскопов по email через UniSender';
+    protected $signature = 'horoscope:send-daily-emails {--test= : Отправить тестовое письмо}';
+    protected $description = 'Рассылка утренних гороскопов по новой архитектуре подписок';
 
     private array $signsMeta = [
         'Ari' => ['Овен', '♈'], 'Tau' => ['Телец', '♉'], 'Gem' => ['Близнецы', '♊'],
@@ -26,7 +26,24 @@ class SendDailyHoroscopeEmails extends Command
         $dateRu = $date->locale('ru')->isoFormat('D MMMM YYYY');
         $service = app(UniSenderService::class);
 
-        $query = User::where('email_opt_in', true)->with('profile');
+        // Ищем пользователей с активной подпиской + канал email + тип daily
+        $query = User::whereHas('subscription', function ($q) {
+                $q->where(function ($q2) {
+                    $q2->where('status', 'active')
+                       ->orWhere(function ($q3) {
+                           $q3->where('status', 'trial')
+                              ->where('trial_ends_at', '>', now());
+                       });
+                });
+            })
+            ->whereHas('channels', function ($q) {
+                $q->where('slug', 'email');
+            })
+            ->whereHas('horoscopeTypes', function ($q) {
+                $q->where('slug', 'daily');
+            })
+            ->with('profile');
+
         if ($testEmail) {
             $query->where('email', $testEmail);
         }
@@ -48,6 +65,7 @@ class SendDailyHoroscopeEmails extends Command
             $horoscope = DailyHoroscope::where('date', $date)
                 ->where('zodiac_sign', $sign)
                 ->where('type', 'general')
+                ->where('period', 'today')
                 ->first();
 
             if (!$horoscope) {
@@ -57,7 +75,7 @@ class SendDailyHoroscopeEmails extends Command
             }
 
             [$html, $text] = $service->buildHoroscopeEmail($user->name, $signName, $signEmoji, $horoscope->content, $dateRu);
-            $ok = $service->sendEmail($user->email, "Ваш гороскоп на {$dateRu}", $html, $text);
+            $ok = $service->sendEmail($user->email, "✨ Ваш гороскоп на {$dateRu}", $html, $text);
 
             if ($ok) {
                 $this->info("{$user->email}: отправлено ({$signName})");
