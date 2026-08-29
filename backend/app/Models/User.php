@@ -76,6 +76,11 @@ class User extends Authenticatable
         return $this->hasOne(Subscription::class);
     }
 
+    public function horoscopes()
+    {
+        return $this->hasMany(Horoscope::class)->orderByDesc("created_at");
+    }
+
     public function profile(): HasOne
     {
         return $this->hasOne(UserProfile::class);
