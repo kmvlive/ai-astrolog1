@@ -150,10 +150,6 @@ export default function DashboardPage() {
     return (
       <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
         <div className="text-xl">Загрузка...</div>
-        {/* ===== Секция управления подписками ===== */}
-        <div className="max-w-2xl mx-auto mt-12">
-          <SubscriptionSettings />
-        </div>
       </main>
     );
   }
