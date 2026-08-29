@@ -29,6 +29,14 @@ const TYPES = [
   { slug: "health", name: "Здоровье", icon: "🌿" },
 ];
 
+const PERIODS = [
+  { slug: "today", name: "Сегодня" },
+  { slug: "tomorrow", name: "Завтра" },
+  { slug: "week", name: "Неделя" },
+  { slug: "month", name: "Месяц" },
+  { slug: "year", name: "Год" },
+];
+
 export default function SignHoroscopePage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -37,13 +45,14 @@ export default function SignHoroscopePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedType, setSelectedType] = useState("general");
+  const [selectedPeriod, setSelectedPeriod] = useState("today");
 
   const currentSign = ALL_SIGNS.find((s) => s.slug === slug);
 
   useEffect(() => {
     setLoading(true);
     setError("");
-    fetch(`${API_URL}/api/daily-horoscopes/${slug}?type=${selectedType}`)
+    fetch(`${API_URL}/api/daily-horoscopes/${slug}?type=${selectedType}&period=${selectedPeriod}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.error) {
@@ -54,7 +63,7 @@ export default function SignHoroscopePage() {
       })
       .catch(() => setError("Ошибка загрузки"))
       .finally(() => setLoading(false));
-  }, [slug, selectedType]);
+  }, [slug, selectedType, selectedPeriod]);
 
   if (!currentSign) {
     return (
@@ -85,12 +94,25 @@ export default function SignHoroscopePage() {
           <h1 className="text-4xl sm:text-5xl font-bold mb-2">
             Гороскоп для {currentSign.name}
           </h1>
-          <p className="text-slate-400">
-            на {horoscope?.date && new Date(horoscope.date).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })}
-          </p>
         </div>
 
-        {/* Переключатель типов */}
+        <div className="flex flex-wrap justify-center gap-2 mb-6">
+          {PERIODS.map((p) => (
+            <button
+              key={p.slug}
+              onClick={() => setSelectedPeriod(p.slug)}
+              disabled={loading}
+              className={`px-4 py-2 rounded-xl border text-sm font-medium transition ${
+                selectedPeriod === p.slug
+                  ? "bg-violet-600 border-violet-500 text-white"
+                  : "bg-slate-900 border-white/10 text-slate-300 hover:border-violet-500/50"
+              }`}
+            >
+              {p.name}
+            </button>
+          ))}
+        </div>
+
         <div className="flex flex-wrap justify-center gap-2 mb-8">
           {TYPES.map((t) => (
             <button
@@ -125,7 +147,6 @@ export default function SignHoroscopePage() {
               </div>
             </article>
 
-            {/* CTA — персональный гороскоп */}
             <div className="bg-gradient-to-br from-violet-900/30 to-indigo-900/30 border border-violet-500/30 rounded-3xl p-8 sm:p-10 text-center">
               <div className="text-5xl mb-4">✨</div>
               <h2 className="text-2xl sm:text-3xl font-bold mb-3">
@@ -137,7 +158,7 @@ export default function SignHoroscopePage() {
               <ul className="text-left text-slate-300 mb-6 space-y-2 max-w-md mx-auto">
                 <li>✓ Индивидуальные предсказания на каждый день</li>
                 <li>✓ 5 типов: общий, любовь, карьера, финансы, здоровье</li>
-                <li>✓ Получение на email или в мессенджеры</li>
+                <li>✓ Получение на email каждое утро</li>
                 <li>✓ 7 дней бесплатно</li>
               </ul>
               <Link
@@ -148,7 +169,6 @@ export default function SignHoroscopePage() {
               </Link>
             </div>
 
-            {/* Ссылки на другие знаки */}
             <div className="mt-12">
               <h3 className="text-center text-slate-400 mb-4">Другие знаки:</h3>
               <div className="flex flex-wrap justify-center gap-2">

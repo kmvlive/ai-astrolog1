@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class DailyHoroscope extends Model
 {
-    protected $fillable = ['date', 'zodiac_sign', 'type', 'content'];
+    protected $fillable = ['date', 'zodiac_sign', 'type', 'period', 'content'];
 
-    protected $casts = ['date' => 'date'];
+    protected $casts = [
+        'date' => 'date',
+    ];
 }
