@@ -92,8 +92,9 @@ class HoroscopeController extends Controller
             ], 500);
         }
 
-        // Генерация текста гороскопа
-        $content = $this->generateHoroscopeText($natal, $type, $user->name);
+        // Генерация текста: сначала ИИ (Timeweb), при ошибке — шаблон
+        $aiText = app(\App\Services\AiService::class)->generateHoroscope($natal, $type, $user->name);
+        $content = $aiText ?? $this->generateHoroscopeText($natal, $type, $user->name);
 
         // Сохраняем
         $horoscope = Horoscope::create([
