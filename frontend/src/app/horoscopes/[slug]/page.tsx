@@ -1,24 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
 const ALL_SIGNS = [
-  { slug: "oven", name: "Овен", emoji: "♈" },
-  { slug: "telec", name: "Телец", emoji: "♉" },
-  { slug: "bliznecy", name: "Близнецы", emoji: "♊" },
-  { slug: "rak", name: "Рак", emoji: "♋" },
-  { slug: "lev", name: "Лев", emoji: "♌" },
-  { slug: "deva", name: "Дева", emoji: "♍" },
-  { slug: "vesy", name: "Весы", emoji: "♎" },
-  { slug: "skorpion", name: "Скорпион", emoji: "♏" },
-  { slug: "strelec", name: "Стрелец", emoji: "♐" },
-  { slug: "kozerog", name: "Козерог", emoji: "♑" },
-  { slug: "vodoley", name: "Водолей", emoji: "♒" },
-  { slug: "ryby", name: "Рыбы", emoji: "♓" },
+  { slug: "oven", name: "Овен", genitive: "Овна", emoji: "♈" },
+  { slug: "telec", name: "Телец", genitive: "Тельца", emoji: "♉" },
+  { slug: "bliznecy", name: "Близнецы", genitive: "Близнецов", emoji: "♊" },
+  { slug: "rak", name: "Рак", genitive: "Рака", emoji: "♋" },
+  { slug: "lev", name: "Лев", genitive: "Льва", emoji: "♌" },
+  { slug: "deva", name: "Дева", genitive: "Девы", emoji: "♍" },
+  { slug: "vesy", name: "Весы", genitive: "Весов", emoji: "♎" },
+  { slug: "skorpion", name: "Скорпион", genitive: "Скорпиона", emoji: "♏" },
+  { slug: "strelec", name: "Стрелец", genitive: "Стрельца", emoji: "♐" },
+  { slug: "kozerog", name: "Козерог", genitive: "Козерога", emoji: "♑" },
+  { slug: "vodoley", name: "Водолей", genitive: "Водолея", emoji: "♒" },
+  { slug: "ryby", name: "Рыбы", genitive: "Рыб", emoji: "♓" },
 ];
 
 const TYPES = [
@@ -39,13 +39,14 @@ const PERIODS = [
 
 export default function SignHoroscopePage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const slug = params.slug as string;
 
   const [horoscope, setHoroscope] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selectedType, setSelectedType] = useState("general");
-  const [selectedPeriod, setSelectedPeriod] = useState("today");
+  const [selectedType, setSelectedType] = useState(searchParams.get("type") || "general");
+  const [selectedPeriod, setSelectedPeriod] = useState(searchParams.get("period") || "today");
 
   // Состояние для подписки на email
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -122,7 +123,7 @@ export default function SignHoroscopePage() {
         <div className="text-center mb-8">
           <div className="text-7xl mb-4">{currentSign.emoji}</div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-2">
-            Гороскоп для {currentSign.name}
+            Гороскоп для {currentSign.genitive}
           </h1>
         </div>
 
