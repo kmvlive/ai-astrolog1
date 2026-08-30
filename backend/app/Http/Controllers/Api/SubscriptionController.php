@@ -9,27 +9,18 @@ use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
 {
-    /**
-     * Получить текущие настройки подписок
-     */
     public function getSettings(Request $request)
     {
         $user = $request->user();
 
-        // Каналы пользователя (уже Channel с pivot)
         $userChannels = $user->channels()->get();
         $userChannelSlugs = $userChannels->pluck('slug')->toArray();
-
-        // Типы гороскопов пользователя
         $userTypes = $user->horoscopeTypes()->pluck('slug')->toArray();
 
-        // Все доступные каналы
         $availableChannels = Channel::where('is_active', true)->get();
 
-        // Все доступные типы (периодические — для подписки)
-        $availableTypes = HoroscopeType::where('is_active', true)
-            ->whereIn('periodicity', ['daily', 'weekly', 'monthly', 'yearly'])
-            ->get();
+        // Только бесплатные тематические типы (периоды и дневной-платный исключены)
+        $availableTypes = HoroscopeType::where('is_active', true)->get();
 
         return response()->json([
             'channels' => $availableChannels,
@@ -44,9 +35,6 @@ class SubscriptionController extends Controller
         ]);
     }
 
-    /**
-     * Обновить каналы доставки
-     */
     public function updateChannels(Request $request)
     {
         $request->validate([
@@ -57,26 +45,21 @@ class SubscriptionController extends Controller
         $user = $request->user();
         $requestedSlugs = $request->channels;
 
-        // Все каналы в системе
         $allChannels = Channel::whereIn('slug', ['email', 'telegram', 'max'])->get()->keyBy('slug');
-
-        // Текущие channel_id пользователя
         $currentChannelIds = $user->channels()->pluck('channels.id')->toArray();
 
-        // Добавляем новые
         foreach ($requestedSlugs as $slug) {
             if (isset($allChannels[$slug])) {
                 $channel = $allChannels[$slug];
                 if (!in_array($channel->id, $currentChannelIds)) {
                     $user->channels()->attach($channel->id, [
                         'channel_identifier' => $slug === 'email' ? $user->email : null,
-                        'is_verified' => $slug === 'email', // Email считаем подтверждённым
+                        'is_verified' => $slug === 'email',
                     ]);
                 }
             }
         }
 
-        // Удаляем ненужные
         foreach ($currentChannelIds as $channelId) {
             $channel = $allChannels->firstWhere('id', $channelId);
             if ($channel && !in_array($channel->slug, $requestedSlugs)) {
@@ -84,20 +67,14 @@ class SubscriptionController extends Controller
             }
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Каналы доставки обновлены',
-        ]);
+        return response()->json(['success' => true, 'message' => 'Каналы доставки обновлены']);
     }
 
-    /**
-     * Обновить типы гороскопов
-     */
     public function updateTypes(Request $request)
     {
         $request->validate([
             'types' => 'required|array',
-            'types.*' => 'in:daily,weekly,monthly,yearly,love,finance',
+            'types.*' => 'in:general,love,career,finance,health',
         ]);
 
         $user = $request->user();
@@ -106,16 +83,13 @@ class SubscriptionController extends Controller
         $allTypes = HoroscopeType::whereIn('slug', $requestedSlugs)->pluck('id', 'slug');
         $currentTypeIds = $user->horoscopeTypes()->pluck('horoscope_types.id')->toArray();
 
-        // Добавляем новые
         foreach ($requestedSlugs as $slug) {
             if (isset($allTypes[$slug]) && !in_array($allTypes[$slug], $currentTypeIds)) {
                 $user->horoscopeTypes()->attach($allTypes[$slug]);
             }
         }
 
-        // Удаляем ненужные
         foreach ($currentTypeIds as $typeId) {
-            // Проверяем, остался ли этот тип в запрошенных
             $keep = false;
             foreach ($requestedSlugs as $slug) {
                 if (isset($allTypes[$slug]) && $allTypes[$slug] === $typeId) {
@@ -128,9 +102,6 @@ class SubscriptionController extends Controller
             }
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Типы гороскопов обновлены',
-        ]);
+        return response()->json(['success' => true, 'message' => 'Типы гороскопов обновлены']);
     }
 }

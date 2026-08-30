@@ -11,6 +11,9 @@ const CHANNEL_ICONS: Record<string, string> = {
 };
 
 const TYPE_ICONS: Record<string, string> = {
+  general: "🔮",
+  career: "💼",
+  health: "🌿",
   daily: "🌞",
   weekly: "📅",
   monthly: "🗓",
