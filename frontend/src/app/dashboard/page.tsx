@@ -6,6 +6,7 @@ import Link from "next/link";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 import SubscriptionSettings from "@/components/SubscriptionSettings";
+import PersonalHoroscopePromo from "@/components/PersonalHoroscopePromo";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
@@ -358,6 +359,7 @@ export default function DashboardPage() {
       </div>
         {/* ===== Секция управления подписками ===== */}
         <div className="max-w-2xl mx-auto mt-12">
+        <div className="max-w-2xl mx-auto mt-12"><PersonalHoroscopePromo /></div>
           <SubscriptionSettings />
         </div>
       <SiteFooter />

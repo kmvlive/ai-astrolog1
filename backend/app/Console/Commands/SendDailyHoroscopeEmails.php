@@ -10,7 +10,7 @@ use Illuminate\Console\Command;
 class SendDailyHoroscopeEmails extends Command
 {
     protected $signature = 'horoscope:send-daily-emails {--test= : Отправить тестовое письмо}';
-    protected $description = 'Рассылка утренних гороскопов — сводка со всеми выбранными типами';
+    protected $description = 'Рассылка утренних гороскопов — сводка с выбранными тематическими типами';
 
     private array $signsMeta = [
         'Ari' => ['Овен', '♈', 'oven'], 'Tau' => ['Телец', '♉', 'telec'],
@@ -22,12 +22,15 @@ class SendDailyHoroscopeEmails extends Command
     ];
 
     /**
-     * Маппинг slug типа подписки → type в таблице daily_horoscopes + эмодзи + русское имя
+     * Маппинг slug подписки → type в daily_horoscopes + эмодзи + русское имя
+     * Бесплатные тематические подписки
      */
     private array $typeMapping = [
-        'daily'    => ['general',   '🔮', 'Общий'],
+        'general'  => ['general',   '🔮', 'Общий'],
         'love'     => ['love',      '❤️',  'Любовь'],
+        'career'   => ['career',    '💼', 'Карьера'],
         'finance'  => ['financial', '💰', 'Финансы'],
+        'health'   => ['health',    '🌿', 'Здоровье'],
     ];
 
     public function handle(): int
@@ -37,7 +40,7 @@ class SendDailyHoroscopeEmails extends Command
         $dateRu = $date->locale('ru')->isoFormat('D MMMM YYYY');
         $service = app(UniSenderService::class);
 
-        // Ищем пользователей: активная подписка + email + хотя бы один тип
+        // Ищем: активная подписка + email + хотя бы один тематический тип
         $query = User::whereHas('subscription', function ($q) {
                 $q->where(function ($q2) {
                     $q2->where('status', 'active')
@@ -71,7 +74,7 @@ class SendDailyHoroscopeEmails extends Command
             $sign = $this->zodiacSign($bd->month, $bd->day);
             [$signName, $signEmoji, $signSlug] = $this->signsMeta[$sign];
 
-            // Собираем все выбранные пользователем типы, которые можем отправить
+            // Собираем выбранные типы пользователя, которые можем отправить
             $userTypeSlugs = $user->horoscopeTypes->pluck('slug')->toArray();
             $sections = [];
 
