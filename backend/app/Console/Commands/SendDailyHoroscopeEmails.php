@@ -10,13 +10,24 @@ use Illuminate\Console\Command;
 class SendDailyHoroscopeEmails extends Command
 {
     protected $signature = 'horoscope:send-daily-emails {--test= : Отправить тестовое письмо}';
-    protected $description = 'Рассылка утренних гороскопов по новой архитектуре подписок';
+    protected $description = 'Рассылка утренних гороскопов — сводка со всеми выбранными типами';
 
     private array $signsMeta = [
-        'Ari' => ['Овен', '♈'], 'Tau' => ['Телец', '♉'], 'Gem' => ['Близнецы', '♊'],
-        'Can' => ['Рак', '♋'], 'Leo' => ['Лев', '♌'], 'Vir' => ['Дева', '♍'],
-        'Lib' => ['Весы', '♎'], 'Sco' => ['Скорпион', '♏'], 'Sag' => ['Стрелец', '♐'],
-        'Cap' => ['Козерог', '♑'], 'Aqu' => ['Водолей', '♒'], 'Pis' => ['Рыбы', '♓'],
+        'Ari' => ['Овен', '♈', 'oven'], 'Tau' => ['Телец', '♉', 'telec'],
+        'Gem' => ['Близнецы', '♊', 'bliznecy'], 'Can' => ['Рак', '♋', 'rak'],
+        'Leo' => ['Лев', '♌', 'lev'], 'Vir' => ['Дева', '♍', 'deva'],
+        'Lib' => ['Весы', '♎', 'vesy'], 'Sco' => ['Скорпион', '♏', 'skorpion'],
+        'Sag' => ['Стрелец', '♐', 'strelec'], 'Cap' => ['Козерог', '♑', 'kozerog'],
+        'Aqu' => ['Водолей', '♒', 'vodoley'], 'Pis' => ['Рыбы', '♓', 'ryby'],
+    ];
+
+    /**
+     * Маппинг slug типа подписки → type в таблице daily_horoscopes + эмодзи + русское имя
+     */
+    private array $typeMapping = [
+        'daily'    => ['general',   '🔮', 'Общий'],
+        'love'     => ['love',      '❤️',  'Любовь'],
+        'finance'  => ['financial', '💰', 'Финансы'],
     ];
 
     public function handle(): int
@@ -26,7 +37,7 @@ class SendDailyHoroscopeEmails extends Command
         $dateRu = $date->locale('ru')->isoFormat('D MMMM YYYY');
         $service = app(UniSenderService::class);
 
-        // Ищем пользователей с активной подпиской + канал email + тип daily
+        // Ищем пользователей: активная подписка + email + хотя бы один тип
         $query = User::whereHas('subscription', function ($q) {
                 $q->where(function ($q2) {
                     $q2->where('status', 'active')
@@ -39,10 +50,8 @@ class SendDailyHoroscopeEmails extends Command
             ->whereHas('channels', function ($q) {
                 $q->where('slug', 'email');
             })
-            ->whereHas('horoscopeTypes', function ($q) {
-                $q->where('slug', 'daily');
-            })
-            ->with('profile');
+            ->whereHas('horoscopeTypes')
+            ->with(['profile', 'horoscopeTypes']);
 
         if ($testEmail) {
             $query->where('email', $testEmail);
@@ -60,25 +69,65 @@ class SendDailyHoroscopeEmails extends Command
 
             $bd = \Carbon\Carbon::parse($profile->birth_date);
             $sign = $this->zodiacSign($bd->month, $bd->day);
-            [$signName, $signEmoji] = $this->signsMeta[$sign];
+            [$signName, $signEmoji, $signSlug] = $this->signsMeta[$sign];
 
-            $horoscope = DailyHoroscope::where('date', $date)
-                ->where('zodiac_sign', $sign)
-                ->where('type', 'general')
-                ->where('period', 'today')
-                ->first();
+            // Собираем все выбранные пользователем типы, которые можем отправить
+            $userTypeSlugs = $user->horoscopeTypes->pluck('slug')->toArray();
+            $sections = [];
 
-            if (!$horoscope) {
-                $this->warn("{$user->email}: нет гороскопа для {$signName}");
+            foreach ($userTypeSlugs as $slug) {
+                if (!isset($this->typeMapping[$slug])) continue;
+
+                [$type, $emoji, $name] = $this->typeMapping[$slug];
+
+                $horoscope = DailyHoroscope::where('date', $date)
+                    ->where('zodiac_sign', $sign)
+                    ->where('type', $type)
+                    ->where('period', 'today')
+                    ->first();
+
+                if (!$horoscope) {
+                    // Ленивая генерация
+                    $content = app(\App\Services\AiService::class)
+                        ->generateDailyHoroscope($sign, $signName, $date, $type, 'today');
+                    if (!$content) continue;
+                    $horoscope = DailyHoroscope::create([
+                        'date' => $date,
+                        'zodiac_sign' => $sign,
+                        'type' => $type,
+                        'period' => 'today',
+                        'content' => $content,
+                    ]);
+                }
+
+                $sections[] = [
+                    'emoji' => $emoji,
+                    'name' => $name,
+                    'truncated' => $service->truncateHalf($horoscope->content),
+                    'url' => "https://my.neiro-astro.ru/horoscopes/{$signSlug}?type={$type}",
+                    'signSlug' => $signSlug,
+                ];
+            }
+
+            if (empty($sections)) {
+                $this->warn("{$user->email}: нет гороскопов для отправки");
                 $skipped++;
                 continue;
             }
 
-            [$html, $text] = $service->buildHoroscopeEmail($user->name, $signName, $signEmoji, $horoscope->content, $dateRu);
+            [$html, $text] = $service->buildDailyDigestEmail(
+                $user->name,
+                $signName,
+                $signEmoji,
+                $dateRu,
+                $sections
+            );
+
             $ok = $service->sendEmail($user->email, "✨ Ваш гороскоп на {$dateRu}", $html, $text);
 
             if ($ok) {
-                $this->info("{$user->email}: отправлено ({$signName})");
+                $typesStr = implode(', ', array_column($sections, 'name'));
+                $this->info("{$user->email}: отправлено ({$signName}: {$typesStr})");
                 $sent++;
             } else {
                 $this->error("{$user->email}: ошибка отправки");

@@ -60,12 +60,61 @@ class UniSenderService
         }
     }
 
-    public function buildHoroscopeEmail(string $name, string $signName, string $signEmoji, string $content, string $dateRu): array
+    /**
+     * Обрезать текст примерно пополам, не разрывая предложения
+     */
+    public function truncateHalf(string $content): string
     {
-        $paragraphs = implode('', array_map(
-            fn($p) => '<p style="margin:0 0 16px;line-height:1.7;color:#e2e8f0;">' . htmlspecialchars(trim($p)) . '</p>',
-            preg_split('/\n\n+/', $content)
-        ));
+        // Разбиваем на предложения
+        $sentences = preg_split('/(?<=[.!?])\s+(?=[А-ЯЁA-Z])/u', $content);
+        $sentences = array_filter($sentences, fn($s) => trim($s) !== '');
+        $sentences = array_values($sentences);
+
+        if (count($sentences) <= 1) {
+            // Если одно предложение — берём половину символов
+            $halfLen = (int) (mb_strlen($content) / 2);
+            $cutPos = mb_strpos($content, ' ', $halfLen);
+            return $cutPos ? mb_substr($content, 0, $cutPos) . '...' : $content;
+        }
+
+        // Берём первые ~50% предложений (минимум 1)
+        $halfCount = max(1, (int) ceil(count($sentences) / 2));
+        $truncated = implode(' ', array_slice($sentences, 0, $halfCount));
+        return rtrim($truncated, '.!? ') . '...';
+    }
+
+    /**
+     * Построить письмо со сводкой — несколько типов с обрезкой и ссылками
+     * @param array $sections Массив ['emoji', 'name', 'truncated', 'url', 'signSlug']
+     */
+    public function buildDailyDigestEmail(
+        string $name,
+        string $signName,
+        string $signEmoji,
+        string $dateRu,
+        array $sections
+    ): array {
+        $sectionsHtml = '';
+        $sectionsText = '';
+
+        foreach ($sections as $s) {
+            $sectionsHtml .= <<<HTML
+<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+<tr><td style="padding:16px 20px;background:#1e293b;border-radius:12px;border-left:4px solid #7c3aed;">
+  <div style="font-size:18px;font-weight:bold;color:#c4b5fd;margin-bottom:8px;">
+    {$s['emoji']} {$s['name']}
+  </div>
+  <p style="margin:0 0 16px;line-height:1.7;color:#cbd5e1;">
+    {$s['truncated']}
+  </p>
+  <a href="{$s['url']}" style="display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:bold;">
+    Читать полностью →
+  </a>
+</td></tr>
+</table>
+HTML;
+            $sectionsText .= "\n{$s['emoji']} {$s['name']}\n{$s['truncated']}\nЧитать полностью: {$s['url']}\n";
+        }
 
         $html = <<<HTML
 <!DOCTYPE html>
@@ -75,26 +124,39 @@ class UniSenderService
 <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#1e293b;border-radius:16px;overflow:hidden;">
 <tr><td style="padding:32px;text-align:center;background:linear-gradient(135deg,#4c1d95,#312e81);">
   <div style="font-size:48px;">{$signEmoji}</div>
-  <h1 style="margin:8px 0 0;color:#fff;font-size:24px;">Гороскоп для {$signName}</h1>
-  <p style="margin:4px 0 0;color:#c4b5fd;">{$dateRu}</p>
+  <h1 style="margin:8px 0 0;color:#fff;font-size:24px;">Ваш гороскоп на {$dateRu}</h1>
+  <p style="margin:4px 0 0;color:#c4b5fd;">{$signName}</p>
 </td></tr>
 <tr><td style="padding:32px;">
-  <p style="margin:0 0 16px;color:#94a3b8;">Здравствуйте, {$name}!</p>
-  {$paragraphs}
-  <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
-  <tr><td align="center">
-    <a href="https://my.neiro-astro.ru/dashboard" style="display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;padding:14px 32px;border-radius:12px;font-weight:bold;">
-      Получить персональный гороскоп
+  <p style="margin:0 0 20px;color:#94a3b8;">Здравствуйте, {$name}!</p>
+  {$sectionsHtml}
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;background:linear-gradient(135deg,#7c3aed,#4c1d95);border-radius:12px;overflow:hidden;">
+  <tr><td style="padding:24px;text-align:center;">
+    <div style="font-size:24px;margin-bottom:8px;">💎</div>
+    <div style="color:#fff;font-size:16px;font-weight:bold;margin-bottom:12px;">
+      Хотите прогноз, составленный лично для вас?
+    </div>
+    <p style="color:#ddd6fe;font-size:13px;line-height:1.6;margin:0 0 16px;">
+      По дате, времени и месту рождения — точный расчёт вашей натальной карты.
+    </p>
+    <a href="https://my.neiro-astro.ru/dashboard" style="display:inline-block;background:#fff;color:#7c3aed;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:bold;">
+      Заказать индивидуальный гороскоп
     </a>
   </td></tr>
   </table>
-  <p style="margin-top:16px;text-align:center;color:#64748b;font-size:13px;">
-    Общий прогноз учитывает только знак зодиака.<br>Персональный строится на вашей натальной карте — точно и индивидуально.
+
+  <p style="margin-top:24px;text-align:center;color:#64748b;font-size:12px;line-height:1.6;">
+    Это общий прогноз для знака {$signName}.<br>
+    <a href="https://my.neiro-astro.ru/dashboard" style="color:#a78bfa;text-decoration:underline;">
+      Построить персональный гороскоп →
+    </a>
   </p>
 </td></tr>
 <tr><td style="padding:16px 32px;text-align:center;background:#0f172a;">
   <p style="margin:0;color:#475569;font-size:12px;">
-    AI Астролог · my.neiro-astro.ru
+    AI Астролог · my.neiro-astro.ru<br>
+    <a href="https://my.neiro-astro.ru/dashboard" style="color:#64748b;">Настройки рассылки</a>
   </p>
 </td></tr>
 </table>
@@ -103,8 +165,8 @@ class UniSenderService
 </body></html>
 HTML;
 
-        $text = "Гороскоп для {$signName} на {$dateRu}\n\n{$name}, здравствуйте!\n\n{$content}\n\n"
-            . "Получить персональный гороскоп: https://my.neiro-astro.ru/dashboard";
+        $text = "Ваш гороскоп на {$dateRu}\n{$signName}\n\nЗдравствуйте, {$name}!\n{$sectionsText}\n\n"
+            . "Заказать индивидуальный гороскоп: https://my.neiro-astro.ru/dashboard";
 
         return [$html, $text];
     }

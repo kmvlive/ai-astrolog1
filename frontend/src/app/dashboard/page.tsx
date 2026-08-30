@@ -348,14 +348,11 @@ export default function DashboardPage() {
 
         <div className="bg-gradient-to-r from-violet-900/20 to-indigo-900/20 border border-violet-500/20 rounded-2xl p-6 sm:p-8">
           <h2 className="text-xl font-bold mb-2">🎁 Пробный период</h2>
-          <p className="text-slate-300 mb-4">
-            У вас осталось <span className="text-violet-400 font-bold">7 дней</span> бесплатного доступа ко всем функциям.
-          </p>
           <Link
             href="/pricing"
             className="inline-block bg-violet-600 hover:bg-violet-500 rounded-xl px-6 py-3 font-semibold transition"
           >
-            Оформить подписку
+            Оформить подписку на индивидуальный гороскоп на неделю
           </Link>
         </div>
       </div>
