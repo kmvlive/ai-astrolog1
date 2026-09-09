@@ -342,6 +342,43 @@ export default function DashboardPage() {
             )}
             {settingsSaved && <span className="ml-3 text-green-400 text-sm">✓ Сохранено</span>}
           </div>
+
+          {/* Какие календари получать */}
+          {calendars.length > 0 && (
+            <section className="mt-8 p-6 rounded-2xl bg-slate-900/60 border border-white/10">
+              <h3 className="text-xl font-bold mb-1">📅 Какие календари получать?</h3>
+              <p className="text-sm text-slate-400 mb-5">Выберите календари, которые будут приходить вам утром на выбранных каналах.</p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {calendars.map((c) => (
+                  <label key={c.id} className={`flex items-start gap-3 p-4 rounded-xl cursor-pointer border transition ${selCalendars.includes(c.slug) ? "bg-violet-600/20 border-violet-500/40" : "bg-slate-800/50 border-white/5 hover:border-white/20"}`}>
+                    <input
+                      type="checkbox"
+                      checked={selCalendars.includes(c.slug)}
+                      onChange={() => toggleCalendar(c.slug)}
+                      className="mt-1 w-5 h-5 accent-violet-500"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-2xl">{c.emoji}</span>
+                        <span className="font-semibold">{c.name}</span>
+                      </div>
+                      <p className="text-xs text-slate-400">{c.description}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+              <div className="flex items-center gap-3 mt-5">
+                <button
+                  onClick={saveCalendars}
+                  disabled={calendarsSaving}
+                  className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 rounded-xl px-6 py-2.5 font-semibold transition"
+                >
+                  {calendarsSaving ? "Сохраняем..." : "Сохранить"}
+                </button>
+                {calendarsSaved && <span className="text-emerald-400 text-sm">✓ Сохранено</span>}
+              </div>
+            </section>
+          )}
         </div>
 
         {/* Блок Telegram */}
@@ -551,42 +588,6 @@ export default function DashboardPage() {
           )}
         </div>
         </section>
-          {/* Какие календари получать */}
-          {calendars.length > 0 && (
-            <section className="mt-8 p-6 rounded-2xl bg-slate-900/60 border border-white/10">
-              <h3 className="text-xl font-bold mb-1">📅 Какие календари получать?</h3>
-              <p className="text-sm text-slate-400 mb-5">Выберите календари, которые будут приходить вам утром на выбранных каналах.</p>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {calendars.map((c) => (
-                  <label key={c.id} className={`flex items-start gap-3 p-4 rounded-xl cursor-pointer border transition ${selCalendars.includes(c.slug) ? "bg-violet-600/20 border-violet-500/40" : "bg-slate-800/50 border-white/5 hover:border-white/20"}`}>
-                    <input
-                      type="checkbox"
-                      checked={selCalendars.includes(c.slug)}
-                      onChange={() => toggleCalendar(c.slug)}
-                      className="mt-1 w-5 h-5 accent-violet-500"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-2xl">{c.emoji}</span>
-                        <span className="font-semibold">{c.name}</span>
-                      </div>
-                      <p className="text-xs text-slate-400">{c.description}</p>
-                    </div>
-                  </label>
-                ))}
-              </div>
-              <div className="flex items-center gap-3 mt-5">
-                <button
-                  onClick={saveCalendars}
-                  disabled={calendarsSaving}
-                  className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 rounded-xl px-6 py-2.5 font-semibold transition"
-                >
-                  {calendarsSaving ? "Сохраняем..." : "Сохранить"}
-                </button>
-                {calendarsSaved && <span className="text-emerald-400 text-sm">✓ Сохранено</span>}
-              </div>
-            </section>
-          )}
           
 
 </div>
