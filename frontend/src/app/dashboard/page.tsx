@@ -551,7 +551,6 @@ export default function DashboardPage() {
           )}
         </div>
         </section>
-
           {/* Какие календари получать */}
           {calendars.length > 0 && (
             <section className="mt-8 p-6 rounded-2xl bg-slate-900/60 border border-white/10">
@@ -588,7 +587,9 @@ export default function DashboardPage() {
               </div>
             </section>
           )}
-          </div>
+          
+
+</div>
           <SiteFooter />
         </main>
       );
