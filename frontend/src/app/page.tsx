@@ -245,26 +245,6 @@ export default function HomePage() {
             {/* ФАЗА ЛУНЫ */}
       <div className={isLoggedIn ? "pt-6 sm:pt-10" : ""}>
         
-      <section className="max-w-6xl mx-auto px-4 pb-16">
-        <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-900/20 via-slate-900/40 to-violet-900/20 p-8 md:p-10">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
-            <div>
-              <div className="text-4xl mb-3">📅</div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">Календари на каждый день</h2>
-              <p className="text-slate-400 max-w-xl">Праздники, именины, лунные дни, православные и мусульманские даты, посадка и стрижки — всё посчитано для вас.</p>
-            </div>
-            <Link href="/calendars" className="shrink-0 bg-violet-600 hover:bg-violet-500 rounded-xl px-6 py-3 font-semibold transition shadow-lg shadow-violet-600/30">Все календари →</Link>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-            {CALENDARS.map((c) => (
-              <Link key={c.slug} href={`/calendars/${c.slug}`} className="group p-4 rounded-2xl bg-slate-900/60 border border-white/5 hover:border-violet-500/40 hover:bg-slate-900 transition text-center">
-                <div className="text-3xl mb-2 group-hover:scale-110 transition-transform">{c.emoji}</div>
-                <div className="text-xs text-slate-300 leading-tight">{{ holidays: "Праздники", orthodox: "Православный", muslim: "Мусульманский", lunar: "Лунный", gardener: "Садовода", haircut: "Стрижки", names: "Именины" }[c.slug] ?? c.name}</div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <MoonWidget />
       </div>
@@ -391,6 +371,27 @@ export default function HomePage() {
       </section>
 
       {/* БЛОГ */}
+      <section className="max-w-6xl mx-auto px-4 pb-16">
+        <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-900/20 via-slate-900/40 to-violet-900/20 p-8 md:p-10">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+            <div>
+              <div className="text-4xl mb-3">📅</div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">Календари на каждый день</h2>
+              <p className="text-slate-400 max-w-xl">Праздники, именины, лунные дни, православные и мусульманские даты, посадка и стрижки — всё посчитано для вас.</p>
+            </div>
+            <Link href="/calendars" className="shrink-0 bg-violet-600 hover:bg-violet-500 rounded-xl px-6 py-3 font-semibold transition shadow-lg shadow-violet-600/30">Все календари →</Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+            {CALENDARS.map((c) => (
+              <Link key={c.slug} href={`/calendars/${c.slug}`} className="group p-4 rounded-2xl bg-slate-900/60 border border-white/5 hover:border-violet-500/40 hover:bg-slate-900 transition text-center">
+                <div className="text-3xl mb-2 group-hover:scale-110 transition-transform">{c.emoji}</div>
+                <div className="text-xs text-slate-300 leading-tight">{{ holidays: "Праздники", orthodox: "Православный", muslim: "Мусульманский", lunar: "Лунный", gardener: "Садовода", haircut: "Стрижки", names: "Именины" }[c.slug] ?? c.name}</div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="bg-slate-900/50 py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-10">
