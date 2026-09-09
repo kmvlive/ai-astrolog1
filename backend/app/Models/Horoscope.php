@@ -10,7 +10,8 @@ class Horoscope extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'type', 'content', 'natal_data'];
+    protected $fillable = ['user_id', 'type',
+        'is_personal', 'content', 'natal_data'];
 
     protected $casts = [
         'natal_data' => 'array',

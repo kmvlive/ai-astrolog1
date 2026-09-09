@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import ShareButtons from "@/components/ShareButtons";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
+import ManageSubscription from "../../../components/ManageSubscription";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
@@ -114,8 +118,9 @@ export default function SignHoroscopePage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white py-12 px-4">
-      <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-slate-950 text-white">
+      <SiteHeader />
+      <div className="max-w-3xl mx-auto px-4 py-12">
         <Link href="/horoscopes" className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition">
           ← Все знаки зодиака
         </Link>
@@ -179,6 +184,8 @@ export default function SignHoroscopePage() {
               </div>
             </article>
 
+            <ShareButtons title={`${currentSign.emoji} Гороскоп для ${currentSign.name} — AI Астролог`} />
+
             {/* 📬 БЛОК: ЕЖЕДНЕВНАЯ РАССЫЛКА — главная точка входа */}
             <div className="bg-gradient-to-br from-sky-900/30 to-indigo-900/30 border border-sky-500/30 rounded-3xl p-8 mb-6">
               <div className="flex items-center gap-3 mb-4">
@@ -236,6 +243,9 @@ export default function SignHoroscopePage() {
               )}
             </div>
 
+            {/* ⚙️ БЛОК: УПРАВЛЕНИЕ РАССЫЛКОЙ — для существующих подписчиков */}
+            <ManageSubscription />
+
             {/* ✨ БЛОК: ПЕРСОНАЛЬНЫЙ ГОРОСКОП — апсейл */}
             <div className="bg-gradient-to-br from-violet-900/30 to-indigo-900/30 border border-violet-500/30 rounded-3xl p-8 text-center">
               <div className="text-5xl mb-4">✨</div>
@@ -279,6 +289,7 @@ export default function SignHoroscopePage() {
           </>
         )}
       </div>
+          <SiteFooter />
     </main>
   );
 }

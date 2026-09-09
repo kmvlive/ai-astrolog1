@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Channel;
+use App\Models\Subscription;
+use App\Models\HoroscopeType;
 use App\Services\UniSenderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -11,6 +14,12 @@ use Illuminate\Support\Facades\Hash;
 
 class SubscribeController extends Controller
 {
+    private array $slugToSign = [
+        'oven' => 'Ari', 'telec' => 'Tau', 'bliznecy' => 'Gem', 'rak' => 'Can',
+        'lev' => 'Leo', 'deva' => 'Vir', 'vesy' => 'Lib', 'skorpion' => 'Sco',
+        'strelec' => 'Sag', 'kozerog' => 'Cap', 'vodoley' => 'Aqu', 'ryby' => 'Pis',
+    ];
+
     public function subscribe(Request $request)
     {
         $request->validate([
@@ -19,14 +28,17 @@ class SubscribeController extends Controller
         ]);
 
         $email = trim(strtolower($request->email));
+        $signCode = $this->slugToSign[$request->sign] ?? null;
 
-        // Ищем существующего пользователя
         $user = User::where('email', $email)->first();
 
         if ($user) {
-            // Обновляем подписку
-            $user->update(['email_opt_in' => true]);
-            
+            $user->update([
+                'email_opt_in' => true,
+                'email_verified_at' => $user->email_verified_at ?? now(),
+            ]);
+            $this->ensureSubscriptionSetup($user, $email, $signCode);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Отлично! Завтра в 8:00 придёт первый гороскоп.',
@@ -34,25 +46,26 @@ class SubscribeController extends Controller
             ]);
         }
 
-        // Создаём нового пользователя без пароля (только email)
-        // Генерируем случайный токен — пользователь сможет войти через "magic link" или установить пароль
         $user = User::create([
             'name' => 'Подписчик',
             'email' => $email,
-            'password' => Hash::make(Str::random(32)), // пароль, который никто не знает
+            'password' => Hash::make(Str::random(32)),
             'email_opt_in' => true,
-            'email_verified_at' => now(), // считаем email подтверждённым (прислал сам)
         ]);
+        
+        // Явно устанавливаем verified (через update для надёжности)
+        $user->email_verified_at = now();
+        $user->save();
 
-        // Создаём пустой профиль
         $user->profile()->create([
             'timezone' => 'Europe/Moscow',
+            'zodiac_sign' => $signCode,
         ]);
 
-        // Генерируем токен для "magic link" (опционально — для будущего использования)
+        $this->ensureSubscriptionSetup($user, $email, $signCode);
+
         $magicToken = $user->createToken('magic-login')->plainTextToken;
 
-        // Отправляем welcome письмо
         $this->sendWelcomeEmail($user, $request->sign);
 
         return response()->json([
@@ -60,6 +73,38 @@ class SubscribeController extends Controller
             'message' => 'Отлично! Завтра в 8:00 придёт первый гороскоп на ' . $email . '.',
             'existing' => false,
         ]);
+    }
+
+    /**
+     * Гарантирует: подписка + email-канал + тип general
+     */
+    private function ensureSubscriptionSetup(User $user, string $email, ?string $signCode): void
+    {
+        if (!$user->subscription) {
+            Subscription::create([
+                'user_id' => $user->id,
+                'status' => 'active',
+                'plan_type' => 'free',
+            ]);
+        }
+
+        $emailChannel = Channel::where('slug', 'email')->first();
+        if ($emailChannel && !$user->channels()->where('channels.id', $emailChannel->id)->exists()) {
+            $user->channels()->attach($emailChannel->id, [
+                'channel_identifier' => $email,
+                'is_verified' => true,
+            ]);
+        }
+
+        $generalType = HoroscopeType::where('slug', 'general')->first();
+        if ($generalType && !$user->horoscopeTypes()->where('horoscope_types.id', $generalType->id)->exists()) {
+            $user->horoscopeTypes()->attach($generalType->id);
+        }
+
+        // Дописываем знак зодиака, если его не было
+        if ($signCode && $user->profile && !$user->profile->zodiac_sign) {
+            $user->profile->update(['zodiac_sign' => $signCode]);
+        }
     }
 
     private function sendWelcomeEmail(User $user, ?string $signSlug)
@@ -85,11 +130,11 @@ class SubscribeController extends Controller
 <tr><td style="padding:32px;color:#e2e8f0;line-height:1.7;">
   <p>Здравствуйте!</p>
   <p>Вы подписались на ежедневный гороскоп для {$signName}. Каждое утро в 8:00 вы будете получать персональное предсказание на этот день.</p>
-  <p>А пока — можете построить <strong>полный персональный гороскоп</strong> на основе вашей натальной карты. Это бесплатно 7 дней.</p>
+  <p>Хотите управлять подпиской (типы гороскопов, время, отписка)? Войдите в один клик:</p>
   <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
   <tr><td align="center">
     <a href="https://my.neiro-astro.ru/dashboard" style="display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;padding:14px 32px;border-radius:12px;font-weight:bold;">
-      Построить персональный гороскоп
+      ⚙️ Управлять подпиской
     </a>
   </td></tr>
   </table>
@@ -106,7 +151,7 @@ class SubscribeController extends Controller
 </body></html>
 HTML;
 
-        $text = "Здравствуйте!\n\nВы подписались на ежедневный гороскоп. Каждое утро в 8:00 — новое предсказание.\n\nПостроить персональный гороскоп: https://my.neiro-astro.ru/dashboard";
+        $text = "Здравствуйте!\n\nВы подписались на ежедневный гороскоп. Каждое утро в 8:00 — новое предсказание.\n\nУправление подпиской: https://my.neiro-astro.ru/dashboard";
 
         app(UniSenderService::class)->sendEmail(
             $user->email,

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
+use App\Services\EmailVerificationService;
 
 class AuthController extends Controller
 {
@@ -22,7 +23,7 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::defaults()],
-            'birth_date' => ['nullable', 'date'],
+            'birth_date' => ['required', 'date'],
             'birth_time' => ['nullable', 'date_format:H:i'],
             'birth_city' => ['nullable', 'string', 'max:255'],
             'horoscope_types' => ['nullable', 'array'],
@@ -34,6 +35,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'password_set_at' => now(),
         ]);
 
         // Создаём профиль с данными рождения
@@ -47,8 +49,10 @@ class AuthController extends Controller
         if ($request->filled('birth_time')) {
             $profileData['birth_time'] = $request->birth_time;
         }
-        if ($request->filled('birth_city')) {
-            $profileData['city'] = $request->birth_city;
+        $birthCity = trim((string)($request->birth_city ?? ''));
+        // Нужны минимум 3 буквы — отсекаем "...", "---", пробелы
+        if (mb_strlen($birthCity) >= 3 && preg_match('/[а-яёa-z]/ui', $birthCity)) {
+            $profileData['city'] = $birthCity;
             // Геокодинг координат через Nominatim (OpenStreetMap, бесплатно)
             $coords = $this->geocodeCity($request->birth_city);
             if ($coords) {
@@ -74,6 +78,9 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
+        // Отправляем письмо подтверждения (double opt-in)
+        app(EmailVerificationService::class)->sendVerification($user);
+
         return response()->json([
             'user' => $user->load('profile'),
             'token' => $token,
@@ -83,6 +90,21 @@ class AuthController extends Controller
     /**
      * Login user.
      */
+    public function setPassword(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = $request->user();
+        $user->update([
+            'password' => Hash::make($request->password),
+            'password_set_at' => now(),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Пароль установлен! Теперь вы можете входить с ним.']);
+    }
+
     public function login(Request $request)
     {
         $request->validate([
@@ -98,6 +120,11 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->firstOrFail();
         $token = $user->createToken('auth-token')->plainTextToken;
+
+        // Отправляем письмо подтверждения только если email ещё не подтверждён
+        if (!$user->email_verified_at) {
+            app(EmailVerificationService::class)->sendVerification($user);
+        }
 
         return response()->json([
             'user' => $user->load('profile'),
@@ -151,5 +178,21 @@ class AuthController extends Controller
         }
 
         return null;
+    }
+
+    private function currentSub($user): ?array
+    {
+        $sub = \App\Models\Subscription::where('user_id', $user->id)
+            ->where('status', 'active')
+            ->orderByDesc('expires_at')
+            ->first();
+        if (!$sub || !$sub->expires_at || $sub->expires_at->isPast()) {
+            return null;
+        }
+        return [
+            'plan_slug' => $sub->plan_type,
+            'expires_at' => $sub->expires_at->toIso8601String(),
+            'days_left' => (int) now()->diffInDays($sub->expires_at, false),
+        ];
     }
 }

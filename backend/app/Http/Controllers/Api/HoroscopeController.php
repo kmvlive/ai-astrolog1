@@ -100,6 +100,7 @@ class HoroscopeController extends Controller
         $horoscope = Horoscope::create([
             'user_id' => $user->id,
             'type' => $type,
+            'is_personal' => true,
             'content' => $content,
             'natal_data' => $natal,
         ]);

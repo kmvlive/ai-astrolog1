@@ -11,6 +11,7 @@ export default function SiteFooter() {
         </div>
         <div className="flex gap-6">
           <Link href="/horoscopes" className="hover:text-white transition">Гороскопы</Link>
+          <Link className="hover:text-white transition" href="/calendars">Календари</Link>
           <Link href="/dashboard" className="hover:text-white transition">Личный кабинет</Link>
           <Link href="/" className="hover:text-white transition">Главная</Link>
         </div>

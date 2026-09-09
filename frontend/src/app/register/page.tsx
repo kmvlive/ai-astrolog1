@@ -1,5 +1,8 @@
 "use client";
 
+import DateInput from "@/components/DateInput";
+import TimeInput from "@/components/TimeInput";
+
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -39,6 +42,14 @@ export default function RegisterPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+      // Проверка города: если заполнен — минимум 3 буквы
+      const cityValue = (birthCity || "").trim();
+      if (cityValue && cityValue.length < 3) {
+        setError("Город должен содержать минимум 3 буквы");
+        setLoading(false);
+        return;
+      }
+
     setLoading(true);
 
     if (!name.trim()) { setError("Укажите имя"); setLoading(false); return; }
@@ -62,7 +73,7 @@ export default function RegisterPage() {
           password_confirmation: password,
           birth_date: birthDate,
           birth_time: birthTime,
-          birth_city: birthCity,
+          birth_city: birthCity.trim() || undefined,
           horoscope_types: selected,
           frequency,
         }),
@@ -139,26 +150,14 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="sm:col-span-3">
+            <div className="text-sm font-medium text-slate-300 mb-1">Дата рождения *</div>
+            <DateInput value={birthDate} onChange={setBirthDate} />
+          </div>
+          <div className="sm:col-span-3 grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">Дата рождения *</label>
-              <input
-                type="date"
-                value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
-                className="w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-3 outline-none focus:border-violet-500"
-                disabled={loading}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">Время (необязательно)</label>
-              <input
-                type="time"
-                value={birthTime}
-                onChange={(e) => setBirthTime(e.target.value)}
-                className="w-full rounded-xl bg-slate-800 border border-white/10 px-4 py-3 outline-none focus:border-violet-500"
-                disabled={loading}
-              />
+              <div className="text-sm font-medium text-slate-300 mb-1">Время рождения (необязательно)</div>
+              <TimeInput value={birthTime} onChange={setBirthTime} />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1">Город (необязательно)</label>

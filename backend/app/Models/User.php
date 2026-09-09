@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
@@ -21,9 +23,14 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'free_personal_enabled',
         'name',
         'email',
         'password',
+        'is_admin',
+        'email_verification_token',
+        'email_verification_sent_at',
+        'email_opt_in',
     ];
 
     /**
@@ -33,6 +40,10 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'is_admin',
+        'email_verification_token',
+        'email_verification_sent_at',
+        'email_opt_in',
         'remember_token',
     ];
 
@@ -47,6 +58,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function calendars(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Calendar::class, 'user_calendar');
     }
 
     public function horoscopeTypes(): BelongsToMany
@@ -100,5 +116,10 @@ class User extends Authenticatable
         return $this->subscription->status === 'trial' 
             && $this->subscription->trial_ends_at 
             && $this->subscription->trial_ends_at->isFuture();
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return (bool) $this->is_admin;
     }
 }

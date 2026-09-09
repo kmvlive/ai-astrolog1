@@ -11,6 +11,10 @@ class DeliveryLog extends Model
     use HasFactory;
 
     protected $fillable = [
+        'event_type',
+        'recipient_email',
+        'subject',
+        'metadata',
         'user_id',
         'channel_id',
         'generated_horoscope_id',
@@ -20,6 +24,8 @@ class DeliveryLog extends Model
     ];
 
     protected $casts = [
+        'metadata' => 'array',
+        'sent_at' => 'datetime',
         'sent_at' => 'datetime',
     ];
 

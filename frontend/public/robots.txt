@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /payment/
+Disallow: /admin
+Disallow: /api/
+Disallow: /share/
+
+Sitemap: https://my.neiro-astro.ru/sitemap.xml
+Sitemap: https://my.neiro-astro.ru/sitemap-dreams.xml

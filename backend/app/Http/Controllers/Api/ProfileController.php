@@ -13,29 +13,39 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $request->validate([
+            'name' => ['nullable', 'string', 'max:255'],
             'birth_date' => ['required', 'date'],
             'birth_time' => ['required', 'date_format:H:i'],
-            'birth_city' => ['required', 'string', 'max:255'],
+            'birth_city' => ['nullable', 'string', 'max:255'],
         ]);
 
         $user = $request->user();
+
+        if ($request->filled('name')) {
+            $user->update(['name' => $request->name]);
+        }
+
         $profile = $user->profile ?? $user->profile()->create(['timezone' => 'Europe/Moscow']);
 
+        $birthCity = trim((string)($request->birth_city ?? ''));
+        $hasCity = mb_strlen($birthCity) >= 3 && preg_match('/[а-яёa-z]/ui', $birthCity);
         $profileData = [
             'birth_date' => $request->birth_date,
             'birth_time' => $request->birth_time,
-            'city' => $request->birth_city,
+            'city' => $hasCity ? $birthCity : null,
         ];
 
-        // Геокодинг координат
-        $coords = $this->geocodeCity($request->birth_city);
-        if ($coords) {
-            $profileData['latitude'] = $coords['lat'];
-            $profileData['longitude'] = $coords['lon'];
-        } else {
-            return response()->json([
-                'error' => 'Не удалось найти город. Попробуйте указать более точно (например, "Москва, Россия")'
-            ], 400);
+        // Геокодинг координат — только если город указан
+        if ($hasCity) {
+            $coords = $this->geocodeCity($request->birth_city);
+            if ($coords) {
+                $profileData['latitude'] = $coords['lat'];
+                $profileData['longitude'] = $coords['lon'];
+            } else {
+                return response()->json([
+                    'error' => 'Не удалось найти город. Попробуйте указать более точно (например, "Москва, Россия")'
+                ], 400);
+            }
         }
 
         $profile->update($profileData);

@@ -1,0 +1,137 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
+import AdBlock from "@/components/AdBlock";
+import NameSearch from "@/components/NameSearch";
+import { CALENDARS, getDayInfo, toKey } from "@/lib/calendars";
+
+export function generateStaticParams() {
+  return CALENDARS.map((c) => ({ slug: c.slug }));
+}
+
+export async function generateMetadata({ params }: any) {
+  const p = await Promise.resolve(params);
+  const c = CALENDARS.find((x) => x.slug === p.slug);
+  if (!c) return { title: "Календарь" };
+  return { title: `${c.emoji} ${c.name} — на каждый день | AI Астролог`, description: c.short };
+}
+
+const MONTHS = ["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"];
+const WD = ["пн","вт","ср","чт","пт","сб","вс"];
+
+export default async function Page(props: any) {
+  const params = await Promise.resolve(props.params);
+  const sp = await Promise.resolve(props.searchParams);
+  const c = CALENDARS.find((x) => x.slug === params.slug);
+  if (!c) notFound();
+
+  const now = new Date();
+  let y = now.getFullYear(), m = now.getMonth();
+  if (typeof sp.m === "string") {
+    const mm = sp.m.match(/^(\d{4})-(\d{2})$/);
+    if (mm) { y = Number(mm[1]); m = Number(mm[2]) - 1; }
+  }
+  const prev = m === 0 ? `${y - 1}-12` : `${y}-${String(m).padStart(2, "0")}`;
+  const next = m === 11 ? `${y + 1}-01` : `${y}-${String(m + 1).padStart(2, "0")}`;
+  const curKey = `${y}-${String(m + 1).padStart(2, "0")}`;
+
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const offset = (new Date(y, m, 1).getDay() + 6) % 7;
+  const cells: (number | null)[] = [...Array(offset).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => i + 1)];
+
+  const days = Array.from({ length: daysInMonth }, (_, i) => {
+    const d = new Date(y, m, i + 1);
+    return { n: i + 1, info: getDayInfo(c.slug, d), key: toKey(d) };
+  });
+  const notable = days.filter((d) => d.info.badge || d.info.rating === "good");
+
+  const rateCls = (r?: string) =>
+    r === "good" ? "bg-emerald-500/20 border-emerald-400/40 text-emerald-200"
+    : r === "bad" ? "bg-rose-500/20 border-rose-400/40 text-rose-200"
+    : "bg-slate-800/60 border-white/10 text-slate-300 hover:border-violet-500/40";
+
+  return (
+    <main className="min-h-screen bg-slate-950 text-white">
+      <SiteHeader />
+      <div className="max-w-5xl mx-auto px-4 py-10">
+        <div className="text-sm text-slate-500 mb-6">
+          <Link href="/" className="hover:text-slate-300">Главная</Link>
+          {" → "}
+          <Link href="/calendars" className="hover:text-slate-300">Календари</Link>
+          {" → "}
+          <span className="text-slate-300">{c.name}</span>
+        </div>
+
+        <div className="text-center mb-8">
+          <div className="text-6xl mb-3">{c.emoji}</div>
+          <h1 className={`text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r ${c.gradient} bg-clip-text text-transparent`}>{c.name}</h1>
+          <p className="text-slate-400">{c.short}</p>
+        </div>
+
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <Link href={`/calendars/${c.slug}?m=${prev}`} className="px-4 py-2 rounded-xl bg-slate-800/80 border border-white/10 hover:border-violet-500/40 text-sm transition">← {MONTHS[(m + 11) % 12]}</Link>
+          <div className="text-lg font-bold capitalize">{MONTHS[m]} {y}</div>
+          <Link href={`/calendars/${c.slug}?m=${next}`} className="px-4 py-2 rounded-xl bg-slate-800/80 border border-white/10 hover:border-violet-500/40 text-sm transition">{MONTHS[(m + 1) % 12]} →</Link>
+        </div>
+
+        <div className="grid grid-cols-7 gap-1.5 mb-2">
+          {WD.map((w) => <div key={w} className="text-center text-xs text-slate-500 font-semibold py-1">{w}</div>)}
+        </div>
+        <div className="grid grid-cols-7 gap-1.5">
+          {cells.map((n, i) =>
+            n === null ? <div key={`e${i}`} /> : (
+              <Link
+                key={n}
+                href={`/calendars/${c.slug}/${days[n - 1].key}`}
+                title={days[n - 1].info.badge ?? undefined}
+                className={`aspect-square flex flex-col items-center justify-center rounded-xl border text-sm font-semibold transition ${rateCls(days[n - 1].info.rating)} ${days[n - 1].key === toKey(new Date()) ? "ring-2 ring-violet-500" : ""}`}
+              >
+                <span>{n}</span>
+                {days[n - 1].info.badge && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1" />}
+              </Link>
+            )
+          )}
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-4 justify-center text-xs text-slate-500">
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-emerald-500/30 border border-emerald-400/40" /> благоприятно</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-rose-500/30 border border-rose-400/40" /> неблагоприятно</span>
+          <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-400" /> особая дата</span>
+        </div>
+
+        {notable.length > 0 && (
+          <div className="mt-10">
+            <h2 className="text-xl font-bold mb-4">✨ Особые даты месяца</h2>
+            <div className="grid md:grid-cols-2 gap-3">
+              {notable.map((d) => (
+                <Link key={d.n} href={`/calendars/${c.slug}/${d.key}`} className="p-4 rounded-2xl bg-slate-900/60 border border-white/10 hover:border-violet-500/40 transition">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="font-semibold">{d.n} {MONTHS[m]}</div>
+                    <div className="text-xs text-amber-300 truncate max-w-[70%] text-right">{d.info.badge}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-10">
+          <h3 className="text-lg font-bold mb-4 text-center">Другие календари</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {CALENDARS.filter((x) => x.slug !== c.slug).map((x) => (
+              <Link key={x.slug} href={`/calendars/${x.slug}?m=${curKey}`} className="p-3 rounded-xl bg-slate-900/50 border border-white/5 hover:border-white/20 text-center transition">
+                <div className="text-2xl mb-1">{x.emoji}</div>
+                <div className="text-xs text-slate-300">{x.name}</div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {c.slug === "names" && <div className="mt-8"><NameSearch /></div>}
+        <div className="mt-10"><AdBlock /></div>
+      </div>
+      <SiteFooter />
+    </main>
+  );
+}

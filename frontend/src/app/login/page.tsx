@@ -110,9 +110,15 @@ export default function LoginPage() {
           </button>
 
           <div className="text-center">
-            <Link href="/forgot-password" className="text-sm text-violet-400 hover:text-violet-300">
-              Забыли пароль?
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link href="/forgot-password" className="text-sm text-violet-400 hover:text-violet-300">
+                Забыли пароль?
+              </Link>
+              <span className="text-slate-600">·</span>
+              <Link href="/login-email" className="text-sm text-amber-400 hover:text-amber-300">
+                🔑 Войти по email
+              </Link>
+            </div>
           </div>
         </form>
       </div>

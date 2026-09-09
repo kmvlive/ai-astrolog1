@@ -1,2 +1,4 @@
 User-agent: *
-Disallow:
+Allow: /
+
+Sitemap: https://my.neiro-astro.ru/sitemap-dreams.xml

@@ -18,6 +18,7 @@ class UserProfile extends Model
         'longitude',
         'birth_date',
         'birth_time',
+        'zodiac_sign',
     ];
 
     protected $casts = [

@@ -1,6 +1,7 @@
 services:
   # Backend (Laravel + PHP-FPM + Nginx)
   backend:
+    network_mode: host
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -9,15 +10,18 @@ services:
     working_dir: /var/www/html
     volumes:
       - ./backend:/var/www/html
+      - ./backend/docker/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini:ro
       - ./backend/storage/app:/var/www/html/storage/app
-    networks:
-      - astro-net
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+      - 77.88.8.8
     depends_on:
       - db
       - redis
     environment:
-      - DB_HOST=db
-      - REDIS_HOST=redis
+      - DB_HOST=172.18.0.2
+      - REDIS_HOST=172.18.0.3
       - TIMEWEB_AI_BASE_URL=https://api.timeweb.ai/v1
       - TIMEWEB_AI_API_KEY=sk-PyIqBw7PvNPDaJp-kqv75w
       - TIMEWEB_AI_MODEL=dashscope/qwen3.5-flash
@@ -27,6 +31,8 @@ services:
 
   # Frontend (Next.js)
   frontend:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -56,7 +62,7 @@ services:
     depends_on:
       - redis
     environment:
-      - REDIS_HOST=redis
+      - REDIS_HOST=172.18.0.3
       - TIMEWEB_AI_BASE_URL=https://api.timeweb.ai/v1
       - TIMEWEB_AI_API_KEY=sk-PyIqBw7PvNPDaJp-kqv75w
       - TIMEWEB_AI_MODEL=dashscope/qwen3.5-flash
@@ -89,6 +95,36 @@ services:
       - astro-redisdata:/data
     networks:
       - astro-net
+
+  # Scheduler (cron jobs)
+  scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: astro-scheduler
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: php artisan schedule:work
+    volumes:
+      - ./backend:/var/www/html
+      - ./backend/docker/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini:ro
+    networks:
+      - astro-net
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_HOST=172.18.0.2
+      - REDIS_HOST=172.18.0.3
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - TIMEWEB_AI_BASE_URL=https://api.timeweb.ai/v1
+      - TIMEWEB_AI_API_KEY=sk-PyIqBw7PvNPDaJp-kqv75w
+      - TIMEWEB_AI_MODEL=dashscope/qwen3.5-flash
+      - UNISENDER_API_KEY=6z7cio4yqpaws6gsyzx93p15id1xmhimzezgedfy
+      - UNISENDER_FROM_EMAIL=no-reply@my.neiro-astro.ru
+      - UNISENDER_FROM_NAME="AI Астролог"
 
 volumes:
   astro-pgdata:

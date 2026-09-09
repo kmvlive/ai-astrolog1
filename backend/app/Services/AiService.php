@@ -2,11 +2,53 @@
 
 namespace App\Services;
 
+use App\Models\BlogPost;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class AiService
 {
+    /**
+     * Универсальный чат с AI
+     */
+    public function chat(string $prompt, array $options = []): ?string
+    {
+        $baseUrl = rtrim(env('TIMEWEB_AI_BASE_URL', 'https://api.timeweb.ai/v1'), '/');
+        $apiKey = env('TIMEWEB_AI_API_KEY');
+        $model = env('TIMEWEB_AI_MODEL', 'dashscope/qwen3.5-flash');
+
+        if (!$apiKey) return null;
+
+        try {
+            $response = Http::timeout(30)
+                ->withHeaders([
+                    'Authorization' => "Bearer {$apiKey}",
+                    'Content-Type' => 'application/json',
+                ])
+                ->post("{$baseUrl}/chat/completions", [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                    'temperature' => $options['temperature'] ?? 0.85,
+                    'max_tokens' => $options['max_tokens'] ?? 500,
+                    'enable_thinking' => false,
+                ]);
+
+            if ($response->successful()) {
+                $text = $response->json('choices.0.message.content');
+                return $text ? trim($text) : null;
+            }
+
+            Log::error('AI chat error', ['status' => $response->status(), 'body' => mb_substr($response->body(), 0, 500)]);
+            return null;
+        } catch (\Exception $e) {
+            Log::error('AI chat exception', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
     public function generateHoroscope(array $natalData, string $type, string $name): ?string
     {
         $baseUrl = rtrim(env('TIMEWEB_AI_BASE_URL', 'https://api.timeweb.ai/v1'), '/');
@@ -29,11 +71,12 @@ class AiService
                     ],
                     'temperature' => 0.85,
                     'max_tokens' => 1500,
+                    'enable_thinking' => false,
                 ]);
 
             if ($response->successful()) {
                 $text = $response->json('choices.0.message.content');
-                return $text ? trim($text) : null;
+                return $text ? trim($this->cleanAiText($text)) : null;
             }
 
             Log::error('Timeweb AI error', ['status' => $response->status(), 'body' => mb_substr($response->body(), 0, 500)]);
@@ -70,11 +113,12 @@ class AiService
                     ],
                     'temperature' => 0.9,
                     'max_tokens' => $this->periodMaxTokens($period),
+                    'enable_thinking' => false,
                 ]);
 
             if ($response->successful()) {
                 $text = $response->json('choices.0.message.content');
-                return $text ? trim($text) : null;
+                return $text ? trim($this->cleanAiText($text)) : null;
             }
 
             Log::error('Daily horoscope error', ['sign' => $signCode, 'type' => $type, 'period' => $period, 'status' => $response->status()]);
@@ -131,6 +175,104 @@ class AiService
         };
     }
 
+    /**
+     * Генерация бесплатного гороскопа (китайский, японский, друидов и т.д.)
+     */
+    public function generateFreeHoroscope(string $system, string $sign, string $signName, \Carbon\Carbon $date): ?string
+    {
+        $baseUrl = rtrim(env('TIMEWEB_AI_BASE_URL', 'https://api.timeweb.ai/v1'), '/');
+        $apiKey = env('TIMEWEB_AI_API_KEY');
+        $model = env('TIMEWEB_AI_MODEL', 'dashscope/qwen3.5-flash');
+        if (!$apiKey) return null;
+
+        $dateRu = $date->locale('ru')->isoFormat('D MMMM YYYY');
+        [$sysPrompt, $userPrompt] = $this->buildFreePrompt($system, $signName, $dateRu);
+
+        try {
+            $response = Http::timeout(60)
+                ->withHeaders([
+                    'Authorization' => "Bearer {$apiKey}",
+                    'Content-Type' => 'application/json',
+                ])
+                ->post("{$baseUrl}/chat/completions", [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => $sysPrompt],
+                        ['role' => 'user', 'content' => $userPrompt],
+                    ],
+                    'temperature' => 0.92,
+                    'max_tokens' => 550,
+                    'enable_thinking' => false,
+                ]);
+
+            if ($response->successful()) {
+                $text = $response->json('choices.0.message.content');
+                return $text ? trim($this->cleanAiText($text)) : null;
+            }
+            Log::error('Free horoscope error', ['system' => $system, 'sign' => $sign, 'status' => $response->status()]);
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Free horoscope exception', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
+     * Совместимость двух знаков (один раз на пару)
+     */
+    public function generateCompatibility(string $name1, string $name2): ?string
+    {
+        $baseUrl = rtrim(env('TIMEWEB_AI_BASE_URL', 'https://api.timeweb.ai/v1'), '/');
+        $apiKey = env('TIMEWEB_AI_API_KEY');
+        $model = env('TIMEWEB_AI_MODEL', 'dashscope/qwen3.5-flash');
+        if (!$apiKey) return null;
+
+        try {
+            $response = Http::timeout(60)
+                ->withHeaders([
+                    'Authorization' => "Bearer {$apiKey}",
+                    'Content-Type' => 'application/json',
+                ])
+                ->post("{$baseUrl}/chat/completions", [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'Ты — астролог-эксперт по совместимости знаков. Тёплый, вдохновляющий тон. Обращайся на "вы".'],
+                        ['role' => 'user', 'content' => "Опиши совместимость знаков {$name1} и {$name2}: общие черты, сильные стороны пары, возможные сложности, советы для гармонии. 3-4 абзаца связного текста, без заголовков, списков и эмодзи."],
+                    ],
+                    'temperature' => 0.85,
+                    'max_tokens' => 700,
+                    'enable_thinking' => false,
+                ]);
+
+            if ($response->successful()) {
+                $text = $response->json('choices.0.message.content');
+                return $text ? trim($this->cleanAiText($text)) : null;
+            }
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Compatibility exception', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    private function buildFreePrompt(string $system, string $signName, string $dateRu): array
+    {
+        $sys = config("horoscope_systems.{$system}");
+        $desc = $sys['description'] ?? '';
+
+        $sysPrompts = [
+            'chinese' => "Ты — мудрый китайский астролог, мастер восточной традиции. {$desc} Составляй прогнозы в духе восточной мудрости: плавный, поэтичный слог, метафоры стихий, отсылки к Инь-Ян. Тёплый, уважительный тон. Без списков, заголовков и эмодзи. 2-3 абзаца.",
+            'japanese' => "Ты — японский оракул, мастер системы девяти звёзд Киу. {$desc} Составляй прогнозы в духе японской эстетики: утончённо, с образами природы, сезонности, гармонии. Тёплый тон. Без списков и эмодзи. 2-3 абзаца.",
+            'zoroastrian' => "Ты — персидский мудрец-зороастриец. {$desc} Составляй прогнозы в духе древней мудрости Авесты: торжественно, с отсылками к огню, свету, добрым и злым духам. Тёплый тон. Без списков и эмодзи. 2-3 абзаца.",
+            'druids' => "Ты — кельтский друид-оракул. {$desc} Составляй прогнозы мистически, с образами леса, корней, древних ритуалов. Тёплый, уважительный тон. Без списков и эмодзи. 2-3 абзаца.",
+            'flowers' => "Ты — цветочный оракул. {$desc} Составляй прогнозы поэтично, с образами цветов, ароматов, садов. Тёплый, романтичный тон. Без списков и эмодзи. 2-3 абзаца.",
+        ];
+
+        $sysPrompt = $sysPrompts[$system] ?? 'Ты — профессиональный астролог. Тёплый тон. 2-3 абзаца без списков.';
+        $userPrompt = "Составь прогноз на {$dateRu} для представителя знака {$signName}. Учитывай особенности знака и текущие планетарные влияния.";
+        return [$sysPrompt, $userPrompt];
+    }
+
     private function getSystemPrompt(): string
     {
         return "Ты — профессиональный астролог с 20-летним опытом. "
@@ -167,8 +309,6 @@ class AiService
             $sign = $signsRu[$p['sign'] ?? ''] ?? '?';
             $retro = !empty($p['retrograde']) ? ' (ретроградная)' : '';
             $house = str_replace('_House', '', $p['house'] ?? '');
-            $planetLines[] = "- {$pname} в {$sign}, {$p['degree']}°{$retro}, {$house}";
-        }
 
         $today = now()->locale('ru')->isoFormat('D MMMM YYYY');
 
@@ -177,4 +317,338 @@ class AiService
             . "Положения планет:\n" . implode("\n", $planetLines) . "\n\n"
             . "Составь персональный гороскоп, учитывая конкретные положения планет. Обращайся по имени. 3-4 абзаца.";
     }
+}
+
+    public function generateBlogPost(): ?BlogPost
+    {
+        $today = now()->startOfDay();
+        $existing = BlogPost::whereDate('published_at', $today)->where('author_type', 'ai')->first();
+        if ($existing) return $existing;
+
+        $moonData = $this->getMoonData($today);
+        $baseUrl = rtrim(env('TIMEWEB_AI_BASE_URL', 'https://api.timeweb.ai/v1'), '/');
+        $apiKey = env('TIMEWEB_AI_API_KEY');
+        $model = env('TIMEWEB_AI_MODEL', 'dashscope/qwen3.5-flash');
+
+        if (!$apiKey) return null;
+
+        $systemPrompt = <<<PROMPT
+Ты — профессиональный астролог с 20-летним стажем. Пишешь ежедневную статью для блога "Энергии сегодняшнего дня".
+
+Стиль: тёплый, мудрый, практичный. Обращаешься на "вы". Даёшь конкретные советы, а не общие фразы.
+Формат: Markdown. Используй заголовки ##, списки, цитаты.
+Длина: 800-1200 слов.
+Структура:
+1. Вступление (атмосфера дня)
+2. Ключевые энергии (на основе данных Луны)
+3. Практические советы по сферам (работа, отношения, здоровье)
+4. Что делать / чего избегать
+5. Завершение (напутствие)
+
+PROMPT;
+
+        $userPrompt = "Дата: {$today->format('d.m.Y')} ({$this->weekdayRu($today)}).{$moonData}\n\nНапиши статью про энергии этого дня.";
+
+        try {
+            $response = Http::timeout(90)
+                ->withHeaders([
+                    'Authorization' => "Bearer {$apiKey}",
+                    'Content-Type' => 'application/json',
+                ])
+                ->post("{$baseUrl}/chat/completions", [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => $systemPrompt],
+                        ['role' => 'user', 'content' => $userPrompt],
+                    ],
+                    'temperature' => 0.88,
+                    'max_tokens' => 2000,
+                    'enable_thinking' => false,
+                ]);
+
+            if (!$response->successful()) {
+                Log::error('Blog AI error', ['status' => $response->status()]);
+                return null;
+            }
+
+            $content = $response->json('choices.0.message.content');
+            if (!$content) return null;
+
+            $content = preg_replace('/^\s*#{1,6}\s+[^\n]+\n+/', '', trim($content), 1);
+            $title = $this->extractTitle($content) ?: "Энергии дня: " . $today->translatedFormat('d F Y');
+            $slug = Str::slug($title) . '-' . $today->format('Ymd');
+
+            $post = BlogPost::create([
+                'title' => $title,
+                'slug' => $slug,
+                'excerpt' => mb_substr(strip_tags(Str::markdown($content)), 0, 160) . '…',
+                'content' => $content,
+                'author_type' => 'ai',
+                'author_name' => 'AI-астролог',
+                'published_at' => $today->setTime(7, 0),
+                'seo_title' => $title . ' — Блог AI-астролога',
+                'seo_description' => mb_substr(strip_tags(Str::markdown($content)), 0, 150),
+            ]);
+
+            $cover = $this->generateCover($post);
+            if ($cover) { $post->update(['cover_image' => $cover]); }
+
+            return $post;
+        } catch (\Exception $e) {
+            Log::error('Blog AI exception', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    public function moonPhase($date): array
+    {
+        $timestamp = $date->timestamp;
+        $synodicMonth = 2551443;
+        $newMoonRef = 614088;
+        $phase = fmod($timestamp - $newMoonRef, $synodicMonth) / $synodicMonth;
+
+        $age = $phase * 29.53;
+        $illumination = (1 - cos($phase * 2 * M_PI)) / 2 * 100;
+
+        if ($age < 3.69) $phaseName = '🌑 Новолуние';
+        elseif ($age < 11.07) $phaseName = '🌒 Растущий серп';
+        elseif ($age < 14.77) $phaseName = '🌓 Первая четверть';
+        elseif ($age < 18.45) $phaseName = '🌔 Растущая Луна';
+        elseif ($age < 22.15) $phaseName = '🌕 Полнолуние';
+        elseif ($age < 25.83) $phaseName = '🌖 Убывающая Луна';
+        elseif ($age < 29.53) $phaseName = '🌗 Последняя четверть';
+        else $phaseName = '🌘 Убывающий серп';
+
+        return [$age, (int) round($illumination), $phaseName];
+    }
+
+    private function getMoonData($date): string
+    {
+        [$age, $illum, $phaseName] = $this->moonPhase($date);
+        return "
+
+Астроданные: {$phaseName}, возраст Луны " . round($age, 1) . " дней, освещённость {$illum}%.";
+    }
+
+    private function weekdayRu($date): string
+    {
+        return ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'][$date->dayOfWeek];
+    }
+
+    private function extractTitle(string $content): ?string
+    {
+        if (preg_match('/^#{1,6}\s*(.+)$/m', $content, $m)) return trim($m[1]);
+        $lines = explode("\n", trim($content));
+        foreach ($lines as $l) {
+            $l = trim($l);
+            if (mb_strlen($l) > 10 && mb_strlen($l) < 80 && !str_starts_with($l, '#')) {
+                return $l;
+            }
+        }
+        return null;
+    }
+
+
+    private const FANTASY_PROMPTS = [
+        'ethereal beautiful woman with long flowing hair standing before a giant waterfall made of stars and stardust, galaxies and glowing planets in the background, deep purple indigo night sky, mystical fantasy digital painting, highly detailed, cinematic, no text, no watermark',
+        'handsome young man riding a mythical winged horse flying through cosmos, giant planets and colorful nebulae behind, starry sky, epic fantasy digital painting, highly detailed, cinematic lighting, no text, no watermark',
+        'several glowing planets arranged at different distances in deep space, purple and blue nebula clouds, scattered bright stars, cosmic fantasy digital painting, ultra detailed, no text, no watermark',
+        'mysterious woman silhouette crowned with stars standing on a mountain cliff under a giant ringed planet, milky way across the sky, fantasy digital art, highly detailed, no text, no watermark',
+        'celestial goddess with flowing dress made of nebulae holding a glowing moon, small planets orbiting around her at different distances, starry cosmos background, fantasy digital painting, no text, no watermark',
+        'waterfall of liquid starlight falling into a cosmic ocean, beautiful woman with flowing hair watching it, galaxies and planets in the sky, dreamy fantasy art, highly detailed, no text, no watermark',
+        'young man on a mythical pegasus galloping above the moon surface, distant planets at different depths, star field, epic fantasy digital painting, no text, no watermark',
+        'ancient astronomer tower under a giant swirling galaxy, planets aligned at different distances in the sky, purple nebula, stars, fantasy digital painting, cinematic, no text, no watermark',
+    ];
+
+    private const COVER_POOL = [
+        'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a',
+        'https://images.unsplash.com/photo-1462331940025-496dfbfc7564',
+        'https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3',
+        'https://images.unsplash.com/photo-1475274047050-1d0c0975c63e',
+        'https://images.unsplash.com/photo-1502134249126-9f3755a50d78',
+        'https://images.unsplash.com/photo-1532693322450-2cb5c511067d',
+    ];
+
+    public function generateCover(BlogPost $post): ?string
+    {
+        $disk = \Illuminate\Support\Facades\Storage::disk('public');
+        $disk->makeDirectory('blog-covers');
+
+        // 1) AI фэнтези-арт (кураторские промпты, без заголовка статьи)
+        for ($i = 0; $i < 3; $i++) {
+            $prompt = self::FANTASY_PROMPTS[random_int(0, count(self::FANTASY_PROMPTS) - 1)];
+            $url = "https://image.pollinations.ai/prompt/" . urlencode($prompt)
+                . "?width=1200&height=800&seed=" . random_int(100000, 999999) . "&nologo=true&model=flux";
+            try {
+                $resp = Http::timeout(45)->get($url);
+                $ct = (string) $resp->header('Content-Type');
+                if ($resp->successful() && strlen($resp->body()) > 30000 && str_contains($ct, 'image')) {
+                    $suffix = substr(md5(time() . random_int(1000, 9999)), 0, 8);
+                    $file = 'blog-covers/' . $post->slug . '-' . $suffix . '.jpg';
+                    $disk->put($file, $resp->body());
+                    return $file;
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Cover: pollinations исключение', ['error' => $e->getMessage()]);
+            }
+        }
+
+        // 2) Запасной: космос из подборки Unsplash
+        $start = random_int(0, count(self::COVER_POOL) - 1);
+        for ($i = 0; $i < 3; $i++) {
+            $url = self::COVER_POOL[($start + $i) % count(self::COVER_POOL)] . "?w=1200&h=800&fit=crop&q=80&fm=jpg";
+            try {
+                $resp = Http::timeout(20)->get($url);
+                $ct = (string) $resp->header('Content-Type');
+                if ($resp->successful() && strlen($resp->body()) > 30000 && str_contains($ct, 'image')) {
+                    $file = 'blog-covers/' . $post->slug . '.jpg';
+                    $disk->put($file, $resp->body());
+                    return $file;
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        // 3) Последний запасной: SVG с фазой Луны
+        $suffix = substr(md5(time() . random_int(1000, 9999)), 0, 8);
+        $file = 'blog-covers/' . $post->slug . '-' . $suffix . '.svg';
+        $disk->put($file, $this->renderSvgCover($post));
+        return $file;
+    }
+
+    private function renderSvgCover(BlogPost $post): string
+    {
+        mt_srand(crc32($post->slug));
+        $stars = '';
+        for ($i = 0; $i < 110; $i++) {
+            $x = mt_rand(0, 1200); $y = mt_rand(0, 800);
+            $r = mt_rand(4, 22) / 10;
+            $o = number_format(mt_rand(25, 100) / 100, 2, '.', '');
+            $stars .= "<circle cx='{$x}' cy='{$y}' r='{$r}' fill='#ffffff' opacity='{$o}'/>";
+        }
+        for ($i = 0; $i < 8; $i++) {
+            $x = mt_rand(40, 1160); $y = mt_rand(40, 720); $s = mt_rand(7, 14); $t = intdiv($s, 3);
+            $stars .= "<path d='M{$x} " . ($y - $s) . " L" . ($x + $t) . " " . ($y - $t) . " L" . ($x + $s) . " {$y} L" . ($x + $t) . " " . ($y + $t) . " L{$x} " . ($y + $s) . " L" . ($x - $t) . " " . ($y + $t) . " L" . ($x - $s) . " {$y} L" . ($x - $t) . " " . ($y - $t) . " Z' fill='#ffe9a8' opacity='0.85'/>";
+        }
+
+        [$age, $illum, $phaseName] = $this->moonPhase($post->published_at ?? now());
+        $shadowX = (int) round(900 + (($age / 29.53) * 2 - 1) * 70);
+
+        return <<<SVG
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1e1b4b"/><stop offset="0.5" stop-color="#4c1d95"/><stop offset="1" stop-color="#2e1065"/></linearGradient>
+<radialGradient id="glow"><stop offset="0" stop-color="#fef3c7" stop-opacity="0.9"/><stop offset="0.4" stop-color="#fcd34d" stop-opacity="0.3"/><stop offset="1" stop-color="#fcd34d" stop-opacity="0"/></radialGradient>
+<radialGradient id="moon" cx="0.4" cy="0.4" r="0.8"><stop offset="0" stop-color="#fffbeb"/><stop offset="1" stop-color="#fde68a"/></radialGradient>
+<filter id="blur"><feGaussianBlur stdDeviation="40"/></filter>
+</defs>
+<rect width="1200" height="800" fill="url(#bg)"/>
+<ellipse cx="250" cy="640" rx="300" ry="180" fill="#7c3aed" opacity="0.25" filter="url(#blur)"/>
+<ellipse cx="950" cy="120" rx="280" ry="160" fill="#db2777" opacity="0.16" filter="url(#blur)"/>
+{$stars}
+<circle cx="900" cy="220" r="170" fill="url(#glow)"/>
+<circle cx="900" cy="220" r="80" fill="url(#moon)"/>
+<circle cx="{$shadowX}" cy="212" r="76" fill="#241d5c" opacity="0.95"/>
+<text x="60" y="760" font-family="Georgia, serif" font-size="32" fill="#e9d5ff" opacity="0.9">{$phaseName} • Луна освещена на {$illum}%</text>
+</svg>
+SVG;
+    }
+
+
+    /**
+     * Очищает AI-текст от артефактов: иероглифы, лишние пробелы, маркдаун
+     */
+    private function cleanAiText(string $text): string
+    {
+        // Удаляем CJK-иероглифы (китайский, японский, корейский)
+        $text = preg_replace("/[\x{4E00}-\x{9FFF}\x{3400}-\x{4DBF}\x{F900}-\x{FAFF}]+/u", "", $text);
+        
+        // Удаляем артефакты форматирования
+        $text = preg_replace('/^#+\s*/m', '', $text); // заголовки # ## ###
+        $text = preg_replace('/\*\*([^*]+)\*\*/', '$1', $text); // **жирный**
+        $text = preg_replace('/\*([^*]+)\*/', '$1', $text); // *курсив*
+        $text = preg_replace('/`([^`]+)`/', '$1', $text); // `код`
+        
+        // Нормализуем пробелы
+        $text = preg_replace('/ {2,}/', ' ', $text);
+        $text = preg_replace('/\n{3,}/', "\n\n", $text);
+        
+        return trim($text);
+    }
+
+
+    public function generateBiorhythmAdvice(int $physical, int $emotional, int $intellectual, int $average): ?string
+    {
+        $baseUrl = rtrim(env('TIMEWEB_AI_BASE_URL', 'https://api.timeweb.ai/v1'), '/');
+        $apiKey = env('TIMEWEB_AI_API_KEY');
+        $model = env('TIMEWEB_AI_MODEL', 'dashscope/qwen3.5-flash');
+
+        if (!$apiKey) return null;
+
+        try {
+            $response = Http::timeout(45)
+                ->withHeaders([
+                    'Authorization' => "Bearer {$apiKey}",
+                    'Content-Type' => 'application/json',
+                ])
+                ->post("{$baseUrl}/chat/completions", [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'Ты — заботливый наставник по саморазвитию. Давай короткие (3-5 предложений) практические советы на день на основе биоритмов человека. Тёплый, поддерживающий тон на "ты". Без заголовков, списков и эмодзи.'],
+                        ['role' => 'user', 'content' => "Мои биоритмы сегодня: физический {$physical}%, эмоциональный {$emotional}%, интеллектуальный {$intellectual}%, общий {$average}%. Что мне делать, чего избегать, на чём сосредоточиться?"],
+                    ],
+                    'temperature' => 0.85,
+                    'max_tokens' => 400,
+                    'enable_thinking' => false,
+                ]);
+
+            if ($response->successful()) {
+                $text = $response->json('choices.0.message.content');
+                return $text ? trim($this->cleanAiText($text)) : null;
+            }
+
+            Log::error('Biorhythm AI error', ['status' => $response->status(), 'body' => mb_substr($response->body(), 0, 300)]);
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Biorhythm AI exception', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+
+    public function generateDreamInterpretation(string $keyword): ?string
+    {
+        $baseUrl = rtrim(env('TIMEWEB_AI_BASE_URL', 'https://api.timeweb.ai/v1'), '/');
+        $apiKey = env('TIMEWEB_AI_API_KEY');
+        $model = env('TIMEWEB_AI_MODEL', 'dashscope/qwen3.5-flash');
+
+        if (!$apiKey) return null;
+
+        try {
+            $response = Http::timeout(45)
+                ->withHeaders([
+                    'Authorization' => "Bearer {$apiKey}",
+                    'Content-Type' => 'application/json',
+                ])
+                ->post("{$baseUrl}/chat/completions", [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'Ты — мудрый толкователь снов. Давай короткие (2-3 предложения) тёплые толкования на русском языке. Без заголовков, списков и эмодзи.'],
+                        ['role' => 'user', 'content' => "К чему снится: {$keyword}? Дай краткое тёплое толкование."],
+                    ],
+                    'temperature' => 0.8,
+                    'max_tokens' => 300,
+                    'enable_thinking' => false,
+                ]);
+
+            if ($response->successful()) {
+                $text = $response->json('choices.0.message.content');
+                return $text ? trim($this->cleanAiText($text)) : null;
+            }
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Dream AI exception', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
 }

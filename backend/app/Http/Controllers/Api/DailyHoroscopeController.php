@@ -59,11 +59,26 @@ class DailyHoroscopeController extends Controller
         $sign = self::SIGNS[$slug];
         $date = now()->startOfDay();
 
-        $horoscope = DailyHoroscope::where('date', $date)
-            ->where('zodiac_sign', $sign['code'])
-            ->where('type', $type)
-            ->where('period', $period)
-            ->first();
+        if (in_array($period, ['week', 'month', 'year'])) {
+            // Длинные периоды: берём свежую запись в рамках текущего периода
+            $start = match ($period) {
+                'week' => now()->startOfWeek(),
+                'month' => now()->startOfMonth(),
+                'year' => now()->startOfYear(),
+            };
+            $horoscope = DailyHoroscope::where('date', '>=', $start)
+                ->where('zodiac_sign', $sign['code'])
+                ->where('type', $type)
+                ->where('period', $period)
+                ->orderByDesc('date')
+                ->first();
+        } else {
+            $horoscope = DailyHoroscope::where('date', $date)
+                ->where('zodiac_sign', $sign['code'])
+                ->where('type', $type)
+                ->where('period', $period)
+                ->first();
+        }
 
         if (!$horoscope) {
             $content = app(AiService::class)->generateDailyHoroscope($sign['code'], $sign['name'], $date, $type, $period);

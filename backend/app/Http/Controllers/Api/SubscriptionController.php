@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Channel;
 use App\Models\HoroscopeType;
+use App\Models\Calendar;
 use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
@@ -32,6 +33,9 @@ class SubscriptionController extends Controller
             'has_active_subscription' => $user->hasActiveSubscription(),
             'is_on_trial' => $user->isOnTrial(),
             'subscription' => $user->subscription,
+            'free_personal_enabled' => (bool) $user->free_personal_enabled,
+            'calendars' => Calendar::where('is_active', true)->get(),
+            'user_calendar_slugs' => $user->calendars()->pluck('slug')->toArray(),
         ]);
     }
 
@@ -44,6 +48,11 @@ class SubscriptionController extends Controller
 
         $user = $request->user();
         $requestedSlugs = $request->channels;
+
+        // Email — обязательный канал, нельзя отключить
+        if (!in_array('email', $requestedSlugs)) {
+            $requestedSlugs[] = 'email';
+        }
 
         $allChannels = Channel::whereIn('slug', ['email', 'telegram', 'max'])->get()->keyBy('slug');
         $currentChannelIds = $user->channels()->pluck('channels.id')->toArray();
@@ -70,11 +79,21 @@ class SubscriptionController extends Controller
         return response()->json(['success' => true, 'message' => 'Каналы доставки обновлены']);
     }
 
+
+    public function updateCalendars(Request $request)
+    {
+        $request->validate(['slugs' => 'required|array']);
+        $user = $request->user();
+        $ids = Calendar::whereIn('slug', $request->slugs)->pluck('id')->toArray();
+        $user->calendars()->sync($ids);
+        return response()->json(['success' => true, 'message' => 'Календари подписки обновлены']);
+    }
+
     public function updateTypes(Request $request)
     {
         $request->validate([
             'types' => 'required|array',
-            'types.*' => 'in:general,love,career,finance,health',
+            'types.*' => \Illuminate\Validation\Rule::in(\App\Models\HoroscopeType::pluck('slug')->toArray()),
         ]);
 
         $user = $request->user();

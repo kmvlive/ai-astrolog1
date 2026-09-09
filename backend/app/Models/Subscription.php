@@ -18,6 +18,9 @@ class Subscription extends Model
         'plan_type',
         'amount',
         'tbank_payment_id',
+        'rebill_id',
+        'auto_renew',
+        'last_rebill_at',
     ];
 
     protected $casts = [
