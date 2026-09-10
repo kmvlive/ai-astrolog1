@@ -159,4 +159,21 @@ class TelegramService
         }
     }
 
+
+    public function sendCalendar(string $chatId, string $dateRu, array $calendars): bool
+    {
+        $text = "📅 <b>Ваши календари на {$dateRu}</b>\n\n";
+
+        foreach ($calendars as $cal) {
+            $text .= "{$cal['emoji']} <b>{$cal['name']}</b>\n";
+            foreach ($cal['blocks'] as $block) {
+                $text .= "<i>{$block['h']}</i>\n{$block['t']}\n\n";
+            }
+        }
+
+        $text .= "\n<a href=\"https://my.neiro-astro.ru/dashboard\">Настроить календари →</a>";
+
+        return $this->sendMessage($chatId, $text, ['disable_web_page_preview' => true]);
+    }
+
 }

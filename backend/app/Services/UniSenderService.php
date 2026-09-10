@@ -309,4 +309,67 @@ HTML;
         return [$html, $text];
     }
 
+
+    public function buildCalendarDigestEmail(
+        string $name,
+        string $dateRu,
+        array $calendars,
+        int $userId = 0
+    ): array {
+        $frontendUrl = env('APP_FRONTEND_URL', 'https://my.neiro-astro.ru');
+        $unsubSig = $userId ? hash_hmac('sha256', (string) $userId, config('app.key')) : '';
+        $unsubUrl = $userId ? rtrim($frontendUrl, '/') . "/api/unsubscribe/{$userId}/{$unsubSig}" : '';
+
+        $calendarsHtml = '';
+        $calendarsText = '';
+
+        foreach ($calendars as $cal) {
+            $calName = htmlspecialchars($cal['name'], ENT_XML1);
+            $emoji = htmlspecialchars($cal['emoji'], ENT_XML1);
+            $calendarsHtml .= '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">'
+                . '<tr><td style="padding:20px;background:#1e293b;border-radius:12px;border-left:4px solid #7c3aed;">'
+                . '<div style="font-size:20px;font-weight:bold;color:#c4b5fd;margin-bottom:12px;">' . $emoji . ' ' . $calName . '</div>';
+
+            foreach ($cal['blocks'] as $block) {
+                $h = htmlspecialchars($block['h'], ENT_XML1);
+                $t = nl2br(htmlspecialchars($block['t'], ENT_XML1));
+                $calendarsHtml .= '<div style="margin-bottom:16px;">'
+                    . '<div style="font-size:14px;font-weight:bold;color:#a78bfa;margin-bottom:6px;">' . $h . '</div>'
+                    . '<div style="color:#cbd5e1;line-height:1.6;font-size:14px;">' . $t . '</div>'
+                    . '</div>';
+                $calendarsText .= "\n{$block['h']}\n{$block['t']}\n";
+            }
+            $calendarsHtml .= "</td></tr></table>";
+            $calendarsText .= "\n";
+        }
+
+        $nameSafe = htmlspecialchars($name, ENT_XML1);
+        $dateRuSafe = htmlspecialchars($dateRu, ENT_XML1);
+
+        $html = '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#0f172a;">'
+            . '<table width="100%" cellpadding="0" cellspacing="0" style="background:#0f172a;padding:32px 16px;">'
+            . '<tr><td align="center">'
+            . '<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#1e293b;border-radius:16px;overflow:hidden;">'
+            . '<tr><td style="padding:32px;text-align:center;background:linear-gradient(135deg,#4c1d95,#312e81);">'
+            . '<div style="font-size:48px;">📅</div>'
+            . '<h1 style="margin:8px 0 0;color:#fff;font-size:24px;">Ваши календари на ' . $dateRuSafe . '</h1>'
+            . '</td></tr>'
+            . '<tr><td style="padding:32px;">'
+            . '<p style="margin:0 0 20px;color:#94a3b8;">Здравствуйте, ' . $nameSafe . '!</p>'
+            . $calendarsHtml
+            . '<p style="margin-top:24px;text-align:center;">'
+            . '<a href="' . $frontendUrl . '/dashboard" style="display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:bold;">'
+            . 'Настроить календари →</a></p>'
+            . '</td></tr></table></td></tr></table>';
+
+        if ($unsubUrl) {
+            $html .= '<p style="text-align:center;color:#64748b;font-size:11px;margin-top:16px;"><a href="' . $unsubUrl . '" style="color:#64748b;">Отписаться от рассылки</a></p>';
+        }
+        $html .= '</body></html>';
+
+        $text = "Здравствуйте, {$name}!\n\nВаши календари на {$dateRu}\n{$calendarsText}\n\nНастроить: {$frontendUrl}/dashboard";
+
+        return [$html, $text];
+    }
+
 }

@@ -151,4 +151,20 @@ class MaxService
             return false;
         }
     }
+
+    public function sendCalendar(string $userId, string $dateRu, array $calendars): ?array
+    {
+        $text = "📅 Ваши календари на {$dateRu}\n\n";
+
+        foreach ($calendars as $cal) {
+            $text .= "{$cal['emoji']} {$cal['name']}\n";
+            foreach ($cal['blocks'] as $block) {
+                $text .= "{$block['h']}\n{$block['t']}\n\n";
+            }
+        }
+
+        $text .= "\nНастроить календари: https://my.neiro-astro.ru/dashboard";
+
+        return $this->sendMessage($userId, $text);
+    }
 }

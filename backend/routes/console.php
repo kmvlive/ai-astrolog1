@@ -29,3 +29,8 @@ Schedule::command('subscriptions:auto-renew')->dailyAt('09:00')->timezone('Europ
 Schedule::command('subscriptions:expiry-reminders')->dailyAt('10:00')->timezone('Europe/Moscow');
 
 Schedule::command('blog:clean-covers')->dailyAt('04:30');
+
+// Рассылка календарей
+Schedule::command('calendar:send-daily-emails')->dailyAt('07:30')->timezone('Europe/Moscow')->withoutOverlapping(120);
+Schedule::command('calendar:send-daily-telegram')->dailyAt('07:35')->timezone('Europe/Moscow');
+Schedule::command('calendar:send-daily-max')->dailyAt('07:40')->timezone('Europe/Moscow');
