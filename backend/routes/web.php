@@ -35,3 +35,21 @@ Route::get('/sitemap-dreams.xml', function () {
         'Expires' => '0',
     ]);
 });
+
+Route::get('/sitemap-names.xml', function () {
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "
+";
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "
+";
+    $xml .= '  <url><loc>https://my.neiro-astro.ru/names</loc><changefreq>daily</changefreq><priority>0.8</priority></url>' . "
+";
+    
+    foreach (\App\Models\NameMeaning::where('approved', true)->get() as $nm) {
+        $xml .= '  <url><loc>https://my.neiro-astro.ru/names/' . $nm->translit . '</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>' . "
+";
+    }
+    
+    $xml .= '</urlset>';
+    return response($xml, 200)->header('Content-Type', 'application/xml');
+});
+
