@@ -143,7 +143,7 @@
     </div>
 </header>
 <main class="container">@yield('content')</main>
-<footer><div class="container">© {{ date('Y') }} AI Астролог — блог <a href="{{ url('/blog/rss') }}" style="color:#a78bfa;margin-left:16px">📡 RSS</a></div></footer>
+@include('partials.site-footer')
 
 <script>
 (function(){
