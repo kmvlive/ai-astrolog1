@@ -11,14 +11,36 @@ type MenuItem = {
   open_in_new_tab: boolean;
 };
 
+// Fallback меню если API не отвечает
+const FALLBACK_MENU: MenuItem[] = [
+  { title: "Главная", url: "/", open_in_new_tab: false },
+  { title: "Гороскопы", url: "/horoscopes", open_in_new_tab: false },
+  { title: "Календари", url: "/calendars", open_in_new_tab: false },
+  { title: "Значение имён", url: "/names", open_in_new_tab: false },
+  { title: "Сонник", url: "/dreams", open_in_new_tab: false },
+  { title: "Личный кабинет", url: "/dashboard", open_in_new_tab: false },
+  { title: "Условия оказания услуг", url: "/terms", open_in_new_tab: false },
+];
+
 export default function SiteFooter() {
-  const [menu, setMenu] = useState<MenuItem[]>([]);
+  const [menu, setMenu] = useState<MenuItem[]>(FALLBACK_MENU);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    fetch(`${API}/api/footer-menu`)
-      .then(r => r.ok ? r.json() : null)
-      .then(d => setMenu(d?.menu || []))
-      .catch(() => {});
+    fetch(`${API}/api/footer-menu`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.menu && d.menu.length > 0) {
+          setMenu(d.menu);
+        }
+        setLoaded(true);
+      })
+      .catch(() => {
+        setLoaded(true);
+      });
   }, []);
 
   return (
@@ -29,21 +51,19 @@ export default function SiteFooter() {
           <div className="flex items-center gap-2 text-sm text-slate-500">
             <span className="text-xl">🔮</span> AI Астролог © 2026
           </div>
-          {menu.length > 0 && (
-            <nav className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm">
-              {menu.map((item, i) => (
-                <Link
-                  key={i}
-                  href={item.url}
-                  target={item.open_in_new_tab ? "_blank" : undefined}
-                  rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
-                  className="text-slate-500 hover:text-white transition"
-                >
-                  {item.title}
-                </Link>
-              ))}
-            </nav>
-          )}
+          <nav className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm">
+            {menu.map((item, i) => (
+              <Link
+                key={i}
+                href={item.url}
+                target={item.open_in_new_tab ? "_blank" : undefined}
+                rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
+                className="text-slate-500 hover:text-white transition"
+              >
+                {item.title}
+              </Link>
+            ))}
+          </nav>
         </div>
 
         {/* Юридический текст */}
