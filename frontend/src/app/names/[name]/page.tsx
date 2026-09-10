@@ -11,6 +11,7 @@ type NameData = {
   name: string;
   translit: string;
   interpretation: string;
+  origin: string | null;
   views: number;
   ai_generated: boolean;
   approved: boolean;
@@ -73,20 +74,30 @@ export default async function NameMeaningPage({ params }: { params: Promise<{ na
 
         <div className="bg-gradient-to-br from-violet-900/40 to-slate-900 border border-violet-500/30 rounded-3xl p-8 sm:p-12 shadow-2xl mb-8">
           <div className="text-6xl mb-4">✨</div>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-6">Значение имени {nm.name}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-4">Значение имени {nm.name}</h1>
+          
+          {/* Бейджи */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {nm.origin && (
+              <span className="inline-flex items-center px-3 py-1 bg-emerald-600/30 border border-emerald-500/40 rounded-full text-xs font-semibold">
+                🏛 {nm.origin}
+              </span>
+            )}
+            {nm.ai_generated && (
+              <span className="inline-block px-3 py-1 bg-violet-600/30 border border-violet-500/40 rounded-full text-xs font-semibold">
+                ✨ AI-толкование
+              </span>
+            )}
+          </div>
+
           <div className="text-lg text-slate-200 leading-relaxed mb-8 whitespace-pre-line">
             {nm.interpretation}
           </div>
-          {nm.ai_generated && (
-            <span className="inline-block px-3 py-1 bg-violet-600/30 border border-violet-500/40 rounded-full text-xs font-semibold">
-              ✨ AI-толкование
-            </span>
-          )}
         </div>
 
         {/* Похожие имена */}
         {related.length > 0 && (
-          <div>
+          <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4">Похожие имена</h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
               {related.map((n) => (
@@ -102,7 +113,7 @@ export default async function NameMeaningPage({ params }: { params: Promise<{ na
           </div>
         )}
 
-        <div className="mt-8 text-center">
+        <div className="text-center">
           <Link
             href="/names"
             className="inline-block bg-violet-600 hover:bg-violet-500 px-6 py-2.5 rounded-xl font-semibold transition"

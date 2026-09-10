@@ -687,4 +687,46 @@ SVG;
             return null;
         }
     }
+
+    public function detectNameOrigin(string $name): ?string
+    {
+        $baseUrl = rtrim(env('TIMEWEB_AI_BASE_URL', 'https://api.timeweb.ai/v1'), '/');
+        $apiKey = env('TIMEWEB_AI_API_KEY');
+        $model = env('TIMEWEB_AI_MODEL', 'dashscope/qwen3.5-flash');
+
+        if (!$apiKey) return null;
+
+        try {
+            $response = Http::timeout(30)
+                ->withHeaders([
+                    'Authorization' => "Bearer {$apiKey}",
+                    'Content-Type' => 'application/json',
+                ])
+                ->post("{$baseUrl}/chat/completions", [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'Ты — эксперт по ономастике. Определяй происхождение имён. Отвечай ОДНИМ словом из списка: славянское, греческое, еврейское, латинское, германское, арабское, тюркское, скандинавское, кельтское, персидское, индийское.'],
+                        ['role' => 'user', 'content' => "Происхождение имени «{$name}»? Ответь одним словом."],
+                    ],
+                    'temperature' => 0.3,
+                    'max_tokens' => 50,
+                    'enable_thinking' => false,
+                ]);
+
+            if ($response->successful()) {
+                $text = trim($response->json('choices.0.message.content') ?? '');
+                $allowed = ['славянское', 'греческое', 'еврейское', 'латинское', 'германское', 'арабское', 'тюркское', 'скандинавское', 'кельтское', 'персидское', 'индийское'];
+                foreach ($allowed as $origin) {
+                    if (mb_strpos(mb_strtolower($text), $origin) !== false) {
+                        return $origin;
+                    }
+                }
+                return $text ?: 'неизвестное';
+            }
+            return null;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('AI detectNameOrigin error: ' . $e->getMessage());
+            return null;
+        }
+    }
 }

@@ -413,7 +413,7 @@ Route::get('/names', function (\Illuminate\Http\Request $request) {
         $names = \App\Models\NameMeaning::where('approved', true)
             ->inRandomOrder()
             ->limit(50)
-            ->get(['name', 'translit']);
+            ->get(['name', 'translit', 'origin']);
         return response()->json(['names' => $names]);
     }
     
@@ -424,7 +424,7 @@ Route::get('/names', function (\Illuminate\Http\Request $request) {
                   ->orWhere('translit', 'ILIKE', "%{$q}%");
         })
         ->limit(20)
-        ->get(['name', 'translit', 'interpretation']);
+        ->get(['name', 'translit', 'origin', 'interpretation']);
     
     return response()->json(['names' => $names]);
 });
@@ -510,3 +510,14 @@ function detransliterateName(string $text): string {
     }
     return $text;
 }
+
+Route::get('/names/origins', function () {
+    $origins = \App\Models\NameMeaning::where('approved', true)
+        ->whereNotNull('origin')
+        ->select('origin')
+        ->distinct()
+        ->pluck('origin')
+        ->sort()
+        ->values();
+    return response()->json(['origins' => $origins]);
+});
