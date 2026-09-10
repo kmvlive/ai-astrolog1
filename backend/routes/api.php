@@ -615,27 +615,3 @@ Route::post('/names/ai', function (\Illuminate\Http\Request $request) {
 
     return response()->json(['name' => $meaning, 'cached' => false]);
 });
-
-function transliterateName(string $text): string {
-    $map = [
-        'а'=>'a','б'=>'b','в'=>'v','г'=>'g','д'=>'d','е'=>'e','ё'=>'yo','ж'=>'zh','з'=>'z','и'=>'i',
-        'й'=>'y','к'=>'k','л'=>'l','м'=>'m','н'=>'n','о'=>'o','п'=>'p','р'=>'r','с'=>'s','т'=>'t',
-        'у'=>'u','ф'=>'f','х'=>'kh','ц'=>'ts','ч'=>'ch','ш'=>'sh','щ'=>'sch','ъ'=>'','ы'=>'y','ь'=>'',
-        'э'=>'e','ю'=>'yu','я'=>'ya'
-    ];
-    return mb_strtolower(str_replace(array_keys($map), array_values($map), $text));
-}
-
-function detransliterateName(string $text): string {
-    $map = [
-        'yo'=>'ё','zh'=>'ж','kh'=>'х','ts'=>'ц','ch'=>'ч','sh'=>'ш','sch'=>'щ','yu'=>'ю','ya'=>'я',
-        'a'=>'а','b'=>'б','v'=>'в','g'=>'г','d'=>'д','e'=>'е','z'=>'з','i'=>'и','y'=>'й',
-        'k'=>'к','l'=>'л','m'=>'м','n'=>'н','o'=>'о','p'=>'п','r'=>'р','s'=>'с','t'=>'т',
-        'u'=>'у','f'=>'ф'
-    ];
-    $text = mb_strtolower($text);
-    foreach ($map as $lat => $cyr) {
-        $text = str_replace($lat, $cyr, $text);
-    }
-    return $text;
-}
