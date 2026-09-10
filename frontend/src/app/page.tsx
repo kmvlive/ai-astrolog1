@@ -3,6 +3,7 @@
 import DreamsCount from "@/components/DreamsCount";
 import { CALENDARS } from "@/lib/calendars";
 import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -528,16 +529,7 @@ export default function HomePage() {
 
       )}
 
-      <footer className="border-t border-white/10 py-8">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
-          <div className="flex items-center gap-2"><span className="text-xl">🔮</span> AI Астролог © 2026</div>
-          <div className="flex gap-6">
-            <Link href="/horoscopes" className="hover:text-white transition">Гороскопы</Link>
-            <Link href="/login" className="hover:text-white transition">Войти</Link>
-            <Link href="/register" className="hover:text-white transition">Регистрация</Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
