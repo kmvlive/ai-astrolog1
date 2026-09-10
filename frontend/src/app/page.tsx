@@ -376,6 +376,15 @@ export default function HomePage() {
               <span className="inline-block bg-purple-600 group-hover:bg-purple-500 rounded-xl px-5 py-2.5 text-sm font-semibold transition">Узнать значение →</span>
             </div>
           </a>
+          <a href="/names/compatibility" className="group relative overflow-hidden bg-gradient-to-br from-pink-900/50 to-rose-950 border border-pink-500/30 rounded-3xl p-8 transition hover:-translate-y-1 hover:border-pink-400/50">
+            <div className="absolute -top-8 -right-8 text-[120px] opacity-20 group-hover:opacity-30 group-hover:scale-110 transition">💕</div>
+            <div className="relative">
+              <div className="text-5xl mb-4">💕</div>
+              <h3 className="text-2xl font-bold mb-2">Совместимость имён</h3>
+              <p className="text-slate-300 mb-6">Как сочетаются два имени в любви, дружбе и работе? AI проанализирует пару за секунды.</p>
+              <span className="inline-block bg-pink-600 group-hover:bg-pink-500 rounded-xl px-5 py-2.5 text-sm font-semibold transition">Проверить пару →</span>
+            </div>
+          </a>
         </div>
       </section>
 

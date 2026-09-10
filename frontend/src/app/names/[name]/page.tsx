@@ -50,7 +50,10 @@ export default async function NameMeaningPage({ params }: { params: Promise<{ na
   if (!data) notFound();
 
   const nm = data.name;
-  const { by_origin, by_letter } = data.related;
+  if (!nm) notFound();
+  const related = data.related || {};
+  const by_origin = related.by_origin || [];
+  const by_letter = related.by_letter || [];
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
