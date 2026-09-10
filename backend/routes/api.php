@@ -431,28 +431,7 @@ Route::get('/names', function (\Illuminate\Http\Request $request) {
 
 Route::get('/names/count', fn () => response()->json(['count' => \App\Models\NameMeaning::where('approved', true)->count()]));
 
-Route::get('/names/{translit}', function (string $translit) {
-    $name = \App\Models\NameMeaning::where('translit', $translit)
-        ->where('approved', true)
-        ->first();
-    
-    if (!$name) {
-        // Пробуем найти по оригинальному имени
-        $detranslit = detransliterateName($translit);
-        $name = \App\Models\NameMeaning::where('name', $detranslit)
-            ->where('approved', true)
-            ->first();
-    }
-    
-    if (!$name) {
-        return response()->json(['error' => 'not_found'], 404);
-    }
-    
-    // Увеличиваем просмотры
-    $name->increment('views');
-    
-    return response()->json(['name' => $name]);
-});
+
 
 Route::post('/names/ai', function (\Illuminate\Http\Request $request) {
     $request->validate([
