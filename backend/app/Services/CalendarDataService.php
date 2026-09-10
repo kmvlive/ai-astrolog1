@@ -23,15 +23,28 @@ class CalendarDataService
     public function __construct()
     {
         $path = 'data/calendars';
-        $this->lunarDays = json_decode(Storage::get("$path/lunar-days.json"), true) ?: [];
-        $this->lunarAdvice = json_decode(Storage::get("$path/lunar-advice.json"), true) ?: [];
-        $this->phases = json_decode(Storage::get("$path/phases.json"), true) ?: [];
-        $this->garden = json_decode(Storage::get("$path/garden.json"), true) ?: [];
-        $this->muslim = json_decode(Storage::get("$path/muslim.json"), true) ?: [];
-        $this->holidays = json_decode(Storage::get("$path/holidays.json"), true) ?: [];
-        $this->orthodox = json_decode(Storage::get("$path/orthodox.json"), true) ?: [];
-        $this->haircutGood = json_decode(Storage::get("$path/haircut-good.json"), true) ?: [];
-        $this->wiki = json_decode(Storage::get("$path/wiki-days.json"), true) ?: [];
+        $this->lunarDays = $this->loadJson("$path/lunar-days.json", []);
+        $this->lunarAdvice = $this->loadJson("$path/lunar-advice.json", []);
+        $this->phases = $this->loadJson("$path/phases.json", []);
+        $this->garden = $this->loadJson("$path/garden.json", []);
+        $this->muslim = $this->loadJson("$path/muslim.json", []);
+        $this->holidays = $this->loadJson("$path/holidays.json", []);
+        $this->orthodox = $this->loadJson("$path/orthodox.json", []);
+        $this->haircutGood = $this->loadJson("$path/haircut-good.json", []);
+        $this->wiki = $this->loadJson("$path/wiki-days.json", []);
+    }
+
+    private function loadJson(string $path, $default)
+    {
+        try {
+            $content = Storage::get($path);
+            if ($content === null || $content === '') {
+                return $default;
+            }
+            return json_decode($content, true) ?: $default;
+        } catch (\Exception $e) {
+            return $default;
+        }
     }
 
     private function moonAge(Carbon $d): float
@@ -121,73 +134,74 @@ class CalendarDataService
                         break;
                     }
                 }
-                return [
-                    'blocks' => [
-                        ['h' => '☪️ День мусульманского календаря', 't' => $e ? "**{$e['name']}** — важная дата уммы." : 'Сегодня обычных дней великих праздников нет.'],
-                        $moonBlock,
-                    ],
-                    'rating' => $e ? 'good' : null,
-                    'badge' => $e['name'] ?? null,
-                ];
+                $blocks = [];
+                if ($e) {
+                    $blocks[] = ['h' => '☪️ ' . $e['name'], 't' => $e['text'] ?? ''];
+                } else {
+                    $blocks[] = ['h' => '☪️ День мусульманского календаря', 't' => 'Сегодня обычный день по исламскому календарю.'];
+                }
+                $blocks[] = $moonBlock;
+                return ['blocks' => $blocks, 'rating' => $e ? 'good' : null, 'badge' => $e['name'] ?? null];
 
             case 'lunar':
+                $advice = $this->lunarAdvice[$ld - 1] ?? '';
                 return [
                     'blocks' => [
                         ['h' => "{$phase['emoji']} {$phase['name']} · {$ld}-е лунные сутки", 't' => $this->lunarDays[$ld - 1] ?? ''],
-                        ['h' => '💡 Рекомендация дня', 't' => $this->lunarAdvice[$pi] ?? ''],
+                        ['h' => '💡 Рекомендация дня', 't' => $advice],
+                        $moonBlock,
                     ],
+                    'rating' => in_array($ld, [1, 7, 14, 21, 28]) ? 'good' : (in_array($ld, [9, 19, 23, 29]) ? 'bad' : null),
                     'badge' => "{$ld}-е лунные сутки",
                 ];
 
             case 'gardener':
-                $g = $this->garden[$pi] ?? ['t' => '', 'r' => 'neutral'];
-                return [
-                    'blocks' => [
-                        ['h' => '🌱 Работы в саду и огороде', 't' => $g['t']],
-                        ['h' => '💡 Совет', 't' => "Фаза Луны: {$phase['emoji']} {$phase['name']}."],
-                        $moonBlock,
-                    ],
-                    'rating' => $g['r'] ?? 'neutral',
-                    'badge' => ($g['r'] ?? '') === 'good' ? 'благоприятно' : (($g['r'] ?? '') === 'bad' ? 'неблагоприятно' : 'сбор урожая'),
-                ];
-
-            case 'names':
-                $w = $this->wikiDay($key);
-                $names = $w['names'] ?? [];
-                return [
-                    'blocks' => [
-                        ['h' => '👼 Именины сегодня', 't' => count($names) ? implode("\n", array_map(fn($n) => "• **$n**", $names)) : 'Сегодня в православном календаре нет именин.'],
-                        ['h' => '💡 О дне', 't' => count($names) ? 'Если ваше имя в списке — сегодня ваши именины.' : 'Хороший день, чтобы узнать, в честь какого святого вас назвали.'],
-                        $moonBlock,
-                    ],
-                    'rating' => count($names) ? 'good' : null,
-                    'badge' => count($names) ? "именинники: " . count($names) : null,
-                ];
+                $g = $this->garden[$key] ?? null;
+                $blocks = [];
+                if ($g) {
+                    $blocks[] = ['h' => '🌱 ' . ($g['title'] ?? 'Садовый день'), 't' => $g['text'] ?? ''];
+                    if (!empty($g['works'])) {
+                        $blocks[] = ['h' => '✅ Что делать', 't' => $this->bulletsText($g['works'])];
+                    }
+                    if (!empty($g['avoid'])) {
+                        $blocks[] = ['h' => '❌ Чего избегать', 't' => $this->bulletsText($g['avoid'])];
+                    }
+                } else {
+                    $blocks[] = ['h' => '🌱 Садовый календарь', 't' => 'Сегодня нейтральный день для садовых работ.'];
+                }
+                $blocks[] = $moonBlock;
+                return ['blocks' => $blocks, 'rating' => $g ? ($g['rating'] ?? null) : null, 'badge' => $g['title'] ?? null];
 
             case 'haircut':
                 $good = in_array($ld, $this->haircutGood);
-                return [
-                    'blocks' => [
-                        ['h' => $good ? '✅ Благоприятный день для стрижки' : '⛔ Неблагоприятный день для стрижки',
-                         't' => $good ? 'Волосы после стрижки будут расти густыми и блестящими.' : 'Считается, что волосы теряют силу. Отложите визит к мастеру.'],
-                        ['h' => '💇 Совет мастера', 't' => "{$phase['emoji']} {$phase['name']}: " . ($good ? 'энергия роста направлена вверх.' : 'энергия убывает.')],
-                        $moonBlock,
-                    ],
-                    'rating' => $good ? 'good' : 'bad',
-                    'badge' => $good ? 'благоприятно' : 'неблагоприятно',
+                $blocks = [
+                    ['h' => $good ? '✂️ Хороший день для стрижки' : '✂️ Стрижка сегодня', 't' => $good ? 'Лунный день благоприятен для обновления причёски — волосы будут расти хорошо.' : 'Сегодня лучше воздержаться от стрижки. Лунный день не способствует здоровью волос.']
                 ];
+                $blocks[] = $moonBlock;
+                return ['blocks' => $blocks, 'rating' => $good ? 'good' : 'bad', 'badge' => $good ? 'Благоприятно' : 'Не рекомендуется'];
 
             default:
-                return ['blocks' => [], 'rating' => null, 'badge' => null];
+                return ['blocks' => [$moonBlock], 'rating' => null, 'badge' => null];
         }
     }
 
     private function bullets(array $items): string
     {
-        return implode("\n", array_map(function($item) {
+        $lines = [];
+        foreach ($items as $item) {
             $name = $item['name'] ?? '';
             $text = $item['text'] ?? '';
-            return "• **$name**" . ($text ? " — $text" : '');
-        }, $items));
+            if ($text) {
+                $lines[] = "• **{$name}** — {$text}";
+            } else {
+                $lines[] = "• {$name}";
+            }
+        }
+        return implode("\n", $lines);
+    }
+
+    private function bulletsText(array $items): string
+    {
+        return implode("\n", array_map(fn($t) => "• $t", $items));
     }
 }
