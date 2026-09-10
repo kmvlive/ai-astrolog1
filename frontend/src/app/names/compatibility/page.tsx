@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -8,7 +8,9 @@ import { useSearchParams } from "next/navigation";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
-export default function CompatibilityPage() {
+export const dynamic = 'force-dynamic';
+
+function CompatibilityContent() {
   const searchParams = useSearchParams();
   const [name1, setName1] = useState(searchParams.get("name1") || "");
   const [name2, setName2] = useState("");
@@ -112,5 +114,13 @@ export default function CompatibilityPage() {
       </div>
       <SiteFooter />
     </main>
+  );
+}
+
+export default function CompatibilityPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">Загрузка...</div>}>
+      <CompatibilityContent />
+    </Suspense>
   );
 }
