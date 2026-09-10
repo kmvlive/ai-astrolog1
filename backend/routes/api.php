@@ -580,7 +580,33 @@ Route::get('/names/{translit}', function (string $translit) {
 
     $name->increment('views');
 
-    return response()->json(['name' => $name]);
+    // Похожие по происхождению
+    $byOrigin = [];
+    if ($name->origin) {
+        $byOrigin = \App\Models\NameMeaning::where('approved', true)
+            ->where('origin', $name->origin)
+            ->where('id', '!=', $name->id)
+            ->inRandomOrder()
+            ->limit(10)
+            ->get(['name', 'translit', 'origin']);
+    }
+
+    // Имена на ту же букву
+    $firstLetter = mb_substr($name->name, 0, 1);
+    $byLetter = \App\Models\NameMeaning::where('approved', true)
+        ->where('name', 'LIKE', $firstLetter . '%')
+        ->where('id', '!=', $name->id)
+        ->inRandomOrder()
+        ->limit(10)
+        ->get(['name', 'translit', 'origin']);
+
+    return response()->json([
+        'name' => $name,
+        'related' => [
+            'by_origin' => $byOrigin,
+            'by_letter' => $byLetter,
+        ],
+    ]);
 });
 
 Route::post('/names/ai', function (\Illuminate\Http\Request $request) {
@@ -614,4 +640,40 @@ Route::post('/names/ai', function (\Illuminate\Http\Request $request) {
     ]);
 
     return response()->json(['name' => $meaning, 'cached' => false]);
+});
+
+// Совместимость имён
+Route::post('/names/compatibility', function (\Illuminate\Http\Request $request) {
+    $request->validate([
+        'name1' => 'required|string|max:50|min:2',
+        'name2' => 'required|string|max:50|min:2',
+    ]);
+
+    $name1 = trim(mb_strtolower($request->name1));
+    $name2 = trim(mb_strtolower($request->name2));
+    $name1 = mb_strtoupper(mb_substr($name1, 0, 1)) . mb_substr($name1, 1);
+    $name2 = mb_strtoupper(mb_substr($name2, 0, 1)) . mb_substr($name2, 1);
+
+    // Кэш: проверяем есть ли уже анализ
+    $cacheKey = 'name_compat_' . md5($name1 . '|' . $name2);
+    $cached = cache($cacheKey);
+    if ($cached) {
+        return response()->json($cached);
+    }
+
+    // Генерируем AI
+    $analysis = app(\App\Services\AiService::class)->analyzeNameCompatibility($name1, $name2);
+    if (!$analysis) {
+        return response()->json(['error' => 'ai_failed'], 500);
+    }
+
+    $result = [
+        'name1' => $name1,
+        'name2' => $name2,
+        'analysis' => $analysis,
+    ];
+
+    cache([$cacheKey => $result], now()->addDay());
+
+    return response()->json($result);
 });

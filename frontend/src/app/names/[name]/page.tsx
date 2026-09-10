@@ -17,31 +17,22 @@ type NameData = {
   approved: boolean;
 };
 
-async function getName(translit: string): Promise<NameData | null> {
+async function getName(translit: string): Promise<{ name: NameData; related: { by_origin: NameData[]; by_letter: NameData[] } } | null> {
   try {
     const r = await fetch(`${API_URL}/api/names/${translit}`, { next: { revalidate: 60 } });
     if (!r.ok) return null;
     const d = await r.json();
-    return d.name || null;
+    return d || null;
   } catch {
     return null;
   }
 }
 
-async function getRelated(currentTranslit: string): Promise<NameData[]> {
-  try {
-    const r = await fetch(`${API_URL}/api/names`, { next: { revalidate: 60 } });
-    const d = await r.json();
-    return (d.names || []).filter((n: NameData) => n.translit !== currentTranslit).slice(0, 20);
-  } catch {
-    return [];
-  }
-}
-
 export async function generateMetadata({ params }: { params: Promise<{ name: string }> }): Promise<Metadata> {
   const { name } = await params;
-  const nm = await getName(name);
-  if (!nm) return { title: "Имя не найдено — AI Астролог" };
+  const data = await getName(name);
+  if (!data) return { title: "Имя не найдено — AI Астролог" };
+  const nm = data.name;
   return {
     title: `Значение имени ${nm.name} — происхождение и характер | AI Астролог`,
     description: nm.interpretation.slice(0, 160),
@@ -55,10 +46,11 @@ export async function generateMetadata({ params }: { params: Promise<{ name: str
 
 export default async function NameMeaningPage({ params }: { params: Promise<{ name: string }> }) {
   const { name } = await params;
-  const nm = await getName(name);
-  if (!nm) notFound();
+  const data = await getName(name);
+  if (!data) notFound();
 
-  const related = await getRelated(nm.translit);
+  const nm = data.name;
+  const { by_origin, by_letter } = data.related;
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
@@ -75,7 +67,7 @@ export default async function NameMeaningPage({ params }: { params: Promise<{ na
         <div className="bg-gradient-to-br from-violet-900/40 to-slate-900 border border-violet-500/30 rounded-3xl p-8 sm:p-12 shadow-2xl mb-8">
           <div className="text-6xl mb-4">✨</div>
           <h1 className="text-3xl sm:text-4xl font-bold mb-4">Значение имени {nm.name}</h1>
-          
+
           {/* Бейджи */}
           <div className="flex flex-wrap gap-2 mb-6">
             {nm.origin && (
@@ -93,14 +85,46 @@ export default async function NameMeaningPage({ params }: { params: Promise<{ na
           <div className="text-lg text-slate-200 leading-relaxed mb-8 whitespace-pre-line">
             {nm.interpretation}
           </div>
+
+          {/* Кнопка совместимости */}
+          <div className="pt-6 border-t border-white/10">
+            <Link
+              href={`/names/compatibility?name1=${nm.translit}`}
+              className="inline-flex items-center gap-2 bg-pink-600 hover:bg-pink-500 px-6 py-2.5 rounded-xl font-semibold transition"
+            >
+              💕 Проверить совместимость с другим именем
+            </Link>
+          </div>
         </div>
 
-        {/* Похожие имена */}
-        {related.length > 0 && (
+        {/* Похожие по происхождению */}
+        {by_origin.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">Похожие имена</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              {nm.origin ? `Имена ${nm.origin} происхождения` : "Похожие имена"}
+            </h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-              {related.map((n) => (
+              {by_origin.map((n) => (
+                <Link
+                  key={n.translit}
+                  href={`/names/${n.translit}`}
+                  className="p-3 bg-slate-900/60 hover:bg-slate-800 border border-white/5 hover:border-violet-500/40 rounded-xl transition text-center text-sm"
+                >
+                  {n.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Имена на ту же букву */}
+        {by_letter.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">
+              Имена на букву «{nm.name.charAt(0)}»
+            </h2>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+              {by_letter.map((n) => (
                 <Link
                   key={n.translit}
                   href={`/names/${n.translit}`}
