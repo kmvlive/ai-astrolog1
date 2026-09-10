@@ -403,3 +403,110 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/max/confirm/{maxUserId}', [\App\Http\Controllers\Api\MaxConnectController::class, 'confirm']);
 });
 Route::get('/max/setup-webhook', [\App\Http\Controllers\Api\MaxWebhookController::class, 'setupWebhook']);
+
+// === ЗНАЧЕНИЯ ИМЕН ===
+Route::get('/names', function (\Illuminate\Http\Request $request) {
+    $q = mb_strtolower(trim($request->input('q', '')));
+    
+    if (mb_strlen($q) < 2) {
+        // Возвращаем 50 случайных имён
+        $names = \App\Models\NameMeaning::where('approved', true)
+            ->inRandomOrder()
+            ->limit(50)
+            ->get(['name', 'translit']);
+        return response()->json(['names' => $names]);
+    }
+    
+    // Поиск
+    $names = \App\Models\NameMeaning::where('approved', true)
+        ->where(function ($query) use ($q) {
+            $query->where('name', 'ILIKE', "%{$q}%")
+                  ->orWhere('translit', 'ILIKE', "%{$q}%");
+        })
+        ->limit(20)
+        ->get(['name', 'translit', 'interpretation']);
+    
+    return response()->json(['names' => $names]);
+});
+
+Route::get('/names/count', fn () => response()->json(['count' => \App\Models\NameMeaning::where('approved', true)->count()]));
+
+Route::get('/names/{translit}', function (string $translit) {
+    $name = \App\Models\NameMeaning::where('translit', $translit)
+        ->where('approved', true)
+        ->first();
+    
+    if (!$name) {
+        // Пробуем найти по оригинальному имени
+        $detranslit = detransliterateName($translit);
+        $name = \App\Models\NameMeaning::where('name', $detranslit)
+            ->where('approved', true)
+            ->first();
+    }
+    
+    if (!$name) {
+        return response()->json(['error' => 'not_found'], 404);
+    }
+    
+    // Увеличиваем просмотры
+    $name->increment('views');
+    
+    return response()->json(['name' => $name]);
+});
+
+Route::post('/names/ai', function (\Illuminate\Http\Request $request) {
+    $request->validate([
+        'name' => 'required|string|max:50|min:2',
+    ]);
+    
+    $rawName = trim(mb_strtolower($request->name));
+    $name = mb_strtoupper(mb_substr($rawName, 0, 1)) . mb_substr($rawName, 1);
+    $translit = transliterateName($name);
+    
+    // Проверяем есть ли уже
+    $existing = \App\Models\NameMeaning::where('translit', $translit)->first();
+    if ($existing) {
+        return response()->json(['name' => $existing, 'cached' => true]);
+    }
+    
+    // Генерируем AI
+    $interpretation = app(\App\Services\AiService::class)->generateNameMeaning($name);
+    if (!$interpretation) {
+        return response()->json(['error' => 'ai_failed'], 500);
+    }
+    
+    $meaning = \App\Models\NameMeaning::create([
+        'name' => $name,
+        'translit' => $translit,
+        'interpretation' => $interpretation,
+        'ai_generated' => true,
+        'approved' => true,
+    ]);
+    
+    return response()->json(['name' => $meaning, 'cached' => false]);
+});
+
+// Хелперы транслитерации
+function transliterateName(string $text): string {
+    $map = [
+        'а'=>'a','б'=>'b','в'=>'v','г'=>'g','д'=>'d','е'=>'e','ё'=>'yo','ж'=>'zh','з'=>'z','и'=>'i',
+        'й'=>'y','к'=>'k','л'=>'l','м'=>'m','н'=>'n','о'=>'o','п'=>'p','р'=>'r','с'=>'s','т'=>'t',
+        'у'=>'u','ф'=>'f','х'=>'kh','ц'=>'ts','ч'=>'ch','ш'=>'sh','щ'=>'sch','ъ'=>'','ы'=>'y','ь'=>'',
+        'э'=>'e','ю'=>'yu','я'=>'ya'
+    ];
+    return mb_strtolower(str_replace(array_keys($map), array_values($map), $text));
+}
+
+function detransliterateName(string $text): string {
+    $map = [
+        'yo'=>'ё','zh'=>'ж','kh'=>'х','ts'=>'ц','ch'=>'ч','sh'=>'ш','sch'=>'щ','yu'=>'ю','ya'=>'я',
+        'a'=>'а','b'=>'б','v'=>'в','g'=>'г','d'=>'д','e'=>'е','z'=>'з','i'=>'и','y'=>'й',
+        'k'=>'к','l'=>'л','m'=>'м','n'=>'н','o'=>'о','p'=>'п','r'=>'р','s'=>'с','t'=>'т',
+        'u'=>'у','f'=>'ф'
+    ];
+    $text = mb_strtolower($text);
+    foreach ($map as $lat => $cyr) {
+        $text = str_replace($lat, $cyr, $text);
+    }
+    return $text;
+}

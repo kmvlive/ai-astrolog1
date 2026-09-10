@@ -651,4 +651,40 @@ SVG;
         }
     }
 
+
+    public function generateNameMeaning(string $name): ?string
+    {
+        $baseUrl = rtrim(env('TIMEWEB_AI_BASE_URL', 'https://api.timeweb.ai/v1'), '/');
+        $apiKey = env('TIMEWEB_AI_API_KEY');
+        $model = env('TIMEWEB_AI_MODEL', 'dashscope/qwen3.5-flash');
+
+        if (!$apiKey) return null;
+
+        try {
+            $response = Http::timeout(60)
+                ->withHeaders([
+                    'Authorization' => "Bearer {$apiKey}",
+                    'Content-Type' => 'application/json',
+                ])
+                ->post("{$baseUrl}/chat/completions", [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'Ты — эксперт по ономастике и истории имён. Пиши тёплый, живой текст на русском языке. Без списков, без эмодзи, без заголовков. Пиши связными абзацами.'],
+                        ['role' => 'user', 'content' => "Расскажи про имя «{$name}»: происхождение, значение, какие черты характера обычно приписывают носителям этого имени, известные люди с таким именем. Напиши 4-6 абзацев тёплого текста."],
+                    ],
+                    'temperature' => 0.75,
+                    'max_tokens' => 800,
+                    'enable_thinking' => false,
+                ]);
+
+            if ($response->successful()) {
+                $text = $response->json('choices.0.message.content');
+                return $text ? trim($this->cleanAiText($text)) : null;
+            }
+            return null;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('AI name meaning error: ' . $e->getMessage());
+            return null;
+        }
+    }
 }

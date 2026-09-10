@@ -332,7 +332,7 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-4 gap-6">
           <Link href="/crystal-ball" className="group relative overflow-hidden bg-gradient-to-br from-violet-900/50 to-indigo-950 border border-violet-500/30 rounded-3xl p-8 transition hover:-translate-y-1 hover:border-violet-400/50">
               <div className="absolute top-4 right-4 text-4xl opacity-20 group-hover:opacity-40 transition">🔮</div>
               <div className="text-3xl mb-3">🔮</div>
@@ -365,6 +365,15 @@ export default function HomePage() {
               <h3 className="text-2xl font-bold mb-2">Сонник</h3>
               <p className="text-slate-300 mb-6"><DreamsCount /> толкований снов. Не нашли свой символ — AI растолкует его специально для вас.</p>
               <span className="inline-block bg-indigo-600 group-hover:bg-indigo-500 rounded-xl px-5 py-2.5 text-sm font-semibold transition">Растолковать сон →</span>
+            </div>
+          </a>
+          <a href="/names" className="group relative overflow-hidden bg-gradient-to-br from-purple-900/50 to-indigo-950 border border-purple-500/30 rounded-3xl p-8 transition hover:-translate-y-1 hover:border-purple-400/50">
+            <div className="absolute -top-8 -right-8 text-[120px] opacity-20 group-hover:opacity-30 group-hover:scale-110 transition">✨</div>
+            <div className="relative">
+              <div className="text-5xl mb-4">✨</div>
+              <h3 className="text-2xl font-bold mb-2">Значение имени</h3>
+              <p className="text-slate-300 mb-6">Происхождение, значение и характер имени. AI расскажет про любое имя за секунды.</p>
+              <span className="inline-block bg-purple-600 group-hover:bg-purple-500 rounded-xl px-5 py-2.5 text-sm font-semibold transition">Узнать значение →</span>
             </div>
           </a>
         </div>
