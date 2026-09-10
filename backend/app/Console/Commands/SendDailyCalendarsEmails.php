@@ -3,11 +3,13 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
+use App\Models\DeliveryLog;
 use App\Services\UniSenderService;
 use App\Services\CalendarDataService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\QueryException;
 
 class SendDailyCalendarsEmails extends Command
 {
@@ -16,6 +18,15 @@ class SendDailyCalendarsEmails extends Command
 
     public function handle(): int
     {
+        // Проверяем что драйвер PostgreSQL доступен
+        try {
+            \DB::connection()->getPdo();
+        } catch (\Exception $e) {
+            Log::error('calendar:send-daily-emails: DB connection failed', ['error' => $e->getMessage()]);
+            $this->error("Ошибка подключения к БД: " . $e->getMessage());
+            return 1;
+        }
+
         $today = now()->toDateString();
 
         if (!$this->option('test') && !$this->option('force')) {
@@ -26,7 +37,7 @@ class SendDailyCalendarsEmails extends Command
             }
         }
 
-        $alreadySent = \App\Models\DeliveryLog::where('event_type', 'daily_calendars')
+        $alreadySent = DeliveryLog::where('event_type', 'daily_calendars')
             ->whereDate('created_at', $today)
             ->where('status', 'sent')
             ->exists();
@@ -55,6 +66,7 @@ class SendDailyCalendarsEmails extends Command
 
         $sent = 0;
         $skipped = 0;
+        $errors = 0;
         $totalCount = $query->count();
         $this->info("Найдено пользователей: {$totalCount}");
 
@@ -69,12 +81,20 @@ class SendDailyCalendarsEmails extends Command
             foreach ($userCalendarSlugs as $slug) {
                 $cal = $user->calendars->firstWhere('slug', $slug);
                 if (!$cal) continue;
-                $info = $calService->getDayInfo($slug, $date);
-                $calendars[] = [
-                    'emoji' => $cal->emoji,
-                    'name' => $cal->name,
-                    'blocks' => $info['blocks'],
-                ];
+                try {
+                    $info = $calService->getDayInfo($slug, $date);
+                    $calendars[] = [
+                        'emoji' => $cal->emoji,
+                        'name' => $cal->name,
+                        'blocks' => $info['blocks'],
+                    ];
+                } catch (\Exception $e) {
+                    Log::warning("calendar:send-daily-emails: failed to get day info", [
+                        'user_id' => $user->id,
+                        'slug' => $slug,
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
 
             if (empty($calendars)) {
@@ -83,8 +103,8 @@ class SendDailyCalendarsEmails extends Command
             }
 
             if (!$this->option('test')) {
-                $alreadySentToUser = \App\Models\DeliveryLog::where('event_type', 'daily_calendars')
-                    ->where('user_id', $user->id)
+                $alreadySentToUser = DeliveryLog::where('user_id', $user->id)
+                    ->where('event_type', 'daily_calendars')
                     ->whereDate('created_at', $today)
                     ->where('status', 'sent')
                     ->exists();
@@ -92,35 +112,73 @@ class SendDailyCalendarsEmails extends Command
                     $skipped++;
                     continue;
                 }
-                \App\Models\DeliveryLog::create(['user_id' => $user->id, 'event_type' => 'daily_calendars', 'status' => 'sending']);
+                
+                try {
+                    DeliveryLog::create([
+                        'user_id' => $user->id,
+                        'event_type' => 'daily_calendars',
+                        'status' => 'sending'
+                    ]);
+                } catch (QueryException $e) {
+                    if (str_contains($e->getMessage(), 'duplicate key') || str_contains($e->getMessage(), 'Unique violation')) {
+                        $skipped++;
+                        continue;
+                    }
+                    throw $e;
+                }
             }
 
-            [$html, $text] = $service->buildCalendarDigestEmail($user->name, $dateRu, $calendars, $user->id);
-            $ok = $service->sendEmail($user->email, "📅 Ваши календари на {$dateRu}", $html, $text);
+            try {
+                [$html, $text] = $service->buildCalendarDigestEmail($user->name, $dateRu, $calendars, $user->id);
+                $ok = $service->sendEmail($user->email, "📅 Ваши календари на {$dateRu}", $html, $text);
 
-            if ($ok) {
-                if (!$this->option('test')) {
-                    \App\Models\DeliveryLog::where('user_id', $user->id)
-                        ->where('event_type', 'daily_calendars')
-                        ->whereDate('created_at', $today)
-                        ->update(['status' => 'sent']);
+                if ($ok) {
+                    if (!$this->option('test')) {
+                        DeliveryLog::where('user_id', $user->id)
+                            ->where('event_type', 'daily_calendars')
+                            ->whereDate('created_at', $today)
+                            ->update(['status' => 'sent']);
+                    }
+                    $sent++;
+                    $this->info("{$user->email}: отправлено");
+                } else {
+                    if (!$this->option('test')) {
+                        DeliveryLog::where('user_id', $user->id)
+                            ->where('event_type', 'daily_calendars')
+                            ->whereDate('created_at', $today)
+                            ->update(['status' => 'failed']);
+                    }
+                    $errors++;
+                    $this->error("{$user->email}: ошибка отправки");
                 }
-                $sent++;
-                $this->info("{$user->email}: отправлено");
-            } else {
+            } catch (\Exception $e) {
+                Log::error("calendar:send-daily-emails: exception for user {$user->id}", [
+                    'email' => $user->email,
+                    'error' => $e->getMessage()
+                ]);
+                $errors++;
+                $this->error("{$user->email}: исключение - " . $e->getMessage());
+                
                 if (!$this->option('test')) {
-                    \App\Models\DeliveryLog::where('user_id', $user->id)
-                        ->where('event_type', 'daily_calendars')
-                        ->whereDate('created_at', $today)
-                        ->update(['status' => 'failed']);
+                    try {
+                        DeliveryLog::where('user_id', $user->id)
+                            ->where('event_type', 'daily_calendars')
+                            ->whereDate('created_at', $today)
+                            ->update(['status' => 'failed']);
+                    } catch (\Exception $updateError) {
+                        // Ignore update errors
+                    }
                 }
-                $this->error("{$user->email}: ошибка");
             }
             usleep(300000);
         }
 
-        Log::info('calendar:send-daily-emails END', ['sent' => $sent, 'skipped' => $skipped]);
-        $this->info("Готово! Отправлено: {$sent}, пропущено: {$skipped}");
+        Log::info('calendar:send-daily-emails END', [
+            'sent' => $sent,
+            'skipped' => $skipped,
+            'errors' => $errors
+        ]);
+        $this->info("Готово! Отправлено: {$sent}, пропущено: {$skipped}, ошибок: {$errors}");
         return 0;
     }
 }
