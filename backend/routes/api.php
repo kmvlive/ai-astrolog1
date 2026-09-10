@@ -521,3 +521,121 @@ Route::get('/names/origins', function () {
         ->values();
     return response()->json(['origins' => $origins]);
 });
+
+// === ЗНАЧЕНИЯ ИМЕН ===
+Route::get('/names/origins', function () {
+    $origins = \App\Models\NameMeaning::where('approved', true)
+        ->whereNotNull('origin')
+        ->select('origin')
+        ->distinct()
+        ->pluck('origin')
+        ->sort()
+        ->values();
+    return response()->json(['origins' => $origins]);
+});
+
+Route::get('/names/count', fn () => response()->json(['count' => \App\Models\NameMeaning::where('approved', true)->count()]));
+
+Route::get('/names', function (\Illuminate\Http\Request $request) {
+    $q = mb_strtolower(trim($request->input('q', '')));
+    $origin = trim($request->input('origin', ''));
+
+    $query = \App\Models\NameMeaning::where('approved', true);
+
+    if ($origin) {
+        $query->where('origin', $origin);
+    }
+
+    if (mb_strlen($q) < 2) {
+        $names = $query->inRandomOrder()->limit(100)->get(['name', 'translit', 'origin']);
+        return response()->json(['names' => $names]);
+    }
+
+    $names = $query
+        ->where(function ($query) use ($q) {
+            $query->where('name', 'ILIKE', "%{$q}%")
+                  ->orWhere('translit', 'ILIKE', "%{$q}%");
+        })
+        ->limit(20)
+        ->get(['name', 'translit', 'origin', 'interpretation']);
+
+    return response()->json(['names' => $names]);
+});
+
+Route::get('/names/{translit}', function (string $translit) {
+    $name = \App\Models\NameMeaning::where('translit', $translit)
+        ->where('approved', true)
+        ->first();
+
+    if (!$name) {
+        $detranslit = detransliterateName($translit);
+        $name = \App\Models\NameMeaning::where('name', $detranslit)
+            ->where('approved', true)
+            ->first();
+    }
+
+    if (!$name) {
+        return response()->json(['error' => 'not_found'], 404);
+    }
+
+    $name->increment('views');
+
+    return response()->json(['name' => $name]);
+});
+
+Route::post('/names/ai', function (\Illuminate\Http\Request $request) {
+    $request->validate([
+        'name' => 'required|string|max:50|min:2',
+    ]);
+
+    $rawName = trim(mb_strtolower($request->name));
+    $name = mb_strtoupper(mb_substr($rawName, 0, 1)) . mb_substr($rawName, 1);
+    $translit = transliterateName($name);
+
+    $existing = \App\Models\NameMeaning::where('translit', $translit)->first();
+    if ($existing) {
+        return response()->json(['name' => $existing, 'cached' => true]);
+    }
+
+    $interpretation = app(\App\Services\AiService::class)->generateNameMeaning($name);
+    if (!$interpretation) {
+        return response()->json(['error' => 'ai_failed'], 500);
+    }
+
+    $origin = app(\App\Services\AiService::class)->detectNameOrigin($name);
+
+    $meaning = \App\Models\NameMeaning::create([
+        'name' => $name,
+        'translit' => $translit,
+        'interpretation' => $interpretation,
+        'origin' => $origin,
+        'ai_generated' => true,
+        'approved' => true,
+    ]);
+
+    return response()->json(['name' => $meaning, 'cached' => false]);
+});
+
+function transliterateName(string $text): string {
+    $map = [
+        'а'=>'a','б'=>'b','в'=>'v','г'=>'g','д'=>'d','е'=>'e','ё'=>'yo','ж'=>'zh','з'=>'z','и'=>'i',
+        'й'=>'y','к'=>'k','л'=>'l','м'=>'m','н'=>'n','о'=>'o','п'=>'p','р'=>'r','с'=>'s','т'=>'t',
+        'у'=>'u','ф'=>'f','х'=>'kh','ц'=>'ts','ч'=>'ch','ш'=>'sh','щ'=>'sch','ъ'=>'','ы'=>'y','ь'=>'',
+        'э'=>'e','ю'=>'yu','я'=>'ya'
+    ];
+    return mb_strtolower(str_replace(array_keys($map), array_values($map), $text));
+}
+
+function detransliterateName(string $text): string {
+    $map = [
+        'yo'=>'ё','zh'=>'ж','kh'=>'х','ts'=>'ц','ch'=>'ч','sh'=>'ш','sch'=>'щ','yu'=>'ю','ya'=>'я',
+        'a'=>'а','b'=>'б','v'=>'в','g'=>'г','d'=>'д','e'=>'е','z'=>'з','i'=>'и','y'=>'й',
+        'k'=>'к','l'=>'л','m'=>'м','n'=>'н','o'=>'о','p'=>'п','r'=>'р','s'=>'с','t'=>'т',
+        'u'=>'у','f'=>'ф'
+    ];
+    $text = mb_strtolower($text);
+    foreach ($map as $lat => $cyr) {
+        $text = str_replace($lat, $cyr, $text);
+    }
+    return $text;
+}
