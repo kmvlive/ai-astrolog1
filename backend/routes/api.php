@@ -656,3 +656,18 @@ Route::post('/names/compatibility', function (\Illuminate\Http\Request $request)
 
     return response()->json($result);
 });
+
+// Нижнее меню (футер)
+Route::get('/footer-menu', function () {
+    $cacheKey = 'footer_menu';
+    $menu = cache($cacheKey);
+    
+    if (!$menu) {
+        $menu = \App\Models\FooterMenuItem::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get(['title', 'url', 'open_in_new_tab']);
+        cache([$cacheKey => $menu], now()->addHour());
+    }
+    
+    return response()->json(['menu' => $menu]);
+});
