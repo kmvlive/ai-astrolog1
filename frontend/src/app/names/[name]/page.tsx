@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import ShareBlock from "@/components/ShareBlock";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
@@ -88,6 +89,8 @@ export default async function NameMeaningPage({ params }: { params: Promise<{ na
           <div className="text-lg text-slate-200 leading-relaxed mb-8 whitespace-pre-line">
             {nm.interpretation}
           </div>
+
+          <ShareBlock title={`Значение имени ${nm.name} — происхождение и характер | AI Астролог`} />
 
           {/* Кнопка совместимости */}
           <div className="pt-6 border-t border-white/10">

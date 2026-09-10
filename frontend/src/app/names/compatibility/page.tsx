@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import ShareBlock from "@/components/ShareBlock";
 import { useSearchParams } from "next/navigation";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
@@ -109,6 +110,9 @@ function CompatibilityContent() {
             <span className="inline-block mt-6 px-3 py-1 bg-pink-600/30 border border-pink-500/40 rounded-full text-xs font-semibold">
               ✨ AI-анализ
             </span>
+            <div className="mt-6 pt-6 border-t border-white/10">
+              <ShareBlock title={`Совместимость имён ${result.name1} и ${result.name2} — AI-анализ | AI Астролог`} />
+            </div>
           </div>
         )}
       </div>
