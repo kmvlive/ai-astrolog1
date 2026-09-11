@@ -148,7 +148,7 @@ class CalendarDataService
                     $seen[] = mb_strtolower($n);
                 }
 
-                // Национальные: только Россия и даты без страны
+                // Национальные: Россия — всегда; даты без страны — через фильтр релевантности
                 foreach ($w['natl'] ?? [] as $raw) {
                     $raw = trim((string) $raw);
                     $isRu = mb_stripos($raw, 'Россия') !== false || mb_stripos($raw, 'РФ') !== false;
@@ -157,10 +157,14 @@ class CalendarDataService
                         continue;
                     }
                     $n = $clean($raw);
-                    if ($n !== '' && !in_array(mb_strtolower($n), $seen, true)) {
-                        $items[] = ['name' => $n, 'text' => ''];
-                        $seen[] = mb_strtolower($n);
+                    if ($n === '' || in_array(mb_strtolower($n), $seen, true)) {
+                        continue;
                     }
+                    if (!$isRu && !$this->isDigestWorthy($n)) {
+                        continue;
+                    }
+                    $items[] = ['name' => $n, 'text' => ''];
+                    $seen[] = mb_strtolower($n);
                 }
 
                 $items = array_slice($items, 0, 6);
