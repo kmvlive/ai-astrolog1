@@ -470,15 +470,57 @@ PROMPT;
     ];
 
     private const HORDE_PROMPTS = [
-        'ethereal glowing crystal ball with swirling cosmos inside, floating in soft lavender mist, pearl white and silver palette, dreamy soft lighting, masterpiece, 8k, professional digital art',
-        'zodiac wheel made of shimmering stars and constellations, delicate golden lines, soft blue and lavender nebula background, celestial elegance, masterpiece, high detail',
-        'tarot cards floating in peaceful cosmic void, glowing silver edges, soft pink and lavender aurora, mystical stillness, professional illustration, 8k quality',
-        'crescent moon reflected in calm mountain lake at dawn, soft pink and lavender sky, silvery mist, ethereal dreamy atmosphere, masterpiece digital art',
-        'ancient celestial astrolabe with golden filigree floating in soft cosmic clouds, pearl white and sky blue palette, elegant and mystical, professional concept art',
-        'floating tarot cards surrounded by delicate starlight, soft bokeh, lavender and cream palette, peaceful mystical atmosphere, high detail illustration',
-        'mystical crystal sphere with galaxy swirl inside, resting on old leather-bound book, soft candlelight glow, warm pearl tones, masterpiece fantasy art',
-        'peaceful starry night over misty lavender hills, silver moonlight, soft dreamy atmosphere, ethereal landscape, professional digital painting, 8k',
+        // Категория 1: Мистические объекты
+        [
+            'ethereal glowing crystal ball with swirling cosmos inside, floating in soft lavender mist, {keyword}, pearl white and silver palette, dreamy soft lighting, masterpiece, 8k',
+            'zodiac wheel made of shimmering stars and constellations, delicate golden lines, {keyword}, soft blue and lavender nebula background, celestial elegance, masterpiece',
+            'ancient celestial astrolabe with golden filigree floating in soft cosmic clouds, {keyword}, pearl white and sky blue palette, elegant and mystical, professional concept art',
+            'mystical crystal sphere with galaxy swirl inside, resting on old leather-bound book, {keyword}, soft candlelight glow, warm pearl tones, masterpiece fantasy art',
+        ],
+        // Категория 2: Люди/силуэты (могут быть кривыми)
+        [
+            'silhouette of a fortune teller woman with flowing hair standing on a cliff under starry sky, {keyword}, milky way, purple aurora, cinematic lighting, digital painting',
+            'mysterious hooded astrologer holding glowing orb, {keyword}, soft moonlight, ethereal mystical atmosphere, professional fantasy art',
+            'elegant woman in flowing robes gazing at zodiac wheel in the sky, {keyword}, soft lavender and silver tones, dreamy mystical illustration',
+        ],
+        // Категория 3: Мифические животные
+        [
+            'majestic phoenix rising from cosmic flames, {keyword}, silver and lavender palette, ethereal mystical creature, masterpiece digital art',
+            'wise owl with galaxy eyes perched on ancient branch, {keyword}, soft moonlight, mystical forest atmosphere, professional illustration',
+            'ethereal white dragon coiled around crescent moon, {keyword}, pearl and silver scales, cosmic clouds, fantasy art, highly detailed',
+            'mystical unicorn with flowing mane made of stardust, {keyword}, soft lavender sky, dreamy magical creature, 8k quality',
+        ],
+        // Категория 4: Пейзажи
+        [
+            'crescent moon reflected in calm mountain lake at dawn, {keyword}, soft pink and lavender sky, silvery mist, ethereal dreamy atmosphere, masterpiece',
+            'peaceful starry night over misty lavender hills, {keyword}, silver moonlight, soft dreamy atmosphere, ethereal landscape, professional digital painting',
+            'ancient temple ruins on a hill under huge full moon and star trails, {keyword}, purple night sky, fantasy landscape, cinematic',
+        ],
+        // Категория 5: Абстрактное/космос
+        [
+            'swirling galaxy vortex in shape of infinity symbol, {keyword}, cosmic dust, violet and blue nebula, surreal mystical digital art',
+            'floating geometric sacred geometry patterns in cosmic void, {keyword}, soft glowing edges, lavender and cream palette, mystical atmosphere',
+            'nebula clouds forming abstract mystical symbols, {keyword}, soft pink and silver tones, ethereal cosmic art, highly detailed',
+        ],
     ];
+
+    private function extractKeywords(string $text): string
+    {
+        // Берём первые 2-3 слова из заголовка
+        $words = array_filter(preg_split('/\s+/', mb_strtolower($text)));
+        $keywords = array_slice($words, 0, min(3, count($words)));
+        return implode(' ', $keywords);
+    }
+
+    private function getRandomPrompt(string $postTitle): string
+    {
+        $category = random_int(0, count(self::HORDE_PROMPTS) - 1);
+        $prompts = self::HORDE_PROMPTS[$category];
+        $prompt = $prompts[random_int(0, count($prompts) - 1)];
+        
+        $keyword = $this->extractKeywords($postTitle);
+        return str_replace('{keyword}', $keyword, $prompt);
+    }
 
     private function generateViaStableHorde(string $prompt): ?string
     {
@@ -549,7 +591,7 @@ PROMPT;
 
         // 0) Stable Horde: уникальный арт без водяных знаков
         for ($i = 0; $i < 2; $i++) {
-            $prompt = self::HORDE_PROMPTS[random_int(0, count(self::HORDE_PROMPTS) - 1)];
+            $prompt = $this->getRandomPrompt($post->title);
             $raw = $this->generateViaStableHorde($prompt);
             if ($raw && strlen($raw) > 30000) {
                 $suffix = substr(md5(time() . random_int(1000, 9999)), 0, 8);
