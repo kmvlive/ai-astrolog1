@@ -56,15 +56,35 @@ class CalendarDataService
 
     private function loadJson(string $path, $default)
     {
+        // Читаем напрямую через файловую систему — надёжнее Storage (не зависит от конфигурации дисков)
+        $candidates = [
+            storage_path('app/' . $path),
+            base_path('storage/app/' . $path),
+        ];
+
+        foreach ($candidates as $file) {
+            if (is_file($file) && is_readable($file)) {
+                $content = @file_get_contents($file);
+                if ($content !== false && $content !== '') {
+                    $decoded = json_decode($content, true);
+                    if ($decoded !== null) {
+                        return $decoded;
+                    }
+                }
+            }
+        }
+
+        // Фолбэк через Storage (вдруг диск настроен иначе)
         try {
             $content = Storage::get($path);
-            if ($content === null || $content === '') {
-                return $default;
+            if ($content) {
+                return json_decode($content, true) ?: $default;
             }
-            return json_decode($content, true) ?: $default;
         } catch (\Exception $e) {
-            return $default;
+            // ignore
         }
+
+        return $default;
     }
 
     private function moonAge(Carbon $d): float
