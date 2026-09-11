@@ -32,6 +32,26 @@ class CalendarDataService
         $this->orthodox = $this->loadJson("$path/orthodox.json", []);
         $this->haircutGood = $this->loadJson("$path/haircut-good.json", []);
         $this->wiki = $this->loadJson("$path/wiki-days.json", []);
+
+        // Встроенные fallback-данные: рассылка никогда не будет пустой
+        if (!$this->phases) {
+            $this->phases = [
+                ['name' => 'Новолуние', 'emoji' => '🌑'],
+                ['name' => 'Растущий серп', 'emoji' => '🌒'],
+                ['name' => 'Первая четверть', 'emoji' => '🌓'],
+                ['name' => 'Растущая луна', 'emoji' => '🌔'],
+                ['name' => 'Полнолуние', 'emoji' => '🌕'],
+                ['name' => 'Убывающая луна', 'emoji' => '🌖'],
+                ['name' => 'Последняя четверть', 'emoji' => '🌗'],
+                ['name' => 'Убывающий серп', 'emoji' => '🌘'],
+            ];
+        }
+        if (!$this->lunarDays) {
+            $this->lunarDays = array_fill(0, 30, 'День несёт свою энергетику — действуйте осознанно и внимательно.');
+        }
+        if (!$this->lunarAdvice) {
+            $this->lunarAdvice = array_fill(0, 30, 'Прислушивайтесь к себе, не форсируйте события и завершайте начатое.');
+        }
     }
 
     private function loadJson(string $path, $default)
