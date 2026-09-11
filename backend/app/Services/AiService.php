@@ -469,10 +469,94 @@ PROMPT;
         'https://images.unsplash.com/photo-1532693322450-2cb5c511067d',
     ];
 
+    private const HORDE_PROMPTS = [
+        'mystic night sky with purple nebula and crescent moon over mountain silhouettes, ethereal fog, deep violet and indigo palette, fantasy digital art, highly detailed',
+        'silhouette of a fortune teller woman with flowing hair standing on a cliff under starry sky, milky way, purple aurora, cinematic lighting, digital painting',
+        'crystal ball glowing with cosmic energy on old wooden table, candles bokeh, dark mystical room, purple tones, fantasy art',
+        'celestial zodiac wheel of stars and constellations in deep space, golden thin lines, purple nebula background, elegant mystical illustration',
+        'moon phases arc over misty lavender field at night, stars, soft glow, dreamy fantasy digital art, violet palette',
+        'ancient astrologer tower on a hill under huge full moon and star trails, purple night sky, fantasy landscape, cinematic',
+        'swirling galaxy in shape of a human silhouette, cosmic dust, violet and blue nebula, surreal mystical digital art',
+        'tarot cards floating in starry void with glowing edges, purple cosmic background, mystical atmosphere, digital painting',
+    ];
+
+    private function generateViaStableHorde(string $prompt): ?string
+    {
+        $base = 'https://stablehorde.net/api/v2';
+        $apikey = env('STABLE_HORDE_KEY', '0000000000');
+        $headers = ['apikey' => $apikey, 'Client-Agent' => 'neiro-astro:1.0:admin'];
+
+        try {
+            $resp = Http::timeout(30)->withHeaders($headers)->post("$base/generate/async", [
+                'prompt' => $prompt,
+                'params' => [
+                    'width' => 1152,
+                    'height' => 768,
+                    'steps' => 20,
+                    'cfg_scale' => 7,
+                    'sampler_name' => 'k_euler_a',
+                    'negative_prompt' => 'text, watermark, logo, signature, words, letters, username, ugly, deformed, blurry, low quality, horses',
+                ],
+                'models' => ['AlbedoBase XL (SDXL)'],
+                'nsfw' => false,
+            ]);
+
+            $id = $resp->json('id');
+            if (!$id) {
+                Log::warning('StableHorde: нет id', ['status' => $resp->status(), 'body' => substr($resp->body(), 0, 300)]);
+                return null;
+            }
+
+            // Ждём результат до ~70 секунд
+            for ($i = 0; $i < 14; $i++) {
+                sleep(5);
+                $st = Http::timeout(15)->withHeaders($headers)->get("$base/generate/status/$id");
+                if (!$st->successful()) continue;
+                $data = $st->json();
+                if ($data['faulted'] ?? false) return null;
+                if (($data['done'] ?? false) && !empty($data['generations'][0]['img'])) {
+                    $raw = base64_decode($data['generations'][0]['img']);
+                    return $this->webpToJpeg($raw, 1200, 800);
+                }
+            }
+            Log::warning('StableHorde: таймаут ожидания', ['id' => $id]);
+            return null;
+        } catch (\Throwable $e) {
+            Log::warning('StableHorde исключение', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    private function webpToJpeg(string $raw, int $w, int $h): ?string
+    {
+        $img = @imagecreatefromstring($raw);
+        if (!$img) return null;
+        $resized = imagescale($img, $w, $h);
+        if (!$resized) { imagedestroy($img); return null; }
+        ob_start();
+        imagejpeg($resized, null, 90);
+        $out = ob_get_clean();
+        imagedestroy($img);
+        imagedestroy($resized);
+        return $out ?: null;
+    }
+
     public function generateCover(BlogPost $post): ?string
     {
         $disk = \Illuminate\Support\Facades\Storage::disk('public');
         $disk->makeDirectory('blog-covers');
+
+        // 0) Stable Horde: уникальный арт без водяных знаков
+        for ($i = 0; $i < 2; $i++) {
+            $prompt = self::HORDE_PROMPTS[random_int(0, count(self::HORDE_PROMPTS) - 1)];
+            $raw = $this->generateViaStableHorde($prompt);
+            if ($raw && strlen($raw) > 30000) {
+                $suffix = substr(md5(time() . random_int(1000, 9999)), 0, 8);
+                $file = 'blog-covers/' . $post->slug . '-' . $suffix . '.jpg';
+                $disk->put($file, $raw);
+                return $file;
+            }
+        }
 
         // 1) AI фэнтези-арт (кураторские промпты, без заголовка статьи)
         for ($i = 0; $i < 3; $i++) {
