@@ -449,16 +449,7 @@ PROMPT;
     }
 
 
-    private const FANTASY_PROMPTS = [
-        'ethereal beautiful woman with long flowing hair standing before a giant waterfall made of stars and stardust, galaxies and glowing planets in the background, deep purple indigo night sky, mystical fantasy digital painting, highly detailed, cinematic, no text, no watermark',
-        'handsome young man riding a mythical winged horse flying through cosmos, giant planets and colorful nebulae behind, starry sky, epic fantasy digital painting, highly detailed, cinematic lighting, no text, no watermark',
-        'several glowing planets arranged at different distances in deep space, purple and blue nebula clouds, scattered bright stars, cosmic fantasy digital painting, ultra detailed, no text, no watermark',
-        'mysterious woman silhouette crowned with stars standing on a mountain cliff under a giant ringed planet, milky way across the sky, fantasy digital art, highly detailed, no text, no watermark',
-        'celestial goddess with flowing dress made of nebulae holding a glowing moon, small planets orbiting around her at different distances, starry cosmos background, fantasy digital painting, no text, no watermark',
-        'waterfall of liquid starlight falling into a cosmic ocean, beautiful woman with flowing hair watching it, galaxies and planets in the sky, dreamy fantasy art, highly detailed, no text, no watermark',
-        'young man on a mythical pegasus galloping above the moon surface, distant planets at different depths, star field, epic fantasy digital painting, no text, no watermark',
-        'ancient astronomer tower under a giant swirling galaxy, planets aligned at different distances in the sky, purple nebula, stars, fantasy digital painting, cinematic, no text, no watermark',
-    ];
+
 
     private const COVER_POOL = [
         'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a',
