@@ -118,7 +118,15 @@ class BlogPostResource extends Resource
                             $record->update(['cover_image' => $cover]);
                             if ($old && $old !== $cover) \Illuminate\Support\Facades\Storage::disk('public')->delete($old);
                         }
-                        \Filament\Notifications\Notification::make()->title('Обложка обновлена — обновите страницу блога')->success()->send();
+                        // Сбрасываем кэш страницы (если он был)
+                        cache()->forget('blog_post_' . $record->id);
+                        cache()->forget('blog_post_slug_' . $record->slug);
+                        
+                        \Filament\Notifications\Notification::make()
+                            ->title('Обложка обновлена')
+                            ->body('Откройте статью в новой вкладке (Ctrl+Click) — кэш очищен')
+                            ->success()
+                            ->send();
                     }),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('view')
