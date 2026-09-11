@@ -765,4 +765,50 @@ SVG;
             return null;
         }
     }
+
+    public function generateHolidaysForDate(string $md): array
+    {
+        $baseUrl = rtrim(env('TIMEWEB_AI_BASE_URL', 'https://api.timeweb.ai/v1'), '/');
+        $apiKey = env('TIMEWEB_AI_API_KEY');
+        $model = env('TIMEWEB_AI_MODEL', 'dashscope/qwen3.5-flash');
+
+        if (!$apiKey) return [];
+
+        try {
+            $response = Http::timeout(30)
+                ->withHeaders([
+                    'Authorization' => "Bearer {$apiKey}",
+                    'Content-Type' => 'application/json',
+                ])
+                ->post("{$baseUrl}/chat/completions", [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'Ты — эксперт по праздникам и памятным датам. Возвращай ТОЛЬКО валидный JSON без markdown-обёрток и пояснений.'],
+                        ['role' => 'user', 'content' => "Перечисли 2-3 праздника и памятные даты, которые ЕЖЕГОДНО отмечаются {$md} (формат MM-DD): микс из международного дня, российского или профессионального праздника и одного необычного/неофициального праздника. Формат: строгий JSON-массив [{"name": "название", "text": "описание одним предложением, 10-15 слов"}]. Только повторяющиеся каждый год праздники, без единичных исторических событий."],
+                    ],
+                    'temperature' => 0.7,
+                    'max_tokens' => 400,
+                    'enable_thinking' => false,
+                ]);
+
+            if ($response->successful()) {
+                $text = trim($response->json('choices.0.message.content'));
+                $text = preg_replace('/^```json\s*|\s*```$/m', '', $text);
+                $arr = json_decode($text, true);
+                if (is_array($arr)) {
+                    $out = [];
+                    foreach ($arr as $item) {
+                        if (is_array($item) && !empty($item['name'])) {
+                            $out[] = ['name' => (string) $item['name'], 'text' => (string) ($item['text'] ?? '')];
+                        }
+                    }
+                    return $out;
+                }
+            }
+            return [];
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('generateHolidaysForDate error: ' . $e->getMessage());
+            return [];
+        }
+    }
 }
