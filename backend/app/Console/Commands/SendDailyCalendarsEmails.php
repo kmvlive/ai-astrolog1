@@ -29,21 +29,12 @@ class SendDailyCalendarsEmails extends Command
 
         $today = now()->toDateString();
 
-        if (!$this->option('test') && !$this->option('force')) {
-            $lock = Cache::lock('send_daily_calendars_emails_lock_' . $today, 1800);
-            if (!$lock->get()) {
-                $this->warn("Команда уже выполняется или уже выполнена сегодня");
-                return 0;
-            }
-        }
-
         $alreadySent = DeliveryLog::where('event_type', 'daily_calendars')
             ->whereDate('created_at', $today)
             ->where('status', 'sent')
             ->exists();
         if ($alreadySent && !$this->option('test') && !$this->option('force')) {
             $this->warn("Сегодня рассылка календарей уже уходила");
-            Cache::lock('send_daily_calendars_emails_lock_' . $today)->forceRelease();
             return 0;
         }
 
