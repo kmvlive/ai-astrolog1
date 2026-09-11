@@ -469,38 +469,55 @@ PROMPT;
         'https://images.unsplash.com/photo-1532693322450-2cb5c511067d',
     ];
 
-    private const HORDE_PROMPTS = [
-        // Категория 1: Мистические объекты
+    private const COVER_PROMPTS = [
+        // 1. Красивые женщины
         [
-            'ethereal glowing crystal ball with swirling cosmos inside, floating in soft lavender mist, {keyword}, pearl white and silver palette, dreamy soft lighting, masterpiece, 8k',
-            'zodiac wheel made of shimmering stars and constellations, delicate golden lines, {keyword}, soft blue and lavender nebula background, celestial elegance, masterpiece',
-            'ancient celestial astrolabe with golden filigree floating in soft cosmic clouds, {keyword}, pearl white and sky blue palette, elegant and mystical, professional concept art',
-            'mystical crystal sphere with galaxy swirl inside, resting on old leather-bound book, {keyword}, soft candlelight glow, warm pearl tones, masterpiece fantasy art',
+            'beautiful mystical sorceress with long flowing silver hair, standing in a moonlit garden, glowing runes floating around her hands, soft lavender and pearl palette, ethereal cinematic lighting, highly detailed face, {keyword}',
+            'elegant fortune teller woman with dark eyes and golden jewelry, sitting at a table with candles and tarot cards, warm amber glow, mysterious smile, rich purple shadows, professional fantasy portrait, {keyword}',
+            'celestial goddess of stars with flowing dress made of night sky and constellations, standing on clouds at dawn, soft pink and gold light, serene expression, epic fantasy digital painting, {keyword}',
+            'young witch with freckles and warm smile holding a glowing crystal lantern, autumn forest at golden hour, fireflies around, cozy magical atmosphere, highly detailed fantasy illustration, {keyword}',
         ],
-        // Категория 2: Люди/силуэты (могут быть кривыми)
+        // 2. Мистические животные
         [
-            'silhouette of a fortune teller woman with flowing hair standing on a cliff under starry sky, {keyword}, milky way, purple aurora, cinematic lighting, digital painting',
-            'mysterious hooded astrologer holding glowing orb, {keyword}, soft moonlight, ethereal mystical atmosphere, professional fantasy art',
-            'elegant woman in flowing robes gazing at zodiac wheel in the sky, {keyword}, soft lavender and silver tones, dreamy mystical illustration',
+            'majestic phoenix with fiery golden plumage rising above misty mountains at sunrise, sparks and embers swirling, epic cinematic fantasy art, highly detailed feathers, {keyword}',
+            'ethereal white unicorn with pearlescent mane walking through a glowing lavender field at twilight, stars appearing in violet sky, magical sparkles, dreamy fantasy painting, {keyword}',
+            'wise ancient dragon with silver scales coiled around a floating crystal island, aurora borealis in background, epic scale, cinematic lighting, masterpiece fantasy art, {keyword}',
+            'glowing celestial whale swimming through starry nebula clouds, tiny stars like plankton around it, surreal dreamlike cosmic scene, soft blue and violet palette, {keyword}',
         ],
-        // Категория 3: Мифические животные
+        // 3. Галактики и космос
         [
-            'majestic phoenix rising from cosmic flames, {keyword}, silver and lavender palette, ethereal mystical creature, masterpiece digital art',
-            'wise owl with galaxy eyes perched on ancient branch, {keyword}, soft moonlight, mystical forest atmosphere, professional illustration',
-            'ethereal white dragon coiled around crescent moon, {keyword}, pearl and silver scales, cosmic clouds, fantasy art, highly detailed',
-            'mystical unicorn with flowing mane made of stardust, {keyword}, soft lavender sky, dreamy magical creature, 8k quality',
+            'spiral galaxy with swirling purple and gold arms seen from above, countless stars and glowing core, deep space vista, ultra detailed astronomical art, {keyword}',
+            'colorful nebula clouds in pink violet and teal with newborn stars shining through, cosmic dust pillars, hubble style epic space scenery, highly detailed, {keyword}',
+            'double sunset over ringed planet seen from moon surface, alien sky in orange and magenta, dramatic clouds, sci-fi fantasy landscape, cinematic, {keyword}',
+            'star cluster inside translucent cosmic bubble floating in dark space, delicate light rays, surreal mystical astronomy art, ultra detailed, {keyword}',
         ],
-        // Категория 4: Пейзажи
+        // 4. Фантастические пейзажи
         [
-            'crescent moon reflected in calm mountain lake at dawn, {keyword}, soft pink and lavender sky, silvery mist, ethereal dreamy atmosphere, masterpiece',
-            'peaceful starry night over misty lavender hills, {keyword}, silver moonlight, soft dreamy atmosphere, ethereal landscape, professional digital painting',
-            'ancient temple ruins on a hill under huge full moon and star trails, {keyword}, purple night sky, fantasy landscape, cinematic',
+            'towering waterfall falling from floating island into clouds below, rainbow mist, lush greenery and glowing flowers on cliff edges, golden morning light, epic fantasy landscape, {keyword}',
+            'ancient marble temple on cliff overlooking turquoise sea at sunset, columns wrapped in flowering vines, warm golden light, serene majestic atmosphere, fantasy concept art, {keyword}',
+            'crystal mountains glowing from inside under aurora borealis, mirror lake reflecting violet sky, snow sparkles, magical winter landscape, masterpiece, {keyword}',
+            'alien valley with giant glowing mushrooms and bioluminescent river at night, two moons in starry sky, fantastical distant world, highly detailed sci-fi fantasy art, {keyword}',
         ],
-        // Категория 5: Абстрактное/космос
+        // 5. Разное время суток
         [
-            'swirling galaxy vortex in shape of infinity symbol, {keyword}, cosmic dust, violet and blue nebula, surreal mystical digital art',
-            'floating geometric sacred geometry patterns in cosmic void, {keyword}, soft glowing edges, lavender and cream palette, mystical atmosphere',
-            'nebula clouds forming abstract mystical symbols, {keyword}, soft pink and silver tones, ethereal cosmic art, highly detailed',
+            'misty dawn over lavender hills with ancient stone circle, first sun rays breaking through fog, soft pink and gold palette, peaceful magical morning, cinematic landscape, {keyword}',
+            'golden hour in enchanted forest with sunbeams through tall trees, floating pollen sparkles, moss covered stones, warm amber tones, dreamy fantasy scenery, {keyword}',
+            'violet twilight over calm sea with lighthouse beam and first stars, soft gradient sky from magenta to deep blue, serene mystical evening, highly detailed, {keyword}',
+            'midnight sky full of stars and milky way over quiet mountain lake, perfect reflection, silver moonlight, peaceful nocturnal landscape, masterpiece, {keyword}',
+        ],
+        // 6. Мистические объекты
+        [
+            'ornate golden astrolabe floating above open ancient book, glowing star map projecting upward, candlelit library background, warm magical atmosphere, ultra detailed fantasy still life, {keyword}',
+            'crystal ball on carved wooden stand showing swirling galaxy inside, soft violet glow illuminating dark mystical room, incense smoke, highly detailed, {keyword}',
+            'spread of glowing tarot cards floating in circle above moonlit table, silver light edges, mystical atmosphere, deep purple and gold palette, fantasy illustration, {keyword}',
+            'antique compass with mother of pearl inlay pointing to a shining star, lying on old star chart, soft candlelight, cozy magical mood, macro fantasy still life, {keyword}',
+        ],
+        // 7. Магия и порталы
+        [
+            'swirling portal of violet and gold light opening between two ancient trees, leaves lifted by magic wind, sparkles streaming through, epic fantasy moment, cinematic, {keyword}',
+            'aurora borealis dancing above snowy peaks in shapes of celestial runes, green and purple ribbons in starry sky, breathtaking night landscape, masterpiece, {keyword}',
+            'streams of glowing starlight flowing like rivers through dark cosmic valley, tiny lights like fireflies in space, surreal dreamscape, ultra detailed, {keyword}',
+            'magic circle of floating candles and flower petals around meditating figure silhouette at night, soft warm glow, peaceful mystical ritual, fantasy art, {keyword}',
         ],
     ];
 
@@ -514,12 +531,12 @@ PROMPT;
 
     private function getRandomPrompt(string $postTitle): string
     {
-        $category = random_int(0, count(self::HORDE_PROMPTS) - 1);
-        $prompts = self::HORDE_PROMPTS[$category];
+        $category = random_int(0, count(self::COVER_PROMPTS) - 1);
+        $prompts = self::COVER_PROMPTS[$category];
         $prompt = $prompts[random_int(0, count($prompts) - 1)];
         
         $keyword = $this->extractKeywords($postTitle);
-        return str_replace('{keyword}', $keyword, $prompt);
+        return str_replace('{keyword}', $keyword, $prompt) . ', masterpiece, highly detailed, cinematic lighting, no text, no watermark';
     }
 
     private function generateViaTimeweb(string $prompt): ?string
