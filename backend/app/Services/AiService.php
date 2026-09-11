@@ -347,7 +347,14 @@ class AiService
 
 PROMPT;
 
-        $userPrompt = "Дата: {$today->format('d.m.Y')} ({$this->weekdayRu($today)}).{$moonData}\n\nНапиши статью про энергии этого дня.";
+        $recentTitles = BlogPost::where('author_type', 'ai')
+            ->orderBy('published_at', 'desc')
+            ->limit(7)
+            ->pluck('title')
+            ->implode("\n- ");
+        $recentBlock = $recentTitles ? "\n\nВАЖНО: не повторяй эти темы и заголовки статей последних дней:\n- {$recentTitles}" : '';
+
+        $userPrompt = "Дата: {$today->format('d.m.Y')} ({$this->weekdayRu($today)}).{$moonData}\n\nНапиши статью про энергии этого дня.{$recentBlock}";
 
         try {
             $response = Http::timeout(90)
@@ -376,6 +383,13 @@ PROMPT;
 
             $content = preg_replace('/^\s*#{1,6}\s+[^\n]+\n+/', '', trim($content), 1);
             $title = $this->extractTitle($content) ?: "Энергии дня: " . $today->translatedFormat('d F Y');
+
+            // Защита от дублей заголовка (0 руб, без повторного AI)
+            if (BlogPost::where('title', $title)->exists()) {
+                $title .= ' — ' . $today->format('d.m.Y');
+                Log::info('Blog AI: заголовок дублировался, добавлена дата', ['title' => $title]);
+            }
+
             $slug = Str::slug($title) . '-' . $today->format('Ymd');
 
             $post = BlogPost::create([
