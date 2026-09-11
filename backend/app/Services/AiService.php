@@ -674,38 +674,6 @@ PROMPT;
             }
         }
 
-        // 1) Stable Horde: fallback если Timeweb упал
-        for ($i = 0; $i < 1; $i++) {
-            $prompt = $this->getRandomPrompt($post->title);
-            $raw = $this->generateViaStableHorde($prompt);
-            if ($raw && strlen($raw) > 30000) {
-                $suffix = substr(md5(time() . random_int(1000, 9999)), 0, 8);
-                $file = 'blog-covers/' . $post->slug . '-' . $suffix . '.jpg';
-                $disk->put($file, $raw);
-                return $file;
-            }
-        }
-
-        // 1) AI фэнтези-арт (кураторские промпты, без заголовка статьи)
-        for ($i = 0; $i < 3; $i++) {
-            $prompt = self::FANTASY_PROMPTS[random_int(0, count(self::FANTASY_PROMPTS) - 1)];
-            $url = "https://image.pollinations.ai/prompt/" . urlencode($prompt)
-                . "?width=1200&height=880&seed=" . random_int(100000, 999999) . "&nologo=true&model=flux";
-            try {
-                $resp = Http::timeout(45)->get($url);
-                $ct = (string) $resp->header('Content-Type');
-                if ($resp->successful() && strlen($resp->body()) > 30000 && str_contains($ct, 'image')) {
-                    $suffix = substr(md5(time() . random_int(1000, 9999)), 0, 8);
-                    $file = 'blog-covers/' . $post->slug . '-' . $suffix . '.jpg';
-                    $cleaned = $this->removeWatermark($resp->body());
-                    $disk->put($file, $cleaned);
-                    return $file;
-                }
-            } catch (\Throwable $e) {
-                Log::warning('Cover: pollinations исключение', ['error' => $e->getMessage()]);
-            }
-        }
-
         // 2) Запасной: космос из подборки Unsplash
         $start = random_int(0, count(self::COVER_POOL) - 1);
         for ($i = 0; $i < 3; $i++) {
