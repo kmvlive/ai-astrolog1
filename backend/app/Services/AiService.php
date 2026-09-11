@@ -470,14 +470,14 @@ PROMPT;
     ];
 
     private const HORDE_PROMPTS = [
-        'mystic night sky with purple nebula and crescent moon over mountain silhouettes, ethereal fog, deep violet and indigo palette, fantasy digital art, highly detailed',
-        'silhouette of a fortune teller woman with flowing hair standing on a cliff under starry sky, milky way, purple aurora, cinematic lighting, digital painting',
-        'crystal ball glowing with cosmic energy on old wooden table, candles bokeh, dark mystical room, purple tones, fantasy art',
-        'celestial zodiac wheel of stars and constellations in deep space, golden thin lines, purple nebula background, elegant mystical illustration',
-        'moon phases arc over misty lavender field at night, stars, soft glow, dreamy fantasy digital art, violet palette',
-        'ancient astrologer tower on a hill under huge full moon and star trails, purple night sky, fantasy landscape, cinematic',
-        'swirling galaxy in shape of a human silhouette, cosmic dust, violet and blue nebula, surreal mystical digital art',
-        'tarot cards floating in starry void with glowing edges, purple cosmic background, mystical atmosphere, digital painting',
+        'ethereal glowing crystal ball with swirling cosmos inside, floating in soft lavender mist, pearl white and silver palette, dreamy soft lighting, masterpiece, 8k, professional digital art',
+        'zodiac wheel made of shimmering stars and constellations, delicate golden lines, soft blue and lavender nebula background, celestial elegance, masterpiece, high detail',
+        'tarot cards floating in peaceful cosmic void, glowing silver edges, soft pink and lavender aurora, mystical stillness, professional illustration, 8k quality',
+        'crescent moon reflected in calm mountain lake at dawn, soft pink and lavender sky, silvery mist, ethereal dreamy atmosphere, masterpiece digital art',
+        'ancient celestial astrolabe with golden filigree floating in soft cosmic clouds, pearl white and sky blue palette, elegant and mystical, professional concept art',
+        'floating tarot cards surrounded by delicate starlight, soft bokeh, lavender and cream palette, peaceful mystical atmosphere, high detail illustration',
+        'mystical crystal sphere with galaxy swirl inside, resting on old leather-bound book, soft candlelight glow, warm pearl tones, masterpiece fantasy art',
+        'peaceful starry night over misty lavender hills, silver moonlight, soft dreamy atmosphere, ethereal landscape, professional digital painting, 8k',
     ];
 
     private function generateViaStableHorde(string $prompt): ?string
@@ -490,12 +490,13 @@ PROMPT;
             $resp = Http::timeout(30)->withHeaders($headers)->post("$base/generate/async", [
                 'prompt' => $prompt,
                 'params' => [
-                    'width' => 1152,
-                    'height' => 768,
-                    'steps' => 20,
-                    'cfg_scale' => 7,
-                    'sampler_name' => 'k_euler_a',
-                    'negative_prompt' => 'text, watermark, logo, signature, words, letters, username, ugly, deformed, blurry, low quality, horses',
+                    'width' => 1024,
+                    'height' => 1024,
+                    'steps' => 28,
+                    'cfg_scale' => 7.5,
+                    'sampler_name' => 'k_dpmpp_2m',
+                    'hires_fix' => true,
+                    'negative_prompt' => 'text, watermark, logo, signature, words, letters, username, ugly, deformed, blurry, low quality, amateur, dark, gloomy, scary, human, face, person, body, silhouette',
                 ],
                 'models' => ['AlbedoBase XL (SDXL)'],
                 'nsfw' => false,
