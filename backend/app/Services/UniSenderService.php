@@ -44,7 +44,12 @@ class UniSenderService
             $data = $response->json();
 
             if ($response->successful() && ($data['status'] ?? '') === 'success') {
-                Log::info('UniSender Go: sent', ['to' => $to, 'job_id' => $data['job_id'] ?? null]);
+                $jobId = $data['job_id'] ?? null;
+                Log::info('UniSender Go: sent', [
+                    'to' => $to,
+                    'job_id' => $jobId,
+                    'status' => 'success',
+                ]);
                 return true;
             }
 

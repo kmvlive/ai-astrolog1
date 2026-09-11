@@ -47,7 +47,13 @@ class SendDailyCalendarsEmails extends Command
             return 0;
         }
 
-        Log::info('calendar:send-daily-emails START', ['test' => $this->option('test')]);
+        Log::info('calendar:send-daily-emails START', [
+            'test' => $this->option('test'),
+            'force' => $this->option('force'),
+            'total_users' => $query->count(),
+        ]);
+        $this->info("Начинаем рассылку для {$totalCount} пользователей...");
+        
         $service = app(UniSenderService::class);
         $calService = app(CalendarDataService::class);
         $date = now()->startOfDay();
@@ -176,8 +182,10 @@ class SendDailyCalendarsEmails extends Command
         Log::info('calendar:send-daily-emails END', [
             'sent' => $sent,
             'skipped' => $skipped,
-            'errors' => $errors
+            'errors' => $errors,
+            'test' => $this->option('test'),
         ]);
+        $this->info("Рассылка завершена: отправлено={$sent}, пропущено={$skipped}, ошибок={$errors}");
         $this->info("Готово! Отправлено: {$sent}, пропущено: {$skipped}, ошибок: {$errors}");
         return 0;
     }
