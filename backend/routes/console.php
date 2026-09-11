@@ -32,5 +32,6 @@ Schedule::command('blog:clean-covers')->dailyAt('04:30');
 
 // Рассылка календарей
 Schedule::command('calendar:send-daily-emails')->dailyAt('07:30')->timezone('Europe/Moscow')->withoutOverlapping(120);
+Schedule::command('calendar:retry-failed')->dailyAt('07:45')->timezone('Europe/Moscow')->timezone('Europe/Moscow')->withoutOverlapping(120);
 Schedule::command('calendar:send-daily-telegram')->dailyAt('07:35')->timezone('Europe/Moscow');
 Schedule::command('calendar:send-daily-max')->dailyAt('07:40')->timezone('Europe/Moscow');
