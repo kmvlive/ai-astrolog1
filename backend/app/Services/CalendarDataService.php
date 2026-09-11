@@ -136,13 +136,17 @@ class CalendarDataService
                 // Убираем префикс "— " (так в wiki-days помечены даты без страны)
                 $clean = fn(string $raw): string => trim(preg_replace('/^\s*—\s*/u', '', trim($raw)));
 
-                // Международные дни — всегда
+                // Международные дни — только релевантные нашей аудитории
                 foreach ($w['intl'] ?? [] as $raw) {
                     $n = $clean((string) $raw);
-                    if ($n !== '' && !in_array(mb_strtolower($n), $seen, true)) {
-                        $items[] = ['name' => $n, 'text' => ''];
-                        $seen[] = mb_strtolower($n);
+                    if ($n === '' || in_array(mb_strtolower($n), $seen, true)) {
+                        continue;
                     }
+                    if (!$this->isDigestWorthy($n)) {
+                        continue;
+                    }
+                    $items[] = ['name' => $n, 'text' => ''];
+                    $seen[] = mb_strtolower($n);
                 }
 
                 // Из национальных берём только Россию и даты без страны
@@ -280,6 +284,36 @@ class CalendarDataService
         $w = $this->wikiDay($key);
         $names = array_values(array_filter($w['names'] ?? [], fn($n) => is_string($n) && trim($n) !== ''));
         return array_values(array_intersect($names, self::SAINT_NAMES));
+    }
+
+    private function isDigestWorthy(string $n): bool
+    {
+        $lower = mb_strtolower($n);
+
+        // Начинается с глобальных маркеров
+        foreach (['всемирн', 'международн', 'день оон', 'день воинской славы'] as $p) {
+            if (str_starts_with($lower, $p)) {
+                return true;
+            }
+        }
+
+        // Содержит близкие аудитории праздники
+        $contains = [
+            'день воинской славы', 'день победы', 'день россии', 'день конституции',
+            'день народного единства', 'день защитника отечества', 'день космонавтики',
+            'новый год', 'рождество', 'пасха', 'троица', 'крещение господне',
+            '8 марта', 'день весны и труда', '1 апреля', 'хэллоуин',
+            'день святого валентина', 'день матери', 'день отца', 'день защиты детей',
+            'день учителя', 'день пожилого человека', 'день программиста', 'день смеха',
+            'гранёного стакана',
+        ];
+        foreach ($contains as $p) {
+            if (mb_strpos($lower, $p) !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function nameDayBlock(string $key): ?array
