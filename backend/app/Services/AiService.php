@@ -522,6 +522,62 @@ PROMPT;
         return str_replace('{keyword}', $keyword, $prompt);
     }
 
+    private function generateViaTimeweb(string $prompt): ?string
+    {
+        $baseUrl = rtrim(env('TIMEWEB_AI_BASE_URL', 'https://api.timeweb.ai/v1'), '/');
+        $apiKey = env('TIMEWEB_AI_API_KEY');
+        if (!$apiKey) {
+            Log::warning('Timeweb: API key не задан');
+            return null;
+        }
+
+        try {
+            $start = microtime(true);
+            $resp = Http::timeout(60)->withHeaders([
+                'Authorization' => "Bearer {$apiKey}",
+                'Content-Type' => 'application/json',
+            ])->post("{$baseUrl}/images/generations", [
+                'model' => 'black_forest_labs/flux-2-klein-9b',
+                'prompt' => $prompt,
+                'size' => '1024x1024',
+                'n' => 1,
+            ]);
+            $sec = round(microtime(true) - $start, 1);
+
+            if ($resp->status() !== 200) {
+                Log::warning('Timeweb: ошибка', ['status' => $resp->status(), 'body' => substr($resp->body(), 0, 300)]);
+                return null;
+            }
+
+            $data = $resp->json();
+            $img = $data['data'][0] ?? null;
+            if (!$img) return null;
+
+            // Если есть URL — скачиваем
+            if (!empty($img['url'])) {
+                $download = Http::timeout(30)->get($img['url']);
+                if ($download->successful() && strlen($download->body()) > 30000) {
+                    Log::info("Timeweb: сгенерировано за {$sec} сек");
+                    return $this->webpToJpeg($download->body(), 1200, 800);
+                }
+            }
+
+            // Если только base64
+            if (!empty($img['b64_json'])) {
+                $raw = base64_decode($img['b64_json']);
+                if ($raw && strlen($raw) > 30000) {
+                    Log::info("Timeweb: сгенерировано за {$sec} сек (base64)");
+                    return $this->webpToJpeg($raw, 1200, 800);
+                }
+            }
+
+            return null;
+        } catch (\Throwable $e) {
+            Log::warning('Timeweb исключение', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
     private function generateViaStableHorde(string $prompt): ?string
     {
         $base = 'https://stablehorde.net/api/v2';
@@ -589,8 +645,20 @@ PROMPT;
         $disk = \Illuminate\Support\Facades\Storage::disk('public');
         $disk->makeDirectory('blog-covers');
 
-        // 0) Stable Horde: уникальный арт без водяных знаков
+        // 0) Timeweb AI: быстрый Flux (4-10 сек)
         for ($i = 0; $i < 2; $i++) {
+            $prompt = $this->getRandomPrompt($post->title);
+            $raw = $this->generateViaTimeweb($prompt);
+            if ($raw && strlen($raw) > 30000) {
+                $suffix = substr(md5(time() . random_int(1000, 9999)), 0, 8);
+                $file = 'blog-covers/' . $post->slug . '-' . $suffix . '.jpg';
+                $disk->put($file, $raw);
+                return $file;
+            }
+        }
+
+        // 1) Stable Horde: fallback если Timeweb упал
+        for ($i = 0; $i < 1; $i++) {
             $prompt = $this->getRandomPrompt($post->title);
             $raw = $this->generateViaStableHorde($prompt);
             if ($raw && strlen($raw) > 30000) {
