@@ -153,7 +153,7 @@ class CalendarDataService
                 $rel = $w['rel'] ?? [];
                 $blocks = [];
                 if ($feast) {
-                    $blocks[] = ['h' => '⛪ Великий праздник', 't' => "**$feast** — день молитвы, благодарности и добрых дел."];
+                    $blocks[] = ['h' => '⛪ Великий праздник', 't' => "$feast — день молитвы, благодарности и добрых дел."];
                 }
                 if (count($rel)) {
                     $blocks[] = ['h' => '🕯 Дни памяти святых', 't' => implode("\n", array_map(fn($n) => "• $n", $rel))];
@@ -232,7 +232,7 @@ class CalendarDataService
             $name = $item['name'] ?? '';
             $text = $item['text'] ?? '';
             if ($text) {
-                $lines[] = "• **{$name}** — {$text}";
+                $lines[] = "• {$name} — {$text}";
             } else {
                 $lines[] = "• {$name}";
             }
@@ -242,6 +242,6 @@ class CalendarDataService
 
     private function bulletsText(array $items): string
     {
-        return implode("\n", array_map(fn($t) => "• $t", $items));
+        return implode("\n", array_map(fn($t) => "• " . str_replace('**', '', $t), $items));
     }
 }
