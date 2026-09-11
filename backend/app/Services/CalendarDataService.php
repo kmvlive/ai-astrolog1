@@ -133,10 +133,9 @@ class CalendarDataService
                 $items = $custom;
                 $seen = array_map(fn($n) => mb_strtolower((string) $n), array_column($custom, 'name'));
 
-                // Убираем префикс "— " (так в wiki-days помечены даты без страны)
                 $clean = fn(string $raw): string => trim(preg_replace('/^\s*—\s*/u', '', trim($raw)));
 
-                // Международные дни — только релевантные нашей аудитории
+                // Международные: только релевантные аудитории
                 foreach ($w['intl'] ?? [] as $raw) {
                     $n = $clean((string) $raw);
                     if ($n === '' || in_array(mb_strtolower($n), $seen, true)) {
@@ -149,7 +148,7 @@ class CalendarDataService
                     $seen[] = mb_strtolower($n);
                 }
 
-                // Из национальных берём только Россию и даты без страны
+                // Национальные: только Россия и даты без страны
                 foreach ($w['natl'] ?? [] as $raw) {
                     $raw = trim((string) $raw);
                     $isRu = mb_stripos($raw, 'Россия') !== false || mb_stripos($raw, 'РФ') !== false;
@@ -164,9 +163,9 @@ class CalendarDataService
                     }
                 }
 
-                // Не больше 6 пунктов в письме
                 $items = array_slice($items, 0, 6);
                 $badge = count($items) ? (count($items) > 1 ? $items[0]['name'] . ' +' . (count($items) - 1) : $items[0]['name']) : null;
+
                 $blocks = [
                     ['h' => '🎉 Праздники дня', 't' => count($items) ? $this->bullets($items) : 'Сегодня нет крупных праздников.'],
                 ];
