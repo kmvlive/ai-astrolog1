@@ -478,14 +478,15 @@ PROMPT;
         for ($i = 0; $i < 3; $i++) {
             $prompt = self::FANTASY_PROMPTS[random_int(0, count(self::FANTASY_PROMPTS) - 1)];
             $url = "https://image.pollinations.ai/prompt/" . urlencode($prompt)
-                . "?width=1200&height=800&seed=" . random_int(100000, 999999) . "&nologo=true&model=flux";
+                . "?width=1200&height=880&seed=" . random_int(100000, 999999) . "&nologo=true&model=flux";
             try {
                 $resp = Http::timeout(45)->get($url);
                 $ct = (string) $resp->header('Content-Type');
                 if ($resp->successful() && strlen($resp->body()) > 30000 && str_contains($ct, 'image')) {
                     $suffix = substr(md5(time() . random_int(1000, 9999)), 0, 8);
                     $file = 'blog-covers/' . $post->slug . '-' . $suffix . '.jpg';
-                    $disk->put($file, $resp->body());
+                    $cleaned = $this->removeWatermark($resp->body());
+                    $disk->put($file, $cleaned);
                     return $file;
                 }
             } catch (\Throwable $e) {
@@ -513,6 +514,37 @@ PROMPT;
         $file = 'blog-covers/' . $post->slug . '-' . $suffix . '.svg';
         $disk->put($file, $this->renderSvgCover($post));
         return $file;
+    }
+
+    private function removeWatermark(string $imageData): string
+    {
+        try {
+            $img = @imagecreatefromstring($imageData);
+            if (!$img) return $imageData;
+
+            $width = imagesx($img);
+            $height = imagesy($img);
+
+            // Pollinations ставит логотип в нижних ~64px — обрезаем 80px с запасом
+            $cropHeight = max($height - 80, (int)($height * 0.9));
+            $cropped = imagecrop($img, ['x' => 0, 'y' => 0, 'width' => $width, 'height' => $cropHeight]);
+            if (!$cropped) {
+                imagedestroy($img);
+                return $imageData;
+            }
+
+            ob_start();
+            imagejpeg($cropped, null, 90);
+            $result = ob_get_clean();
+
+            imagedestroy($img);
+            imagedestroy($cropped);
+
+            return $result && strlen($result) > 30000 ? $result : $imageData;
+        } catch (\Throwable $e) {
+            Log::warning('Cover: removeWatermark failed', ['error' => $e->getMessage()]);
+            return $imageData;
+        }
     }
 
     private function renderSvgCover(BlogPost $post): string
