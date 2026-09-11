@@ -130,13 +130,38 @@ class CalendarDataService
             case 'holidays':
                 $w = $this->wikiDay($key);
                 $custom = $this->holidays[$key] ?? [];
-                $seen = array_map('strtolower', array_column($custom, 'name'));
                 $items = $custom;
-                foreach (array_merge($w['intl'] ?? [], $w['natl'] ?? []) as $n) {
-                    if (!in_array(strtolower($n), $seen)) {
+                $seen = array_map(fn($n) => mb_strtolower((string) $n), array_column($custom, 'name'));
+
+                // Убираем префикс "— " (так в wiki-days помечены даты без страны)
+                $clean = fn(string $raw): string => trim(preg_replace('/^\s*—\s*/u', '', trim($raw)));
+
+                // Международные дни — всегда
+                foreach ($w['intl'] ?? [] as $raw) {
+                    $n = $clean((string) $raw);
+                    if ($n !== '' && !in_array(mb_strtolower($n), $seen, true)) {
                         $items[] = ['name' => $n, 'text' => ''];
+                        $seen[] = mb_strtolower($n);
                     }
                 }
+
+                // Из национальных берём только Россию и даты без страны
+                foreach ($w['natl'] ?? [] as $raw) {
+                    $raw = trim((string) $raw);
+                    $isRu = mb_stripos($raw, 'Россия') !== false || mb_stripos($raw, 'РФ') !== false;
+                    $noCountry = str_starts_with($raw, '—');
+                    if (!$isRu && !$noCountry) {
+                        continue;
+                    }
+                    $n = $clean($raw);
+                    if ($n !== '' && !in_array(mb_strtolower($n), $seen, true)) {
+                        $items[] = ['name' => $n, 'text' => ''];
+                        $seen[] = mb_strtolower($n);
+                    }
+                }
+
+                // Не больше 6 пунктов в письме
+                $items = array_slice($items, 0, 6);
                 $badge = count($items) ? (count($items) > 1 ? $items[0]['name'] . ' +' . (count($items) - 1) : $items[0]['name']) : null;
                 return [
                     'blocks' => [
