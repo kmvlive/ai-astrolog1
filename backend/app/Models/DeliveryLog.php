@@ -19,6 +19,8 @@ class DeliveryLog extends Model
         'channel_id',
         'generated_horoscope_id',
         'status',
+        'attempts',
+        'last_retry_at',
         'error_message',
         'sent_at',
     ];

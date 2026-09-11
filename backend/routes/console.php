@@ -35,3 +35,6 @@ Schedule::command('calendar:send-daily-emails')->dailyAt('07:30')->timezone('Eur
 Schedule::command('calendar:retry-failed')->dailyAt('07:45')->timezone('Europe/Moscow')->timezone('Europe/Moscow')->withoutOverlapping(120);
 Schedule::command('calendar:send-daily-telegram')->dailyAt('07:35')->timezone('Europe/Moscow');
 Schedule::command('calendar:send-daily-max')->dailyAt('07:40')->timezone('Europe/Moscow');
+
+// Повтор фейлов рассылок — каждые 20 минут
+Schedule::command('calendar:retry-failed')->everyTwentyMinutes()->withoutOverlapping(5);
