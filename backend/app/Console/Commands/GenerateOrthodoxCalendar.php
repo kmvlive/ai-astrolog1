@@ -52,7 +52,7 @@ class GenerateOrthodoxCalendar extends Command
                                 ['role' => 'user', 'content' => $this->prompt(self::MONTHS[$m], self::DAYS[$m])],
                             ],
                             'temperature' => 0.3,
-                            'max_tokens' => 8000,
+                            'max_tokens' => 16000,
                             'enable_thinking' => false,
                         ]);
                     if (!$resp->successful()) {
