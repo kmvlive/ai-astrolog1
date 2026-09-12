@@ -222,20 +222,27 @@ class CalendarDataService
 
             case 'orthodox':
                 $w = $this->wikiDay($key);
-                $feast = $this->orthodox[$key] ?? null;
+                $items = $this->orthodox[$key] ?? [];
                 $rel = $w['rel'] ?? [];
                 $blocks = [];
-                if ($feast) {
-                    $blocks[] = ['h' => '⛪ Великий праздник', 't' => "$feast — день молитвы, благодарности и добрых дел."];
-                }
-                if (count($rel)) {
+                
+                if (count($items)) {
+                    // Курированный список приоритет
+                    $feast = $items[0]['name'] ?? null;
+                    $blocks[] = ['h' => '⛪ ' . ($feast ?: 'День церковного календаря'), 't' => $items[0]['text'] ?? 'День молитвы и благодарности.'];
+                    if (count($items) > 1) {
+                        $rest = array_slice($items, 1);
+                        $blocks[] = ['h' => '🕯 Дни памяти', 't' => $this->bullets($rest)];
+                    }
+                } elseif (count($rel)) {
+                    // Fallback на wiki
                     $blocks[] = ['h' => '🕯 Дни памяти святых', 't' => implode("\n", array_map(fn($n) => "• $n", $rel))];
-                }
-                if (!count($blocks)) {
+                } else {
                     $blocks[] = ['h' => '⛪ День церковного календаря', 't' => 'Сегодня рядовой день: хороший повод для тихой молитвы и добрых дел.'];
                 }
+                
                 $blocks[] = $moonBlock;
-                return ['blocks' => $blocks, 'rating' => $feast || count($rel) ? 'good' : null, 'badge' => $feast ?? ($rel[0] ?? null)];
+                return ['blocks' => $blocks, 'rating' => count($items) || count($rel) ? 'good' : null, 'badge' => $items[0]['name'] ?? ($rel[0] ?? null)];
 
             case 'muslim':
                 $year = $date->year;
