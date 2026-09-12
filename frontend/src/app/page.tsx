@@ -404,7 +404,7 @@ export default function HomePage() {
             {CALENDARS.map((c) => (
               <Link key={c.slug} href={`/calendars/${c.slug}`} className="group p-4 rounded-2xl bg-slate-900/60 border border-white/5 hover:border-violet-500/40 hover:bg-slate-900 transition text-center">
                 <div className="text-3xl mb-2 group-hover:scale-110 transition-transform">{c.emoji}</div>
-                <div className="text-xs text-slate-300 leading-tight">{{ holidays: "Праздники", orthodox: "Православный", muslim: "Мусульманский", lunar: "Лунный", gardener: "Садовода", haircut: "Стрижки", names: "Именины" }[c.slug] ?? c.name}</div>
+                <div className="text-xs text-slate-300 leading-tight">{{ holidays: "Праздники", orthodox: "Православный", muslim: "Мусульманский", lunar: "Лунный", gardener: "Садовода", haircut: "Стрижки", names: "Именины", conception: "Зачатие" }[c.slug] ?? c.name}</div>
               </Link>
             ))}
           </div>
