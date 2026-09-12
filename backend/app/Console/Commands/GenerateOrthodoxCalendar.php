@@ -40,21 +40,33 @@ class GenerateOrthodoxCalendar extends Command
 
         $all = [];
         for ($m = 1; $m <= 12; $m++) {
-            $data = null;
-            for ($attempt = 1; $attempt <= 3; $attempt++) {
-                try {
-                    $resp = Http::timeout(180)
-                        ->withHeaders(['Authorization' => "Bearer {$apiKey}", 'Content-Type' => 'application/json'])
-                        ->post("{$baseUrl}/chat/completions", [
-                            'model' => $model,
-                            'messages' => [
-                                ['role' => 'system', 'content' => 'Ты — редактор православного календаря для русскоязычной аудитории. Возвращай ТОЛЬКО валидный JSON без markdown-обёрток.'],
-                                ['role' => 'user', 'content' => $this->prompt(self::MONTHS[$m], self::DAYS[$m])],
-                            ],
-                            'temperature' => 0.3,
-                            'max_tokens' => 16000,
-                            'enable_thinking' => false,
-                        ]);
+            $daysInMonth = self::DAYS[$m];
+            
+            // Разбиваю большие месяцы (31 день) на 2 запроса
+            if ($daysInMonth === 31) {
+                $this->info(self::MONTHS[$m] . ": разбиваю на 2 части (1-15 и 16-31)");
+                $data1 = $this->generateMonth($apiKey, $baseUrl, $model, $m, 1, 15);
+                $data2 = $this->generateMonth($apiKey, $baseUrl, $model, $m, 16, 31);
+                if (!$data1 || !$data2) {
+                    $this->error("Месяц {$m} не собран после разбиения — файл НЕ перезаписан");
+                    return 1;
+                }
+                $all += $data1 + $data2;
+                $this->info("✓ " . self::MONTHS[$m] . ": " . (count($data1) + count($data2)) . " дат (2 запроса)");
+                sleep(1);
+                continue;
+            }
+            
+            // Обычные месяцы (28-30 дней) - один запрос
+            $data = $this->generateMonth($apiKey, $baseUrl, $model, $m, 1, $daysInMonth);
+            if (!$data) {
+                $this->error("Месяц {$m} не собран после 3 попыток — файл НЕ перезаписан");
+                return 1;
+            }
+            $all += $data;
+            $this->info("✓ " . self::MONTHS[$m] . ": " . count($data) . " дат");
+            sleep(1);
+        }
                     if (!$resp->successful()) {
                         $this->warn("месяц {$m}: HTTP {$resp->status()} (попытка {$attempt})");
                         sleep(2); continue;
@@ -113,6 +125,90 @@ class GenerateOrthodoxCalendar extends Command
         Log::info('calendar:generate-orthodox: справочник записан', ['dates' => count($all)]);
         $this->info("✓ orthodox.json записан: " . count($all) . " дат, бэкап создан");
         return 0;
+    }
+
+    private function generateMonth(string $apiKey, string $baseUrl, string $model, int $m, int $startDay, int $endDay): ?array
+    {
+        for ($attempt = 1; $attempt <= 3; $attempt++) {
+            try {
+                $resp = Http::timeout(180)
+                    ->withHeaders(['Authorization' => "Bearer {$apiKey}", 'Content-Type' => 'application/json'])
+                    ->post("{$baseUrl}/chat/completions", [
+                        'model' => $model,
+                        'messages' => [
+                            ['role' => 'system', 'content' => 'Ты — редактор православного календаря для русскоязычной аудитории. Возвращай ТОЛЬКО валидный JSON без markdown-обёрток.'],
+                            ['role' => 'user', 'content' => $this->promptRange(self::MONTHS[$m], $startDay, $endDay)],
+                        ],
+                        'temperature' => 0.3,
+                        'max_tokens' => 16000,
+                        'enable_thinking' => false,
+                    ]);
+                if (!$resp->successful()) {
+                    $this->warn("месяц {$m} (дни {$startDay}-{$endDay}): HTTP {$resp->status()} (попытка {$attempt})");
+                    sleep(2); continue;
+                }
+                $data = $this->parseAndValidateRange((string) $resp->json('choices.0.message.content'), $m, $startDay, $endDay);
+                if ($data) return $data;
+                $this->warn("месяц {$m} (дни {$startDay}-{$endDay}): невалидный JSON (попытка {$attempt})");
+            } catch (\Throwable $e) {
+                $this->warn("месяц {$m} (дни {$startDay}-{$endDay}): {$e->getMessage()} (попытка {$attempt})");
+            }
+            sleep(2);
+        }
+        return null;
+    }
+
+    private function promptRange(string $month, int $startDay, int $endDay): string
+    {
+        $days = $endDay - $startDay + 1;
+        $fixed = [];
+        foreach (self::FIXED as $key => $name) {
+            if (str_starts_with($key, sprintf('%02d-', array_search($month, self::MONTHS) + 1))) {
+                $d = (int) substr($key, 3);
+                if ($d >= $startDay && $d <= $endDay) {
+                    $fixed[] = "{$key}: {$name}";
+                }
+            }
+        }
+        $fixedText = $fixed ? "Обязательные даты:\n" . implode("\n", $fixed) : "";
+        
+        return "Составь православный календарь на {$month}: даты с {$startDay} по {$endDay} (всего {$days} дат), ключи в формате MM-DD.\n"
+            . "Аудитория: русскоязычные верующие Русской Православной Церкви.\n"
+            . "На каждую дату 2-4 записи из категорий:\n"
+            . "- великие и двунадесятые праздники (если есть)\n"
+            . "- дни памяти святых и новомучеников Российских\n"
+            . "- иконы Божией Матери и чудотворные образы\n"
+            . "- дни особых богослужений и постов\n"
+            . "Тон: благоговейный, тёплый, без траура и скорби.\n"
+            . "Значение каждой даты: массив объектов {\"name\": \"название\", \"text\": \"одно тёплое предложение до 120 символов\"}.\n"
+            . "Верни ТОЛЬКО JSON-объект со всеми {$days} ключами.\n"
+            . $fixedText;
+    }
+
+    private function parseAndValidateRange(string $content, int $m, int $startDay, int $endDay): ?array
+    {
+        $content = trim($content);
+        $content = preg_replace('/^```(?:json)?\s*/u', '', $content);
+        $content = preg_replace('/```\s*$/u', '', $content);
+        $data = json_decode($content, true);
+        if (!is_array($data) || !$data) return null;
+
+        $out = [];
+        for ($d = $startDay; $d <= $endDay; $d++) {
+            $key = sprintf('%02d-%02d', $m, $d);
+            $items = $data[$key] ?? null;
+            if (!is_array($items) || !$items) return null;
+            $clean = [];
+            foreach ($items as $it) {
+                $name = is_array($it) ? trim((string) ($it['name'] ?? '')) : trim((string) $it);
+                if ($name === '') continue;
+                $text = is_array($it) ? trim((string) ($it['text'] ?? '')) : '';
+                $clean[] = ['name' => $name, 'text' => mb_substr($text, 0, 200)];
+            }
+            if (count($clean) < 2) return null;
+            $out[$key] = array_slice($clean, 0, 5);
+        }
+        return $out;
     }
 
     private function prompt(string $month, int $days): string
