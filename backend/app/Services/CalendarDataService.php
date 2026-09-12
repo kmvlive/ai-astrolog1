@@ -167,7 +167,27 @@ class CalendarDataService
                     $seen[] = mb_strtolower($n);
                 }
 
-                $items = array_slice($items, 0, 6);
+                // Fallback: если whitelist-фильтр отсёк все wiki-праздники
+                // → берём первые 3 без whitelist, но со стоп-словами (чтобы не было про повешенных)
+                if (empty($items) && (!empty($w['intl']) || !empty($w['natl']))) {
+                    $stopWords = ['повешен', 'расстрел', 'катастроф', 'теракт', 'война', 'смерт', 'траур', 'смещение с трона', 'хайле селассие'];
+                    $fallback = [];
+                    foreach (array_merge($w['intl'] ?? [], $w['natl'] ?? []) as $raw) {
+                        $n = trim(preg_replace('/^\s*—\s*/u', '', trim($raw)));
+                        $lower = mb_strtolower($n);
+                        $skip = false;
+                        foreach ($stopWords as $sw) {
+                            if (str_contains($lower, $sw)) { $skip = true; break; }
+                        }
+                        if (!$skip && $n !== '') {
+                            $fallback[] = ['name' => $n, 'text' => ''];
+                            if (count($fallback) >= 3) break;
+                        }
+                    }
+                    $items = $fallback;
+                }
+
+                                $items = array_slice($items, 0, 6);
                 $badge = count($items) ? (count($items) > 1 ? $items[0]['name'] . ' +' . (count($items) - 1) : $items[0]['name']) : null;
 
                 $blocks = [
