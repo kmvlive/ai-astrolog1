@@ -135,6 +135,23 @@ class CalendarDataService
 
                 $clean = fn(string $raw): string => trim(preg_replace('/^\s*—\s*/u', '', trim($raw)));
 
+                // Плавающие профессиональные праздники: вычисляем по году,
+                // на «своей» дате добавляем, с чужих дат убираем
+                $fmap = $this->floatingMap($date->year);
+                foreach ($fmap as $sub => $rule) {
+                    if ($key === $rule['key']) {
+                        $has = false;
+                        foreach ($items as $it) {
+                            if (str_contains(mb_strtolower($it['name']), $sub)) { $has = true; break; }
+                        }
+                        if (!$has) {
+                            $items[] = ['name' => $rule['name'], 'text' => $rule['text']];
+                        }
+                    } else {
+                        $items = array_values(array_filter($items, fn($it) => !str_contains(mb_strtolower($it['name']), $sub)));
+                    }
+                }
+
                 // Wiki-данные добавляем ТОЛЬКО если курированный holidays.json пуст
                 if (empty($items)) { // wiki только если курированный список пуст
                     // Международные: только релевантные аудитории
@@ -174,7 +191,7 @@ class CalendarDataService
                 // Fallback: если whitelist-фильтр отсёк все wiki-праздники
                 // → берём первые 3 без whitelist, но со стоп-словами (чтобы не было про повешенных)
                 if (empty($items) && (!empty($w['intl']) || !empty($w['natl']))) {
-                    $stopWords = ['повешен', 'расстрел', 'катастроф', 'теракт', 'война', 'смерт', 'траур', 'смещение с трона', 'хайле селассие'];
+                    $stopWords = ['повешен', 'расстрел', 'катастроф', 'теракт', 'война', 'смерт', 'траур', 'смещение с трона', 'хайле селассие', 'геноцид', 'эшафот', 'казнь', 'крушение', 'погибш'];
                     $fallback = [];
                     foreach (array_merge($w['intl'] ?? [], $w['natl'] ?? []) as $raw) {
                         $n = trim(preg_replace('/^\s*—\s*/u', '', trim($raw)));
@@ -311,6 +328,38 @@ class CalendarDataService
         $w = $this->wikiDay($key);
         $names = array_values(array_filter($w['names'] ?? [], fn($n) => is_string($n) && trim($n) !== ''));
         return array_values(array_intersect($names, self::SAINT_NAMES));
+    }
+
+    private function nthWeekday(int $year, int $month, int $isoDow, int $n): \Carbon\Carbon
+    {
+        if ($n > 0) {
+            $d = \Carbon\Carbon::create($year, $month, 1);
+            while ($d->dayOfWeekIso !== $isoDow) $d->addDay();
+            return $d->addDays(($n - 1) * 7);
+        }
+        $d = \Carbon\Carbon::create($year, $month, 1)->endOfMonth()->startOfDay();
+        while ($d->dayOfWeekIso !== $isoDow) $d->subDay();
+        return $d->addDays(($n + 1) * 7);
+    }
+
+    private function floatingMap(int $year): array
+    {
+        $mk = fn(\Carbon\Carbon $d, string $name, string $text) => [
+            'key' => $d->format('m-d'), 'name' => $name, 'text' => $text,
+        ];
+        return [
+            'программист' => $mk(\Carbon\Carbon::create($year, 1, 1)->addDays(255), 'День программиста', '256-й день года: пусть код компилируется с первого раза.'),
+            'металлург' => $mk($this->nthWeekday($year, 7, 7, 3), 'День металлурга', 'Спасибо металлургам — их тепло живёт в каждом доме.'),
+            'рыбак' => $mk($this->nthWeekday($year, 7, 7, 2), 'День рыбака', 'Пусть клёв будет щедрым, а погода — тихой.'),
+            'дорожного хозяйства' => $mk($this->nthWeekday($year, 10, 7, 3), 'День работников дорожного хозяйства', 'Спасибо дорожникам за ровный путь к дому.'),
+            'строител' => $mk($this->nthWeekday($year, 8, 7, 2), 'День строителя', 'Пусть дом будет крепким, а планы — надёжными.'),
+            'день шахт' => $mk($this->nthWeekday($year, 8, 7, -1), 'День шахтёра', 'Уважение тем, кто достаёт сокровища из недр земли.'),
+            'танкист' => $mk($this->nthWeekday($year, 9, 7, 2), 'День танкиста', 'Память и уважение защитникам мирного неба.'),
+            'машиностроител' => $mk($this->nthWeekday($year, 9, 7, -1), 'День машиностроителя', 'Спасибо инженерам за технику, которая не подводит.'),
+            'медик' => $mk($this->nthWeekday($year, 6, 7, 3), 'День медицинского работника', 'Спасибо врачам за заботу и бессонные дежурства.'),
+            'день матери' => $mk($this->nthWeekday($year, 11, 7, -1), 'День матери', 'Позвоните маме — она будет рада просто услышать вас.'),
+            'день отца' => $mk($this->nthWeekday($year, 10, 7, 3), 'День отца', 'Спасибо папам за поддержку и веру в нас.'),
+        ];
     }
 
     private function isDigestWorthy(string $n): bool
