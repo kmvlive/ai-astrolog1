@@ -99,6 +99,15 @@ class SendDailyCalendarsEmails extends Command
                 continue;
             }
 
+            // Добавляю лунный фон один раз в начале письма
+            $moonInfo = $calService->getDayInfo('lunar', $date);
+            $moonBlock = [
+                'emoji' => '🌙',
+                'name' => 'Лунный фон дня',
+                'blocks' => [$moonInfo['blocks'][0]] // Только первый блок (лунные сутки)
+            ];
+            array_unshift($calendars, $moonBlock);
+
             if (!$this->option('test')) {
                 $alreadySentToUser = DeliveryLog::where('user_id', $user->id)
                     ->where('event_type', 'daily_calendars')

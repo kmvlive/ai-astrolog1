@@ -219,7 +219,7 @@ class CalendarDataService
                 if ($nb = $this->nameDayBlock($key)) {
                     $blocks[] = $nb;
                 }
-                $blocks[] = $moonBlock;
+                // moonBlock удалён — добавляется один раз в рассылке
                 return ['blocks' => $blocks, 'rating' => count($items) ? 'good' : null, 'badge' => $badge];
 
             case 'orthodox':
@@ -243,7 +243,7 @@ class CalendarDataService
                     $blocks[] = ['h' => '⛪ День церковного календаря', 't' => 'Сегодня рядовой день: хороший повод для тихой молитвы и добрых дел.'];
                 }
                 
-                $blocks[] = $moonBlock;
+                // moonBlock удалён — добавляется один раз в рассылке
                 return ['blocks' => $blocks, 'rating' => count($items) || count($rel) ? 'good' : null, 'badge' => $items[0]['name'] ?? ($rel[0] ?? null)];
 
             case 'muslim':
@@ -262,7 +262,7 @@ class CalendarDataService
                 } else {
                     $blocks[] = ['h' => '☪️ День мусульманского календаря', 't' => 'Сегодня обычный день по исламскому календарю.'];
                 }
-                $blocks[] = $moonBlock;
+                // moonBlock удалён — добавляется один раз в рассылке
                 return ['blocks' => $blocks, 'rating' => $e ? 'good' : null, 'badge' => $e['name'] ?? null];
 
             case 'lunar':
@@ -291,7 +291,7 @@ class CalendarDataService
                 } else {
                     $blocks[] = ['h' => '🌱 Садовый календарь', 't' => 'Сегодня нейтральный день для садовых работ.'];
                 }
-                $blocks[] = $moonBlock;
+                // moonBlock удалён — добавляется один раз в рассылке
                 return ['blocks' => $blocks, 'rating' => $g ? ($g['rating'] ?? null) : null, 'badge' => $g['title'] ?? null];
 
             case 'haircut':
@@ -299,7 +299,7 @@ class CalendarDataService
                 $blocks = [
                     ['h' => $good ? '✂️ Хороший день для стрижки' : '✂️ Стрижка сегодня', 't' => $good ? 'Лунный день благоприятен для обновления причёски — волосы будут расти хорошо.' : 'Сегодня лучше воздержаться от стрижки. Лунный день не способствует здоровью волос.']
                 ];
-                $blocks[] = $moonBlock;
+                // moonBlock удалён — добавляется один раз в рассылке
                 return ['blocks' => $blocks, 'rating' => $good ? 'good' : 'bad', 'badge' => $good ? 'Благоприятно' : 'Не рекомендуется'];
 
             case 'conception':
@@ -308,7 +308,7 @@ class CalendarDataService
                     ['h' => $good ? '👶 Благоприятный день для зачатия' : '👶 Планирование сегодня', 't' => $good ? 'Энергия Луны поддерживает новые начинания — день считается тёплым и благоприятным для зачатия. Берегите себя и будьте рядом с любимыми.' : 'Сегодня Луна не даёт устойчивой энергии для зачатия — лучше отдохнуть, укрепить здоровье и не форсировать события.']
                 ];
                 $blocks[] = ['h' => '💡 Совет календаря', 't' => $good ? 'Мягкая энергия дня усиливает намерение: проведите вечер в спокойствии и тепле.' : 'Посвятите день заботе о себе: сон, прогулки, витамины — тело скажет спасибо.'];
-                $blocks[] = $moonBlock;
+                // moonBlock удалён — добавляется один раз в рассылке
                 return ['blocks' => $blocks, 'rating' => $good ? 'good' : 'bad', 'badge' => $good ? 'Благоприятно' : 'Не рекомендуется'];
 
             case 'names':
@@ -331,7 +331,7 @@ class CalendarDataService
                 } else {
                     $blocks[] = ['h' => '👼 Календарь именин', 't' => 'Сегодня святцы не отмечают именин из нашего списка.'];
                 }
-                $blocks[] = $moonBlock;
+                // moonBlock удалён — добавляется один раз в рассылке
                 return ['blocks' => $blocks, 'rating' => count($names) ? 'good' : null, 'badge' => $names[0] ?? null];
 
             default:
