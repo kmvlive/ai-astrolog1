@@ -135,36 +135,40 @@ class CalendarDataService
 
                 $clean = fn(string $raw): string => trim(preg_replace('/^\s*—\s*/u', '', trim($raw)));
 
-                // Международные: только релевантные аудитории
-                foreach ($w['intl'] ?? [] as $raw) {
-                    $n = $clean((string) $raw);
-                    if ($n === '' || in_array(mb_strtolower($n), $seen, true)) {
-                        continue;
+                // Wiki-данные добавляем ТОЛЬКО если курированный holidays.json пуст
+                if (empty($items)) { // wiki только если курированный список пуст
+                    // Международные: только релевантные аудитории
+                    foreach ($w['intl'] ?? [] as $raw) {
+                        $n = $clean((string) $raw);
+                        if ($n === '' || in_array(mb_strtolower($n), $seen, true)) {
+                            continue;
+                        }
+                        if (!$this->isDigestWorthy($n)) {
+                            continue;
+                        }
+                        $items[] = ['name' => $n, 'text' => ''];
+                        $seen[] = mb_strtolower($n);
                     }
-                    if (!$this->isDigestWorthy($n)) {
-                        continue;
-                    }
-                    $items[] = ['name' => $n, 'text' => ''];
-                    $seen[] = mb_strtolower($n);
-                }
 
-                // Национальные: Россия — всегда; даты без страны — через фильтр релевантности
-                foreach ($w['natl'] ?? [] as $raw) {
-                    $raw = trim((string) $raw);
-                    $isRu = mb_stripos($raw, 'Россия') !== false || mb_stripos($raw, 'РФ') !== false;
-                    $noCountry = str_starts_with($raw, '—');
-                    if (!$isRu && !$noCountry) {
-                        continue;
+                    // Национальные: Россия — всегда; даты без страны — через фильтр релевантности
+                    foreach ($w['natl'] ?? [] as $raw) {
+                        $raw = trim((string) $raw);
+                        $isRu = mb_stripos($raw, 'Россия') !== false || mb_stripos($raw, 'РФ') !== false;
+                        $noCountry = str_starts_with($raw, '—');
+                        if (!$isRu && !$noCountry) {
+                            continue;
+                        }
+                        $n = $clean($raw);
+                        if ($n === '' || in_array(mb_strtolower($n), $seen, true)) {
+                            continue;
+                        }
+                        if (!$isRu && !$this->isDigestWorthy($n)) {
+                            continue;
+                        }
+                        $items[] = ['name' => $n, 'text' => ''];
+                        $seen[] = mb_strtolower($n);
                     }
-                    $n = $clean($raw);
-                    if ($n === '' || in_array(mb_strtolower($n), $seen, true)) {
-                        continue;
-                    }
-                    if (!$isRu && !$this->isDigestWorthy($n)) {
-                        continue;
-                    }
-                    $items[] = ['name' => $n, 'text' => ''];
-                    $seen[] = mb_strtolower($n);
+
                 }
 
                 // Fallback: если whitelist-фильтр отсёк все wiki-праздники
