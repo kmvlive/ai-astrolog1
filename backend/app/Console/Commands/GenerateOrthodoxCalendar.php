@@ -40,39 +40,19 @@ class GenerateOrthodoxCalendar extends Command
 
         $all = [];
         for ($m = 1; $m <= 12; $m++) {
-            $data = null;
-            for ($attempt = 1; $attempt <= 3; $attempt++) {
-                try {
-                    $resp = Http::timeout(180)
-                        ->withHeaders(['Authorization' => "Bearer {$apiKey}", 'Content-Type' => 'application/json'])
-                        ->post("{$baseUrl}/chat/completions", [
-                            'model' => $model,
-                            'messages' => [
-                                ['role' => 'system', 'content' => 'Ты — редактор православного календаря для русскоязычной аудитории. Возвращай ТОЛЬКО валидный JSON без markdown-обёрток.'],
-                                ['role' => 'user', 'content' => $this->prompt(self::MONTHS[$m], self::DAYS[$m])],
-                            ],
-                            'temperature' => 0.3,
-                            'max_tokens' => 16000,
-                            'enable_thinking' => false,
-                        ]);
-                    if (!$resp->successful()) {
-                        $this->warn("месяц {$m}: HTTP {$resp->status()} (попытка {$attempt})");
-                        sleep(2); continue;
-                    }
-                    $data = $this->parseAndValidate((string) $resp->json('choices.0.message.content'), $m);
-                    if ($data) break;
-                    $this->warn("месяц {$m}: невалидный JSON (попытка {$attempt})");
-                } catch (\Throwable $e) {
-                    $this->warn("месяц {$m}: {$e->getMessage()} (попытка {$attempt})");
-                }
-                sleep(2);
-            }
-            if (!$data) {
-                $this->error("Месяц {$m} не собран после 3 попыток — файл НЕ перезаписан");
+            $daysInMonth = self::DAYS[$m];
+            $mid = (int) floor($daysInMonth / 2);
+            
+            $this->info(self::MONTHS[$m] . ": разбиваю на 2 части (1-{$mid} и " . ($mid + 1) . "-{$daysInMonth})");
+            $data1 = $this->generateMonth($apiKey, $baseUrl, $model, $m, 1, $mid);
+            $data2 = $this->generateMonth($apiKey, $baseUrl, $model, $m, $mid + 1, $daysInMonth);
+            
+            if (!$data1 || !$data2) {
+                $this->error("Месяц {$m} не собран после разбиения — файл НЕ перезаписан");
                 return 1;
             }
-            $all += $data;
-            $this->info("✓ " . self::MONTHS[$m] . ": " . count($data) . " дат");
+            $all += $data1 + $data2;
+            $this->info("✓ " . self::MONTHS[$m] . ": " . (count($data1) + count($data2)) . " дат (2 запроса)");
             sleep(1);
         }
 
