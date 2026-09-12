@@ -18,6 +18,7 @@ class CalendarDataService
     private array $holidays;
     private array $orthodox;
     private array $haircutGood;
+    private array $conceptionGood;
     private array $wiki;
 
     public function __construct()
@@ -31,6 +32,7 @@ class CalendarDataService
         $this->holidays = $this->loadJson("$path/holidays.json", []);
         $this->orthodox = $this->loadJson("$path/orthodox.json", []);
         $this->haircutGood = $this->loadJson("$path/haircut-good.json", []);
+        $this->conceptionGood = $this->loadJson("$path/conception-good.json", []);
         $this->wiki = $this->loadJson("$path/wiki-days.json", []);
 
         // Встроенные fallback-данные: рассылка никогда не будет пустой
@@ -297,6 +299,15 @@ class CalendarDataService
                 $blocks = [
                     ['h' => $good ? '✂️ Хороший день для стрижки' : '✂️ Стрижка сегодня', 't' => $good ? 'Лунный день благоприятен для обновления причёски — волосы будут расти хорошо.' : 'Сегодня лучше воздержаться от стрижки. Лунный день не способствует здоровью волос.']
                 ];
+                $blocks[] = $moonBlock;
+                return ['blocks' => $blocks, 'rating' => $good ? 'good' : 'bad', 'badge' => $good ? 'Благоприятно' : 'Не рекомендуется'];
+
+            case 'conception':
+                $good = in_array($ld, $this->conceptionGood);
+                $blocks = [
+                    ['h' => $good ? '👶 Благоприятный день для зачатия' : '👶 Планирование сегодня', 't' => $good ? 'Энергия Луны поддерживает новые начинания — день считается тёплым и благоприятным для зачатия. Берегите себя и будьте рядом с любимыми.' : 'Сегодня Луна не даёт устойчивой энергии для зачатия — лучше отдохнуть, укрепить здоровье и не форсировать события.']
+                ];
+                $blocks[] = ['h' => '💡 Совет календаря', 't' => $good ? 'Мягкая энергия дня усиливает намерение: проведите вечер в спокойствии и тепле.' : 'Посвятите день заботе о себе: сон, прогулки, витамины — тело скажет спасибо.'];
                 $blocks[] = $moonBlock;
                 return ['blocks' => $blocks, 'rating' => $good ? 'good' : 'bad', 'badge' => $good ? 'Благоприятно' : 'Не рекомендуется'];
 
