@@ -34,8 +34,8 @@ class RetryFailedCalendarEmails extends Command
     {
         $limit = (int) $this->option('limit');
 
-        // Фейлы за сутки, attempts < 3, created_at < 15 мин назад
-        $logs = DeliveryLog::where('event_type', 'daily_calendars')
+        // Фейлы за сутки, attempts < 3, created_at < 15 мин назад (email + telegram)
+        $logs = DeliveryLog::whereIn('event_type', ['daily_calendars', 'daily_calendars_tg'])
             ->where('status', 'failed')
             ->where('attempts', '<', 3)
             ->where('created_at', '>', now()->subDay())
@@ -116,14 +116,32 @@ class RetryFailedCalendarEmails extends Command
             }
 
             try {
-                [$html, $text] = $service->buildCalendarDigestEmail(
-                    $user->name, $dateRu, $calendars, $user->id
-                );
-                $ok = $service->sendEmail(
-                    $user->email,
-                    "📅 Ваши календари на {$dateRu} (повтор)",
-                    $html, $text
-                );
+                // Выбираем канал отправки
+                if ($log->event_type === 'daily_calendars_tg') {
+                    // Telegram
+                    $tgService = app(\App\Services\TelegramService::class);
+                    $sub = \App\Models\TelegramSubscriber::where('user_id', $user->id)
+                        ->where('is_active', true)
+                        ->first();
+                    if (!$sub) {
+                        $log->status = 'dead';
+                        $log->error_message = 'no active telegram subscriber';
+                        $log->save();
+                        $dead++;
+                        continue;
+                    }
+                    $ok = $tgService->sendCalendar($sub->chat_id, $dateRu, $calendars);
+                } else {
+                    // Email
+                    [$html, $text] = $service->buildCalendarDigestEmail(
+                        $user->name, $dateRu, $calendars, $user->id
+                    );
+                    $ok = $service->sendEmail(
+                        $user->email,
+                        "📅 Ваши календари на {$dateRu} (повтор)",
+                        $html, $text
+                    );
+                }
 
                 if ($ok) {
                     $log->status = 'sent';

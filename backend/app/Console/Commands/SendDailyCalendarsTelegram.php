@@ -66,6 +66,8 @@ class SendDailyCalendarsTelegram extends Command
                 $sent++;
                 $this->info("✓ {$sub->chat_id}");
             } else {
+                // Записываем фейл для последующего ретрая
+                \App\Models\DeliveryLog::create(['user_id' => $user->id, 'event_type' => 'daily_calendars_tg', 'status' => 'failed']);
                 $this->error("✗ {$sub->chat_id}");
             }
         }
