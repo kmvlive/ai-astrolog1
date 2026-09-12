@@ -20,6 +20,7 @@ services:
       - redis
 
   frontend:
+    command: npm run start
     container_name: astro-neiro-frontend
     ports:
       - "3001:3000"
