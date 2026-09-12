@@ -40,33 +40,21 @@ class GenerateOrthodoxCalendar extends Command
 
         $all = [];
         for ($m = 1; $m <= 12; $m++) {
-            $daysInMonth = self::DAYS[$m];
-            
-            // Разбиваю большие месяцы (31 день) на 2 запроса
-            if ($daysInMonth === 31) {
-                $this->info(self::MONTHS[$m] . ": разбиваю на 2 части (1-15 и 16-31)");
-                $data1 = $this->generateMonth($apiKey, $baseUrl, $model, $m, 1, 15);
-                $data2 = $this->generateMonth($apiKey, $baseUrl, $model, $m, 16, 31);
-                if (!$data1 || !$data2) {
-                    $this->error("Месяц {$m} не собран после разбиения — файл НЕ перезаписан");
-                    return 1;
-                }
-                $all += $data1 + $data2;
-                $this->info("✓ " . self::MONTHS[$m] . ": " . (count($data1) + count($data2)) . " дат (2 запроса)");
-                sleep(1);
-                continue;
-            }
-            
-            // Обычные месяцы (28-30 дней) - один запрос
-            $data = $this->generateMonth($apiKey, $baseUrl, $model, $m, 1, $daysInMonth);
-            if (!$data) {
-                $this->error("Месяц {$m} не собран после 3 попыток — файл НЕ перезаписан");
-                return 1;
-            }
-            $all += $data;
-            $this->info("✓ " . self::MONTHS[$m] . ": " . count($data) . " дат");
-            sleep(1);
-        }
+            $data = null;
+            for ($attempt = 1; $attempt <= 3; $attempt++) {
+                try {
+                    $resp = Http::timeout(180)
+                        ->withHeaders(['Authorization' => "Bearer {$apiKey}", 'Content-Type' => 'application/json'])
+                        ->post("{$baseUrl}/chat/completions", [
+                            'model' => $model,
+                            'messages' => [
+                                ['role' => 'system', 'content' => 'Ты — редактор православного календаря для русскоязычной аудитории. Возвращай ТОЛЬКО валидный JSON без markdown-обёрток.'],
+                                ['role' => 'user', 'content' => $this->prompt(self::MONTHS[$m], self::DAYS[$m])],
+                            ],
+                            'temperature' => 0.3,
+                            'max_tokens' => 16000,
+                            'enable_thinking' => false,
+                        ]);
                     if (!$resp->successful()) {
                         $this->warn("месяц {$m}: HTTP {$resp->status()} (попытка {$attempt})");
                         sleep(2); continue;
