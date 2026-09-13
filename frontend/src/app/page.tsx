@@ -158,6 +158,7 @@ export default function HomePage() {
   const [mySign, setMySign] = useState<typeof SIGNS[0] | null>(null);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [affirmationTitle, setAffirmationTitle] = useState<string>("");
 
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("auth_token"));
@@ -176,10 +177,9 @@ export default function HomePage() {
     fetch(`${API}/api/affirmations/today`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data && document.getElementById('affirmation-title')) {
-          document.getElementById('affirmation-title')!.textContent = data.title;
-        }
-      });
+        if (data) setAffirmationTitle(data.title);
+      })
+      .catch(() => {});
   }, []);
 
   const checkSign = () => {
@@ -434,7 +434,7 @@ export default function HomePage() {
           </div>
           <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
             <div className="text-sm text-violet-300 mb-1">Сегодня</div>
-            <div className="font-semibold text-white" id="affirmation-title">Загрузка...</div>
+            <div className="font-semibold text-white">{affirmationTitle || "Загрузка..."}</div>
           </div>
         </Link>
       </section>
