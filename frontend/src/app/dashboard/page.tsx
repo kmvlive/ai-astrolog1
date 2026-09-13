@@ -107,6 +107,14 @@ export default function DashboardPage() {
       })
       .catch(() => {});
 
+    // Загрузка статуса подписки на аффирмации
+    fetch(`${API_URL}/api/affirmations/subscription-status`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => r.ok ? r.json() : { subscribed: false })
+      .then(data => setAffirmationSubscribed(data.subscribed || false))
+      .catch(() => {});
+
     fetch(`${API_URL}/api/divination/history`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -208,8 +216,12 @@ export default function DashboardPage() {
     setAffirmationLoading(true);
     try {
       if (affirmationSubscribed) {
-        // Отписка (пока нет endpoint, просто сбрасываем локально)
-        setAffirmationSubscribed(false);
+        // Отписка через API
+        const res = await fetch(`${API_URL}/api/affirmations/subscribe`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) setAffirmationSubscribed(false);
       } else {
         const res = await fetch(`${API_URL}/api/affirmations/subscribe`, {
           method: "POST",
