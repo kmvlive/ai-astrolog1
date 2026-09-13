@@ -52,6 +52,8 @@ export default function DashboardPage() {
   const [settingsSaved, setSettingsSaved] = useState(false);
   const [history, setHistory] = useState<{ uuid: string; type: string; type_name: string; emoji: string; question: string | null; preview: string; date: string }[]>([]);
   const [historyTotal, setHistoryTotal] = useState(0);
+  const [affirmationSubscribed, setAffirmationSubscribed] = useState(false);
+  const [affirmationLoading, setAffirmationLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -197,6 +199,26 @@ export default function DashboardPage() {
     } finally {
       setAutoSaving(false);
     }
+  };
+
+  const handleAffirmationSubscription = async () => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) return;
+    
+    setAffirmationLoading(true);
+    try {
+      if (affirmationSubscribed) {
+        // Отписка (пока нет endpoint, просто сбрасываем локально)
+        setAffirmationSubscribed(false);
+      } else {
+        const res = await fetch(`${API_URL}/api/affirmations/subscribe`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        });
+        if (res.ok) setAffirmationSubscribed(true);
+      }
+    } catch {}
+    finally { setAffirmationLoading(false); }
   };
 
   const planNames: Record<string, string> = {
@@ -379,6 +401,32 @@ export default function DashboardPage() {
               </div>
             </section>
           )}
+        </div>
+
+        {/* Блок подписки на аффирмации */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">💫 Подписка на аффирмации</h2>
+          <div className="rounded-2xl p-6 bg-slate-900 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <div className="font-semibold mb-1">Ежедневные аффирмации</div>
+              <div className="text-sm text-slate-400">
+                {affirmationSubscribed
+                  ? "Вы подписаны — аффирмация приходит каждое утро в 8:00"
+                  : "Получайте вдохновляющую аффирмацию каждое утро"}
+              </div>
+            </div>
+            <button
+              onClick={handleAffirmationSubscription}
+              disabled={affirmationLoading}
+              className={`px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition disabled:opacity-50 ${
+                affirmationSubscribed
+                  ? "bg-green-500/20 text-green-400 hover:bg-red-500/20 hover:text-red-400"
+                  : "bg-violet-600 hover:bg-violet-500"
+              }`}
+            >
+              {affirmationLoading ? "..." : affirmationSubscribed ? "✓ Подписан (отписаться)" : "Подписаться"}
+            </button>
+          </div>
         </div>
 
         {/* Блок Telegram */}
