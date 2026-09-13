@@ -400,6 +400,7 @@ PROMPT;
                 'author_type' => 'ai',
                 'author_name' => 'AI-астролог',
                 'published_at' => $today->setTime(7, 0),
+                'blog_category_id' => 4, // Энергии дня
                 'seo_title' => $title . ' — Блог AI-астролога',
                 'seo_description' => mb_substr(strip_tags(Str::markdown($content)), 0, 150),
             ]);
