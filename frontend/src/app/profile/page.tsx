@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import DateInput from "@/components/DateInput";
 import TimeInput from "@/components/TimeInput";
@@ -102,6 +103,17 @@ export default function ProfilePage() {
     return (
       <main className="min-h-screen bg-slate-950 text-white">
         <SiteHeader />
+      <div className="max-w-2xl mx-auto px-4 pt-6 w-full">
+        <Link href="/profile/referrals" className="block bg-gradient-to-r from-violet-900/40 to-purple-900/30 border border-violet-500/30 rounded-2xl p-4 hover:border-violet-500/60 transition">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="font-semibold">🎁 Приведи друзей</div>
+              <div className="text-sm text-slate-400 mt-0.5">5 друзей = 3 месяца бесплатных гороскопов</div>
+            </div>
+            <span className="text-2xl text-violet-400">→</span>
+          </div>
+        </Link>
+      </div>
         <div className="text-center py-20 text-slate-400">
           <div className="inline-block animate-spin rounded-full h-10 w-10 border-2 border-violet-500 border-t-transparent mb-4" />
           <div>Загрузка...</div>
@@ -113,6 +125,17 @@ export default function ProfilePage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <SiteHeader />
+      <div className="max-w-2xl mx-auto px-4 pt-6 w-full">
+        <Link href="/profile/referrals" className="block bg-gradient-to-r from-violet-900/40 to-purple-900/30 border border-violet-500/30 rounded-2xl p-4 hover:border-violet-500/60 transition">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="font-semibold">🎁 Приведи друзей</div>
+              <div className="text-sm text-slate-400 mt-0.5">5 друзей = 3 месяца бесплатных гороскопов</div>
+            </div>
+            <span className="text-2xl text-violet-400">→</span>
+          </div>
+        </Link>
+      </div>
       <div className="max-w-2xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-violet-400 to-amber-400 bg-clip-text text-transparent">
           Редактирование профиля

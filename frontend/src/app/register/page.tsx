@@ -76,6 +76,7 @@ export default function RegisterPage() {
           birth_city: birthCity.trim() || undefined,
           horoscope_types: selected,
           frequency,
+          referral_code: localStorage.getItem("referral_code") || undefined,
         }),
       });
 

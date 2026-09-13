@@ -24,7 +24,13 @@ class GenerateFreePersonalHoroscopes extends Command
 
         $today = now()->startOfDay();
         
-        $users = User::all()->filter(fn($u) => $u->hasAccessToPersonalHoroscope())
+        $users = User::where(function ($q) {
+                $q->where('free_personal_enabled', true)
+                  ->orWhereHas('referralCycles', function ($q2) {
+                      $q2->where('is_active', true)
+                         ->where('ends_at', '>', now());
+                  });
+            })
             ->whereNotNull('email_verified_at')
             ->whereHas('profile', function ($q) {
                 $q->whereNotNull('birth_date')

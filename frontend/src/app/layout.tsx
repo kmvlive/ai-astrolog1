@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import AnalyticsCounters from "@/components/AnalyticsCounters";
+import ReferralTracker from "@/components/ReferralTracker";
+import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
@@ -28,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={`${inter.className} bg-slate-950 text-white antialiased`}>
+      <Suspense><ReferralTracker /></Suspense>
         {children}
         <AnalyticsCounters />
       </body>
