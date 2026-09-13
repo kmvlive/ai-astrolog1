@@ -93,7 +93,15 @@
         footer{background:#1f2937;color:#d1d5db;padding:32px 0;text-align:center;font-size:14px;margin-top:80px}
         footer a{color:#fff}
         @media(max-width:640px){header.hero h1{font-size:30px}.container{padding:0 16px}}
-    </style>
+    
+/* Category menu */
+.cat-menu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 32px;padding:24px;background:var(--surface);border-radius:20px;border:1px solid var(--border)}
+.cat-chip{padding:8px 16px;background:#f3f4f6;border-radius:999px;font-size:14px;font-weight:500;color:var(--text);text-decoration:none;transition:all .2s;border:1px solid transparent}
+.cat-chip:hover{background:#ede9fe;color:var(--primary);text-decoration:none}
+.cat-chip.active{background:var(--primary);color:#fff;font-weight:600}
+.cat-chip.sub{background:transparent;border:1px dashed var(--border);font-size:13px;padding:6px 14px}
+.cat-chip.sub.active{border-color:var(--primary);border-style:solid}
+</style>
 </head>
 <body>
 <div class="site-header">
