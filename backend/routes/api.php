@@ -134,6 +134,7 @@ Route::get('/daily-horoscopes/{slug}', [DailyHoroscopeController::class, 'show']
 // ===== Protected routes =====
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/affirmations/subscribe', [\App\Http\Controllers\Api\AffirmationController::class, 'subscribe']);
+    Route::delete('/affirmations/subscribe', [\App\Http\Controllers\Api\AffirmationController::class, 'unsubscribe']);
     Route::get('/affirmations/subscription-status', [\App\Http\Controllers\Api\AffirmationController::class, 'subscriptionStatus']);
     Route::get('/referrals', [\App\Http\Controllers\Api\ReferralController::class, 'index']);
     Route::get('/subscription/settings', [\App\Http\Controllers\Api\SubscriptionController::class, 'getSettings']);

@@ -73,4 +73,16 @@ class AffirmationController extends Controller
         
         return response()->json($affirmation);
     }
+
+    public function unsubscribe(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['error' => 'unauthenticated'], 401);
+        }
+
+        \Illuminate\Support\Facades\Cache::forget('affirmation_sub_' . $user->id);
+
+        return response()->json(['success' => true]);
+    }
 }
