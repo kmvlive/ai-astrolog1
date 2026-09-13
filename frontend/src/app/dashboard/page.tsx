@@ -593,17 +593,19 @@ export default function DashboardPage() {
 </div>
 
         {/* Приведи друзей */}
-        <section className="mt-8">
-          <Link href="/profile/referrals" className="block bg-gradient-to-r from-violet-900/40 to-purple-900/30 border border-violet-500/30 rounded-2xl p-6 hover:border-violet-500/60 transition group">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold mb-1">🎁 Приведи друзей</h2>
-                <p className="text-slate-400">5 друзей = 3 месяца бесплатных персональных гороскопов</p>
+        <div className="max-w-6xl mx-auto px-4">
+          <section className="mt-8">
+            <Link href="/profile/referrals" className="block bg-gradient-to-r from-violet-900/40 to-purple-900/30 border border-violet-500/30 rounded-2xl p-6 hover:border-violet-500/60 transition group">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold mb-1">🎁 Приведи друзей</h2>
+                  <p className="text-slate-400">5 друзей = 3 месяца бесплатных персональных гороскопов</p>
+                </div>
+                <span className="text-4xl text-violet-400 group-hover:translate-x-1 transition-transform">→</span>
               </div>
-              <span className="text-4xl text-violet-400 group-hover:translate-x-1 transition-transform">→</span>
-            </div>
-          </Link>
-        </section>
+            </Link>
+          </section>
+        </div>
 
           <SiteFooter />
         </main>
