@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -15,46 +16,62 @@ interface Affirmation {
 }
 
 export default function AffirmationsPage() {
+  const router = useRouter();
   const [today, setToday] = useState<Affirmation | null>(null);
   const [calendar, setCalendar] = useState<Affirmation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [email, setEmail] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
+  const [subLoading, setSubLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    Promise.all([
+    const token = localStorage.getItem("auth_token");
+    setIsLoggedIn(!!token);
+
+    const requests: Promise<any>[] = [
       fetch(`${API_URL}/api/affirmations/today`).then(r => r.ok ? r.json() : null),
       fetch(`${API_URL}/api/affirmations/calendar?days=30`).then(r => r.ok ? r.json() : []),
-    ])
-      .then(([todayData, calendarData]) => {
+    ];
+    if (token) {
+      requests.push(
+        fetch(`${API_URL}/api/affirmations/subscription-status`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }).then(r => r.ok ? r.json() : { subscribed: false })
+      );
+    } else {
+      requests.push(Promise.resolve({ subscribed: false }));
+    }
+
+    Promise.all(requests)
+      .then(([todayData, calendarData, statusData]) => {
         setToday(todayData);
-        setCalendar(calendarData);
+        setCalendar(calendarData || []);
+        setSubscribed(statusData?.subscribed || false);
       })
       .finally(() => setLoading(false));
   }, []);
 
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    
+  const handleSubscribe = async () => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+    setSubLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/subscribe-affirmations`, {
+      const res = await fetch(`${API_URL}/api/affirmations/subscribe`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
-      if (res.ok) {
-        setSubscribed(true);
-        setEmail("");
-      }
+      if (res.ok) setSubscribed(true);
     } catch {}
+    finally { setSubLoading(false); }
   };
 
   const shareAffirmation = async () => {
     if (!today) return;
-    const text = `${today.title}\n\n${today.description}\n\n🌟 Ежедневные аффирмации от AI Астролога`;
-    
+    const text = `${today.title}\n\n${today.description}\n\n💫 Ежедневные аффирмации от AI Астролога`;
     if (navigator.share) {
       navigator.share({ title: today.title, text });
     } else {
@@ -101,51 +118,56 @@ export default function AffirmationsPage() {
               </div>
             )}
 
-            {/* Подписка */}
+            {/* Подписка — умная форма */}
             <div className="bg-slate-900/50 border border-white/10 rounded-2xl p-6 mb-8">
-              <h3 className="text-xl font-bold mb-3">📬 Получать аффирмацию каждое утро</h3>
+              <h3 className="text-xl font-bold mb-3">📬 Получать аффирмацию каждое утро в 8:00</h3>
               {subscribed ? (
-                <div className="text-green-400">✓ Вы подписаны! Первая аффирмация придёт завтра в 8:00</div>
+                <div className="flex items-center gap-3 text-green-400">
+                  <span className="text-2xl">✓</span>
+                  <span>Вы подписаны! Аффирмация будет приходить на вашу почту каждое утро.</span>
+                </div>
+              ) : isLoggedIn ? (
+                <button
+                  onClick={handleSubscribe}
+                  disabled={subLoading}
+                  className="px-6 py-3 bg-violet-600 hover:bg-violet-500 rounded-xl font-semibold transition disabled:opacity-50"
+                >
+                  {subLoading ? "Подписка..." : "🔔 Подписаться на аффирмации"}
+                </button>
               ) : (
-                <form onSubmit={handleSubscribe} className="flex gap-3">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your@email.com"
-                    required
-                    className="flex-1 px-4 py-3 bg-slate-800 border border-white/10 rounded-xl focus:outline-none focus:border-violet-500"
-                  />
+                <div className="flex items-center gap-4">
                   <button
-                    type="submit"
-                    className="px-6 py-3 bg-violet-600 hover:bg-violet-500 rounded-xl font-semibold whitespace-nowrap transition"
+                    onClick={() => router.push("/login")}
+                    className="px-6 py-3 bg-violet-600 hover:bg-violet-500 rounded-xl font-semibold transition"
                   >
-                    Подписаться
+                    Войти, чтобы подписаться
                   </button>
-                </form>
+                  <span className="text-sm text-slate-400">Подписка доступна авторизованным пользователям</span>
+                </div>
               )}
             </div>
 
             {/* Календарь */}
             <div className="bg-slate-900/50 border border-white/10 rounded-2xl p-6">
               <h3 className="text-xl font-bold mb-4">📅 Календарь аффирмаций</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {calendar.map((aff) => (
-                  <div
-                    key={aff.id}
-                    className={`p-4 rounded-xl border transition ${
-                      isToday(aff.date)
-                        ? "bg-violet-600/20 border-violet-500/50"
-                        : "bg-slate-800/30 border-white/5"
-                    }`}
-                  >
-                    <div className="text-sm text-slate-400 mb-1">{formatDate(aff.date)}</div>
-                    <div className="font-semibold text-white mb-1">{aff.title}</div>
-                    <div className="text-sm text-slate-400 line-clamp-2">{aff.description}</div>
-                  </div>
-                ))}
-              </div>
-              {calendar.length === 0 && (
+              {calendar.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {calendar.map((aff) => (
+                    <div
+                      key={aff.id}
+                      className={`p-4 rounded-xl border transition ${
+                        isToday(aff.date)
+                          ? "bg-violet-600/20 border-violet-500/50"
+                          : "bg-slate-800/30 border-white/5"
+                      }`}
+                    >
+                      <div className="text-sm text-slate-400 mb-1">{formatDate(aff.date)}</div>
+                      <div className="font-semibold text-white mb-1">{aff.title}</div>
+                      <div className="text-sm text-slate-400 line-clamp-2">{aff.description}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
                 <div className="text-center py-8 text-slate-400">
                   Аффирмации генерируются ежедневно. Завтра появится новая!
                 </div>
