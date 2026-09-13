@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AffirmationController;
+use App\Http\Controllers\Api\AffirmationRssController;
 use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\MagicLinkController;
 use App\Http\Controllers\Api\UnsubscribeController;
@@ -21,6 +22,7 @@ use App\Models\BlogPost;
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/affirmations/today', [AffirmationController::class, 'today']);
 Route::get('/affirmations/{date}', [AffirmationController::class, 'show'])->where('date', '\d{4}-\d{2}-\d{2}');
+Route::get('/affirmations/rss', [AffirmationRssController::class, 'feed']);
 Route::get('/affirmations/calendar', [AffirmationController::class, 'calendar']);
 Route::post('/login', [AuthController::class, 'login']);
 
