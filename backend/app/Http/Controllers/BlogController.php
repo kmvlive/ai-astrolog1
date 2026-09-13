@@ -3,13 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
+use App\Models\BlogCategory;
 use Illuminate\Http\Request;
 
 class BlogController extends Controller
 {
-    public function index() {
-        $posts = BlogPost::published()->orderByDesc('published_at')->paginate(12);
-        return view('blog.index', compact('posts'));
+    public function index(Request $request, ?BlogCategory $category = null) {
+        $categories = BlogCategory::active()->roots()->with('children')->get();
+
+        $query = BlogPost::published()->with('category');
+        if ($category) {
+            $ids = $category->children()->pluck('id')->push($category->id)->unique();
+            $query->whereIn('blog_category_id', $ids);
+        }
+        $posts = $query->orderByDesc('published_at')->paginate(12)->withQueryString();
+
+        return view('blog.index', compact('posts', 'categories', 'category'));
     }
 
     public function rss()

@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\BlogPostResource\Pages;
 use App\Models\BlogPost;
+use App\Models\BlogCategory;
 use App\Services\AiService;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -41,6 +42,13 @@ class BlogPostResource extends Resource
                         ->maxLength(255)
                         ->unique(ignoreRecord: true)
                         ->prefix('/blog/'),
+                    Forms\Components\Select::make('blog_category_id')
+                        ->label('Категория')
+                        ->relationship('category', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->nullable()
+                        ->columnSpanFull(),
                     Forms\Components\Textarea::make('excerpt')
                         ->label('Краткое описание (для списка и SEO)')
                         ->rows(2)
@@ -88,6 +96,10 @@ class BlogPostResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(50),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->label('Категория')
+                    ->placeholder('—')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('author_type')
                     ->label('Автор')
                     ->badge()

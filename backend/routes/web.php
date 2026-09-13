@@ -7,6 +7,7 @@ Route::get('/', function () {
 });
 
 Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/category/{category:slug}', [\App\Http\Controllers\BlogController::class, 'index'])->name('blog.category');
 Route::get('/blog/rss', [\App\Http\Controllers\BlogController::class, 'rss'])->name('blog.rss');
 Route::get('/blog/{post}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
 

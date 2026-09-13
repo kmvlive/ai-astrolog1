@@ -23,3 +23,8 @@ class BlogPost extends Model
         return 'slug';
     }
 }
+
+    public function category()
+    {
+        return $this->belongsTo(\App\Models\BlogCategory::class, 'blog_category_id');
+    }
