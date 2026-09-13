@@ -23,7 +23,7 @@ class SendPersonalHoroscopeTelegram extends Command
         $query = TelegramSubscriber::where('is_active', true)
             ->whereNotNull('user_id')
             ->whereHas('user', function ($q) use ($date) {
-                $q->where('free_personal_enabled', true)
+                $q->whereRaw('1=1')->get()->filter(fn($u) => $u->hasAccessToPersonalHoroscope())
                   ->whereHas('horoscopes', function ($q2) use ($date) {
                       $q2->where('type', 'general')
                          ->where('is_personal', true)

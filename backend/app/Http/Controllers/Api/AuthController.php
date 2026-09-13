@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
+use App\Services\ReferralService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -62,6 +63,13 @@ class AuthController extends Controller
         }
 
         $user->profile()->create($profileData);
+
+        // Обработка реферального кода
+        $referralCode = $request->input('referral_code') ?? $request->cookie('referral_code');
+        if ($referralCode) {
+            app(ReferralService::class)->trackReferral($user, $referralCode);
+        }
+        app(ReferralService::class)->generateReferralCode($user);
 
         // Привязываем типы гороскопов
         if ($request->filled('horoscope_types')) {

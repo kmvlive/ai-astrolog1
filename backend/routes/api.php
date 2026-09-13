@@ -129,6 +129,7 @@ Route::get('/daily-horoscopes/{slug}', [DailyHoroscopeController::class, 'show']
 
 // ===== Protected routes =====
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/referrals', [ReferralController::class, 'index']);
     Route::get('/subscription/settings', [\App\Http\Controllers\Api\SubscriptionController::class, 'getSettings']);
     Route::post('/subscription/channels', [\App\Http\Controllers\Api\SubscriptionController::class, 'updateChannels']);
     Route::post('/subscription/calendars', [\App\Http\Controllers\Api\SubscriptionController::class, 'updateCalendars']);
@@ -399,6 +400,7 @@ Route::get('/share/{uuid}', [\App\Http\Controllers\Api\DivinationController::cla
 
 // MAX Connect (authenticated)
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/referrals', [ReferralController::class, 'index']);
     Route::get('/max/link', [\App\Http\Controllers\Api\MaxConnectController::class, 'link']);
     Route::post('/max/confirm/{maxUserId}', [\App\Http\Controllers\Api\MaxConnectController::class, 'confirm']);
 });

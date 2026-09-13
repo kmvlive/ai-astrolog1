@@ -23,7 +23,7 @@ class SendPersonalHoroscopeEmails extends Command
         $service = app(UniSenderService::class);
 
         // Ищем пользователей с галочкой + заполненный профиль + есть свежий персональный гороскоп
-        $query = User::where('free_personal_enabled', true)
+        $query = User::all()->filter(fn($u) => $u->hasAccessToPersonalHoroscope())
             ->whereNotNull('email_verified_at')
             ->whereHas('profile', function ($q) {
                 $q->whereNotNull('birth_date')

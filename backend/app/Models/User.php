@@ -11,6 +11,7 @@ use Filament\Panel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\ReferralCycle;
 
 class User extends Authenticatable implements FilamentUser
 {
@@ -24,6 +25,8 @@ class User extends Authenticatable implements FilamentUser
      */
     protected $fillable = [
         'free_personal_enabled',
+        'referral_code',
+        'referred_by',
         'name',
         'email',
         'password',
@@ -121,5 +124,75 @@ class User extends Authenticatable implements FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         return (bool) $this->is_admin;
+    }
+
+    // Referral system
+    public function referrer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'referred_by');
+    }
+
+    public function referredUsers(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(User::class, 'referred_by');
+    }
+
+    public function referralCycles(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ReferralCycle::class);
+    }
+
+    public function getActiveCyclesCount(): int
+    {
+        return $this->referralCycles()
+            ->active()
+            ->where('ends_at', '>', now())
+            ->count();
+    }
+
+    public function canStartNewCycle(): bool
+    {
+        $activeCount = $this->getActiveCyclesCount();
+        
+        // Максимум 4 активных цикла
+        if ($activeCount < 4) {
+            return true;
+        }
+        
+        // Проверяем самый старый активный цикл (прошло ли 10+ месяцев)
+        $oldestCycle = $this->referralCycles()
+            ->active()
+            ->where('ends_at', '>', now())
+            ->orderBy('started_at', 'asc')
+            ->first();
+        
+        if ($oldestCycle && $oldestCycle->started_at->diffInMonths(now()) >= 10) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    public function hasAccessToPersonalHoroscope(): bool
+    {
+        // Старое поле или активный цикл
+        if ($this->free_personal_enabled) {
+            return true;
+        }
+        
+        return $this->referralCycles()
+            ->active()
+            ->where('ends_at', '>', now())
+            ->exists();
+    }
+
+    public function getCurrentReferralProgress(): int
+    {
+        $currentCycle = $this->referralCycles()
+            ->whereNull('started_at')
+            ->latest()
+            ->first();
+        
+        return $currentCycle ? $currentCycle->referrals_count : 0;
     }
 }
