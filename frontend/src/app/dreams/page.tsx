@@ -17,6 +17,7 @@ const transliterate = (text: string): string => {
   return text.toLowerCase().split('').map(c => map[c] || c).join('');
 };
 
+
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
 export default function DreamsPage() {

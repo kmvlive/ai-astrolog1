@@ -5,6 +5,7 @@ import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
 type Profile = {

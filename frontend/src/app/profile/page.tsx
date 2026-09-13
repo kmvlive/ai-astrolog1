@@ -8,6 +8,7 @@ import DateInput from "@/components/DateInput";
 import TimeInput from "@/components/TimeInput";
 import SiteFooter from "@/components/SiteFooter";
 
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
 export default function ProfilePage() {

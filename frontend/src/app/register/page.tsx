@@ -17,6 +17,7 @@ const HOROSCOPE_TYPES = [
   { slug: "tibetan", name: "Тибетский", icon: "🏔️" },
 ];
 
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
 export default function RegisterPage() {
