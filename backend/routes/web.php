@@ -1,5 +1,10 @@
 <?php
 
+// Named route для Sanctum redirect (API использует JSON, но fallback нужен)
+Route::get('/login', function () {
+    return redirect('https://my.neiro-astro.ru/login');
+})->name('login');
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
