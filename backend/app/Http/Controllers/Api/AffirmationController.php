@@ -30,3 +30,18 @@ class AffirmationController extends Controller
         return response()->json($affirmations);
     }
 }
+
+    public function subscribe(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        
+        $email = trim(strtolower($request->email));
+        
+        // Создаём или обновляем подписчика
+        $subscriber = \App\Models\MaxSubscriber::updateOrCreate(
+            ['email' => $email],
+            ['is_active' => true, 'subscribed_at' => now()]
+        );
+        
+        return response()->json(['success' => true]);
+    }

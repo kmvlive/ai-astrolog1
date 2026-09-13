@@ -33,6 +33,8 @@ Schedule::command('subscriptions:expiry-reminders')->dailyAt('10:00')->timezone(
 
 // Блог
 Schedule::command('blog:clean-covers')->dailyAt('04:30');
+    Schedule::command('affirmation:generate-daily')->dailyAt('06:00');
+    Schedule::command('affirmation:send-daily')->dailyAt('08:00');
 
 // Рассылка календарей
 Schedule::command('calendar:send-daily-emails')->dailyAt('07:30')->timezone('Europe/Moscow')->withoutOverlapping(120);

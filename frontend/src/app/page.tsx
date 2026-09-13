@@ -171,6 +171,17 @@ export default function HomePage() {
     }).catch(() => {});
   }, []);
 
+  // Загрузка сегодняшней аффирмации
+  useEffect(() => {
+    fetch(`${API}/api/affirmations/today`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && document.getElementById('affirmation-title')) {
+          document.getElementById('affirmation-title')!.textContent = data.title;
+        }
+      });
+  }, []);
+
   const checkSign = () => {
     if (!birthDate) return;
     const d = new Date(birthDate);
@@ -411,7 +422,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-slate-900/50 py-16">
+            {/* Здоровье и настрой */}
+      <section className="max-w-4xl mx-auto px-4 py-12">
+        <Link href="/affirmations" className="block bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 rounded-2xl p-8 hover:border-violet-500/60 transition group">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h2 className="text-3xl font-bold mb-2">💫 Здоровье и настрой</h2>
+              <p className="text-slate-400">Ежедневные аффирмации для гармонии и вдохновения</p>
+            </div>
+            <span className="text-4xl text-violet-400 group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+          <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+            <div className="text-sm text-violet-300 mb-1">Сегодня</div>
+            <div className="font-semibold text-white" id="affirmation-title">Загрузка...</div>
+          </div>
+        </Link>
+      </section>
+
+<section className="bg-slate-900/50 py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-3xl sm:text-4xl font-bold mb-3">📖 Блог AI-астролога</h2>

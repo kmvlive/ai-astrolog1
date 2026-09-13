@@ -21,6 +21,7 @@ use App\Models\BlogPost;
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/affirmations/today', [AffirmationController::class, 'today']);
 Route::get('/affirmations/calendar', [AffirmationController::class, 'calendar']);
+Route::post('/subscribe-affirmations', [AffirmationController::class, 'subscribe']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // Публичная подписка на ежедневный гороскоп (без регистрации)
