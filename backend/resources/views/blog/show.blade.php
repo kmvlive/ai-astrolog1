@@ -47,6 +47,20 @@
 @media(max-width:640px){.article{padding:28px 20px}.article h1{font-size:26px}}
 </style>
 
+@if(count($categories) > 0)
+<nav class="cat-menu" style="margin-bottom:24px">
+    <a href="{{ route('blog.index') }}" class="cat-chip {{ !$post->category ? 'active' : '' }}">Все статьи</a>
+    @foreach($categories as $cat)
+        <a href="{{ route('blog.category', $cat) }}" class="cat-chip {{ $post->category && ($post->category->id === $cat->id || $post->category->parent_id === $cat->id) ? 'active' : '' }}">{{ $cat->name }}</a>
+        @if($cat->children->count())
+            @foreach($cat->children as $child)
+                <a href="{{ route('blog.category', $child) }}" class="cat-chip sub {{ $post->category && $post->category->id === $child->id ? 'active' : '' }}">↳ {{ $child->name }}</a>
+            @endforeach
+        @endif
+    @endforeach
+</nav>
+@endif
+
 <a href="{{ route('blog.index') }}" class="back">← Все статьи</a>
 <article class="article">
 <div class="article-meta">

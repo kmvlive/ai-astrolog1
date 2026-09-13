@@ -33,7 +33,8 @@ class BlogController extends Controller
             abort(404);
         }
         $post->increment('views_count');
+        $categories = \App\Models\BlogCategory::with('children')->whereNull('parent_id')->orderBy('sort_order')->get();
         $related = BlogPost::published()->where('id', '!=', $post->id)->orderByDesc('published_at')->take(3)->get();
-        return view('blog.show', compact('post', 'related'));
+        return view('blog.show', compact('post', 'related', 'categories'));
     }
 }
