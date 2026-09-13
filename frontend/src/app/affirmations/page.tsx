@@ -71,9 +71,10 @@ export default function AffirmationsPage() {
 
   const shareAffirmation = async () => {
     if (!today) return;
-    const text = `${today.title}\n\n${today.description}\n\n💫 Ежедневные аффирмации от AI Астролога`;
+    const url = `${window.location.origin}/affirmations/${today.date.split('T')[0]}`;
+    const text = `${today.title}\n\n${today.description}\n\n💫 ${url}`;
     if (navigator.share) {
-      navigator.share({ title: today.title, text });
+      navigator.share({ title: today.title, text, url });
     } else {
       await navigator.clipboard.writeText(text);
       setCopied(true);
