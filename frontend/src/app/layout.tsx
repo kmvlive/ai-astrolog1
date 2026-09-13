@@ -8,16 +8,12 @@ import { Suspense } from "react";
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
 export const metadata: Metadata = {
-  title: "AI Астролог — персональные гороскопы",
-  description: "Ежедневные и персональные гороскопы на основе AI. Бесплатные прогнозы для всех 12 знаков зодиака.",
-  keywords: ["гороскоп", "астрология", "AI", "прогноз", "натальная карта"],
-  icons: {
-    icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
-    ],
-    apple: { url: "/favicon.svg", type: "image/svg+xml" },
+  title: {
+    default: "AI Астролог — персональные гороскопы на основе натальной карты",
+    template: "%s | AI Астролог"
   },
+  description: "Бесплатные ежедневные и персональные гороскопы от AI. Точные прогнозы на основе вашей натальной карты и лунных циклов. Узнайте своё будущее!",
+  keywords: ["персональный гороскоп", "натальная карта", "AI астролог", "бесплатный гороскоп", "прогноз на сегодня"],
 };
 
 export const revalidate = 0;
