@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AffirmationController;
 use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\MagicLinkController;
 use App\Http\Controllers\Api\UnsubscribeController;
@@ -18,6 +19,8 @@ use App\Models\BlogPost;
 
 // ===== Public routes =====
 Route::post('/register', [AuthController::class, 'register']);
+Route::get('/affirmations/today', [AffirmationController::class, 'today']);
+Route::get('/affirmations/calendar', [AffirmationController::class, 'calendar']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // Публичная подписка на ежедневный гороскоп (без регистрации)
