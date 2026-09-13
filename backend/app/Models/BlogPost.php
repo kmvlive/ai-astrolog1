@@ -9,6 +9,7 @@ class BlogPost extends Model
     protected $fillable = [
         'title', 'slug', 'excerpt', 'content', 'author_type', 'author_name',
         'cover_image', 'published_at', 'seo_title', 'seo_description', 'views_count',
+        'blog_category_id',
     ];
 
     protected $casts = [
@@ -22,9 +23,9 @@ class BlogPost extends Model
     public function getRouteKeyName(): string {
         return 'slug';
     }
-}
 
     public function category()
     {
         return $this->belongsTo(\App\Models\BlogCategory::class, 'blog_category_id');
     }
+}
