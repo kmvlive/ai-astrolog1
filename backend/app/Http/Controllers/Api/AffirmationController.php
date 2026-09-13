@@ -62,4 +62,15 @@ class AffirmationController extends Controller
         $subscribed = (bool) \Illuminate\Support\Facades\Cache::get('affirmation_sub_' . $user->id, false);
         return response()->json(['subscribed' => $subscribed, 'email' => $user->email]);
     }
+
+    public function show(string $date)
+    {
+        $affirmation = Affirmation::where('date', $date)->first();
+        
+        if (!$affirmation) {
+            return response()->json(['error' => 'not_found'], 404);
+        }
+        
+        return response()->json($affirmation);
+    }
 }
