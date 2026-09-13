@@ -11,12 +11,16 @@ class AffirmationController extends Controller
     public function today()
     {
         $today = now()->startOfDay();
-        $affirmation = Affirmation::forDate($today)->first();
-        
+        $affirmation = Affirmation::whereDate('date', $today)->first();
+
         if (!$affirmation) {
-            // Генерируем на лету если нет
-            app(\App\Console\Commands\GenerateDailyAffirmation::class)->handle(app(\App\Services\AiService::class));
-            $affirmation = Affirmation::forDate($today)->first();
+            // Генерируем через artisan команду (безопаснее чем прямой handle)
+            try {
+                \Illuminate\Support\Facades\Artisan::call('affirmation:generate-daily');
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('Affirmation generate failed', ['error' => $e->getMessage()]);
+            }
+            $affirmation = Affirmation::whereDate('date', $today)->first();
         }
 
         return response()->json($affirmation);
@@ -24,24 +28,38 @@ class AffirmationController extends Controller
 
     public function calendar(Request $request)
     {
-        $days = $request->input('days', 30);
-        $affirmations = Affirmation::upcoming($days)->get();
-        
+        $days = (int) $request->input('days', 30);
+        $affirmations = Affirmation::where('date', '>=', now()->subDays(7)->startOfDay())
+            ->where('date', '<=', now()->addDays($days)->endOfDay())
+            ->orderBy('date')
+            ->get();
+
         return response()->json($affirmations);
     }
-}
 
     public function subscribe(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
-        
-        $email = trim(strtolower($request->email));
-        
-        // Создаём или обновляем подписчика
-        $subscriber = \App\Models\MaxSubscriber::updateOrCreate(
-            ['email' => $email],
-            ['is_active' => true, 'subscribed_at' => now()]
-        );
-        
-        return response()->json(['success' => true]);
+        // Подписка только для авторизованных (email берём из профиля)
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['error' => 'unauthenticated'], 401);
+        }
+
+        $user->update(['email_opt_in' => true]);
+
+        // Помечаем что пользователь хочет аффирмации (через отдельный флаг)
+        \Illuminate\Support\Facades\Cache::forever('affirmation_sub_' . $user->id, true);
+
+        return response()->json(['success' => true, 'email' => $user->email]);
     }
+
+    public function subscriptionStatus(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['subscribed' => false]);
+        }
+        $subscribed = (bool) \Illuminate\Support\Facades\Cache::get('affirmation_sub_' . $user->id, false);
+        return response()->json(['subscribed' => $subscribed, 'email' => $user->email]);
+    }
+}

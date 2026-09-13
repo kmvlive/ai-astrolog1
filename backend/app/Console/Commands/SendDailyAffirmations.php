@@ -3,9 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Models\Affirmation;
-use App\Models\MaxSubscriber;
+use App\Models\User;
 use App\Services\UniSenderService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class SendDailyAffirmations extends Command
 {
@@ -15,30 +16,45 @@ class SendDailyAffirmations extends Command
     public function handle(): int
     {
         $today = now()->startOfDay();
-        $affirmation = Affirmation::forDate($today)->first();
-        
+        $affirmation = Affirmation::whereDate('date', $today)->first();
+
         if (!$affirmation) {
             $this->error('Нет аффирмации на сегодня');
             return 1;
         }
 
-        $subscribers = MaxSubscriber::where('is_active', true)->get();
-        $this->info("Подписчиков: {$subscribers->count()}");
+        // Подписчики: пользователи с флагом в Cache
+        $subscribers = User::whereNotNull('email')
+            ->where('email_opt_in', true)
+            ->get()
+            ->filter(fn($u) => Cache::get('affirmation_sub_' . $u->id, false));
 
-        $service = app(UniSenderService::class);
-        
-        foreach ($subscribers as $sub) {
-            $html = view('emails.affirmation', [
-                'title' => $affirmation->title,
-                'description' => $affirmation->description,
-                'date' => $affirmation->date->format('d.m.Y'),
-            ])->render();
+        $this->info("Подписчиков на аффирмации: {$subscribers->count()}");
 
-            $service->sendEmail($sub->email, "💫 {$affirmation->title}", $html);
-            $this->line("Отправлено: {$sub->email}");
+        if ($subscribers->isEmpty()) {
+            $this->info('Нет подписчиков, рассылка не требуется');
+            return 0;
         }
 
-        $this->info('✓ Рассылка завершена');
+        $service = app(UniSenderService::class);
+
+        foreach ($subscribers as $user) {
+            try {
+                $html = view('emails.affirmation', [
+                    'title' => $affirmation->title,
+                    'description' => $affirmation->description,
+                    'date' => $affirmation->date->format('d.m.Y'),
+                    'userName' => $user->name,
+                ])->render();
+
+                $service->sendEmail($user->email, "💫 {$affirmation->title}", $html);
+                $this->line("✓ {$user->email}");
+            } catch (\Throwable $e) {
+                $this->error("✗ {$user->email}: {$e->getMessage()}");
+            }
+        }
+
+        $this->info('Рассылка завершена');
         return 0;
     }
 }

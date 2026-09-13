@@ -21,7 +21,6 @@ use App\Models\BlogPost;
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/affirmations/today', [AffirmationController::class, 'today']);
 Route::get('/affirmations/calendar', [AffirmationController::class, 'calendar']);
-Route::post('/subscribe-affirmations', [AffirmationController::class, 'subscribe']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // Публичная подписка на ежедневный гороскоп (без регистрации)
@@ -133,6 +132,8 @@ Route::get('/daily-horoscopes/{slug}', [DailyHoroscopeController::class, 'show']
 
 // ===== Protected routes =====
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/affirmations/subscribe', [\App\Http\Controllers\Api\AffirmationController::class, 'subscribe']);
+    Route::get('/affirmations/subscription-status', [\App\Http\Controllers\Api\AffirmationController::class, 'subscriptionStatus']);
     Route::get('/referrals', [\App\Http\Controllers\Api\ReferralController::class, 'index']);
     Route::get('/subscription/settings', [\App\Http\Controllers\Api\SubscriptionController::class, 'getSettings']);
     Route::post('/subscription/channels', [\App\Http\Controllers\Api\SubscriptionController::class, 'updateChannels']);
