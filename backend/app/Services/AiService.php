@@ -445,7 +445,7 @@ PROMPT;
 Астроданные: {$phaseName}, возраст Луны " . round($age, 1) . " дней, освещённость {$illum}%.";
     }
 
-    private function weekdayRu($date): string
+    public function weekdayRu($date): string
     {
         return ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'][$date->dayOfWeek];
     }
