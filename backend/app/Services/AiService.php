@@ -437,7 +437,7 @@ PROMPT;
         return [$age, (int) round($illumination), $phaseName];
     }
 
-    private function getMoonData($date): string
+    public function getMoonData($date): string
     {
         [$age, $illum, $phaseName] = $this->moonPhase($date);
         return "
