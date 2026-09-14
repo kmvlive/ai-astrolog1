@@ -475,7 +475,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Блок натальной карты */}
+        {/* Блок натальной карты (скрыт если бесплатная включена) */}
+        {!freeNatalChartEnabled && (
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-4">🌟 Натальная карта</h2>
           <div className="rounded-2xl p-6 bg-slate-900 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -501,6 +502,8 @@ export default function DashboardPage() {
             </Link>
           </div>
         </div>
+
+        )}
 
         {/* Блок Telegram */}
         <div className="mb-8">
