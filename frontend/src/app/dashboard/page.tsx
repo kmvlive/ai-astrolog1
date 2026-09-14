@@ -55,6 +55,8 @@ export default function DashboardPage() {
   const [historyTotal, setHistoryTotal] = useState(0);
   const [affirmationSubscribed, setAffirmationSubscribed] = useState(false);
   const [affirmationLoading, setAffirmationLoading] = useState(false);
+  const [hasNatalChart, setHasNatalChart] = useState(false);
+  const [natalChartSubscribed, setNatalChartSubscribed] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -73,6 +75,19 @@ export default function DashboardPage() {
           setSubscription(data.subscription);
           setAutoRenew(!!data.subscription.auto_renew);
           setRebillId(data.subscription.rebill_id || null);
+        }
+      })
+      .catch(() => {});
+
+    // Натальная карта
+    fetch(`${API_URL}/api/natal-chart/my`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.has_chart) {
+          setHasNatalChart(true);
+          setNatalChartSubscribed(data.weekly_opt_in || false);
         }
       })
       .catch(() => {});
