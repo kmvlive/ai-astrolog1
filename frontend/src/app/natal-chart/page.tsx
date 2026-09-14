@@ -29,6 +29,7 @@ export default function NatalChartPage() {
   const [hasChart, setHasChart] = useState(false);
   const [chartData, setChartData] = useState<any>(null);
   const [polling, setPolling] = useState(false);
+  const [svgContent, setSvgContent] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -54,6 +55,18 @@ export default function NatalChartPage() {
           if (data?.has_chart) {
             setHasChart(true);
             setChartData(data.chart);
+          // Загружаем SVG если есть
+          if (data.chart?.svg_url) {
+            const token = localStorage.getItem('auth_token');
+            fetch(`${API}${data.chart.svg_url}`, {
+              headers: token ? { Authorization: `Bearer ${token}` } : {},
+            })
+              .then(r => r.ok ? r.text() : null)
+              .then(svg => {
+                if (svg) setSvgContent(svg);
+              })
+              .catch(() => {});
+          }
             setWeeklyOptIn(data.weekly_opt_in || false);
           }
         })
@@ -78,6 +91,18 @@ export default function NatalChartPage() {
         if (data?.has_chart && data.chart?.status === "completed") {
           setHasChart(true);
           setChartData(data.chart);
+          // Загружаем SVG если есть
+          if (data.chart?.svg_url) {
+            const token = localStorage.getItem('auth_token');
+            fetch(`${API}${data.chart.svg_url}`, {
+              headers: token ? { Authorization: `Bearer ${token}` } : {},
+            })
+              .then(r => r.ok ? r.text() : null)
+              .then(svg => {
+                if (svg) setSvgContent(svg);
+              })
+              .catch(() => {});
+          }
           setPolling(false);
           clearInterval(interval);
         }
@@ -165,6 +190,18 @@ export default function NatalChartPage() {
             Дата рождения: {chartData.birth_date} {chartData.birth_time ? `• Время: ${chartData.birth_time}` : ""}
           </p>
 
+          {/* SVG Колесо натальной карты */}
+          {svgContent && (
+            <div className="mb-8 flex justify-center">
+              <div 
+                className="max-w-full overflow-auto rounded-2xl border border-white/10 bg-white p-4"
+                dangerouslySetInnerHTML={{ __html: svgContent }}
+                style={{ maxHeight: '600px' }}
+              />
+            </div>
+          )}
+
+          {/* Текстовая интерпретация */}
           <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 sm:p-8 mb-8 prose prose-invert max-w-none">
             <div dangerouslySetInnerHTML={{ __html: chartData.interpretation.replace(/\n/g, "<br/>").replace(/## (.*)/g, "<h2>$1</h2>") }} />
           </div>
