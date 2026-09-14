@@ -505,62 +505,61 @@ export default function DashboardPage() {
 
         )}
 
-        {/* Блок Telegram */}
+        {/* Блок Мессенджеры */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Telegram</h2>
-          <div className="rounded-2xl p-6 bg-slate-900 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <div className="font-semibold mb-1">🤖 Гороскопы в Telegram</div>
-              <div className="text-sm text-slate-400">
-                {tgConnected
-                  ? "Подключено"
-                  : "Получайте персональные гороскопы прямо в Telegram"}
+          <h2 className="text-2xl font-bold mb-4">Мессенджеры</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Telegram */}
+            <div className="rounded-2xl p-6 bg-slate-900 border border-white/10 flex flex-col items-start justify-between gap-4">
+              <div>
+                <div className="font-semibold mb-1">🤖 Гороскопы в Telegram</div>
+                <div className="text-sm text-slate-400">
+                  {tgConnected
+                    ? "Подключено"
+                    : "Получайте персональные гороскопы прямо в Telegram"}
+                </div>
               </div>
+              {tgConnected ? (
+                <span className="px-4 py-2 rounded-xl bg-green-500/20 text-green-400 text-sm font-semibold whitespace-nowrap">
+                  ✓ Подключено
+                </span>
+              ) : (
+                <a
+                  href={tgLink ? tgLink.replace(/\?start=.*/, '') : `https://t.me/${'neiro_horoskop_bot'}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-sm font-semibold whitespace-nowrap transition"
+                >
+                  Подключить Telegram
+                </a>
+              )}
             </div>
-            {tgConnected ? (
-              <span className="px-4 py-2 rounded-xl bg-green-500/20 text-green-400 text-sm font-semibold whitespace-nowrap">
-                ✓ Подключено
-              </span>
-            ) : (
-              <a
-                href={tgLink ? tgLink.replace(/\?start=.*/, '') : `https://t.me/${'neiro_horoskop_bot'}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-sm font-semibold whitespace-nowrap transition"
-              >
-                Подключить Telegram
-              </a>
-            )}
-          </div>
-        </div>
 
-        
-        {/* Блок MAX */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">MAX</h2>
-          <div className="rounded-2xl p-6 bg-slate-900 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <div className="font-semibold mb-1">💬 Гороскопы в MAX</div>
-              <div className="text-sm text-slate-400">
-                {maxConnected
-                  ? "Подключено"
-                  : "Получайте персональные гороскопы в MAX Messenger"}
+            {/* MAX */}
+            <div className="rounded-2xl p-6 bg-slate-900 border border-white/10 flex flex-col items-start justify-between gap-4">
+              <div>
+                <div className="font-semibold mb-1">💬 Гороскопы в MAX</div>
+                <div className="text-sm text-slate-400">
+                  {maxConnected
+                    ? "Подключено"
+                    : "Получайте персональные гороскопы в MAX Messenger"}
+                </div>
               </div>
+              {maxConnected ? (
+                <span className="px-4 py-2 rounded-xl bg-green-500/20 text-green-400 text-sm font-semibold whitespace-nowrap">
+                  ✓ Подключено
+                </span>
+              ) : (
+                <a
+                  href={maxLink || "https://max.ru/id263211995820_bot"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-sm font-semibold whitespace-nowrap transition"
+                >
+                  Подключить MAX
+                </a>
+              )}
             </div>
-            {maxConnected ? (
-              <span className="px-4 py-2 rounded-xl bg-green-500/20 text-green-400 text-sm font-semibold whitespace-nowrap">
-                ✓ Подключено
-              </span>
-            ) : (
-              <a
-                href={maxLink || "https://max.ru/id263211995820_bot"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-sm font-semibold whitespace-nowrap transition"
-              >
-                Подключить MAX
-              </a>
-            )}
           </div>
         </div>
 
