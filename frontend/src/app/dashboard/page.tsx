@@ -457,6 +457,33 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Блок натальной карты */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">🌟 Натальная карта</h2>
+          <div className="rounded-2xl p-6 bg-slate-900 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <div className="font-semibold mb-1">Персональный гороскоп по натальной карте</div>
+              <div className="text-sm text-slate-400">
+                {hasNatalChart
+                  ? natalChartSubscribed
+                    ? "Вы получаете 4 персональных гороскопа в месяц"
+                    : "Карта готова. Подпишитесь на еженедельный гороскоп"
+                  : "Закажите натальную карту для точных прогнозов"}
+              </div>
+            </div>
+            <Link
+              href="/natal-chart"
+              className={`px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition ${
+                hasNatalChart && natalChartSubscribed
+                  ? "bg-green-500/20 text-green-400 hover:bg-violet-600 hover:text-white"
+                  : "bg-violet-600 hover:bg-violet-500"
+              }`}
+            >
+              {!hasNatalChart ? "Заказать — 49₽" : natalChartSubscribed ? "✓ Подписан" : "Подписаться — 299₽/мес"}
+            </Link>
+          </div>
+        </div>
+
         {/* Блок Telegram */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-4">Telegram</h2>

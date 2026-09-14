@@ -48,6 +48,7 @@ export default function HoroscopesPage() {
     health: "Здоровье",
     chinese: "Китайский",
     tibetan: "Тибетский",
+    natal_chart: "Натальная карта",
   };
 
   const typeIcons: Record<string, string> = {
@@ -58,6 +59,7 @@ export default function HoroscopesPage() {
     health: "🌿",
     chinese: "🐉",
     tibetan: "🏔️",
+    natal_chart: "🌟",
   };
 
   if (loading) {

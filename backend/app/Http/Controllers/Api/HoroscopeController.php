@@ -120,7 +120,37 @@ class HoroscopeController extends Controller
             ->horoscopes()
             ->latest()
             ->limit(20)
-            ->get();
+            ->get()
+            ->map(function ($h) {
+                return [
+                    'id' => $h->id,
+                    'type' => $h->type,
+                    'is_personal' => $h->is_personal,
+                    'content' => $h->content,
+                    'created_at' => $h->created_at,
+                    'source' => 'horoscope',
+                ];
+            });
+
+        // Добавляем натальную карту если есть
+        $natalChart = \App\Models\NatalChart::where('user_id', $request->user()->id)
+            ->where('status', 'completed')
+            ->orderByDesc('generated_at')
+            ->first();
+
+        if ($natalChart) {
+            $horoscopes->prepend([
+                'id' => 'natal-' . $natalChart->id,
+                'type' => 'natal_chart',
+                'is_personal' => true,
+                'content' => $natalChart->interpretation,
+                'created_at' => $natalChart->generated_at ?? $natalChart->created_at,
+                'source' => 'natal_chart',
+                'birth_date' => $natalChart->birth_date?->format('Y-m-d'),
+                'birth_time' => $natalChart->birth_time,
+                'city' => $natalChart->city,
+            ]);
+        }
 
         return response()->json(['horoscopes' => $horoscopes]);
     }
