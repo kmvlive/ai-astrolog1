@@ -46,6 +46,7 @@ export default function DashboardPage() {
   const [selChannels, setSelChannels] = useState<string[]>([]);
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [freePersonalEnabled, setFreePersonalEnabled] = useState(false);
+  const [freeNatalChartEnabled, setFreeNatalChartEnabled] = useState(false);
   const [calendars, setCalendars] = useState<CalendarType[]>([]);
   const [selCalendars, setSelCalendars] = useState<string[]>([]);
   const [calendarsSaving, setCalendarsSaving] = useState(false);
@@ -105,6 +106,7 @@ export default function DashboardPage() {
           if (!channels.includes('email')) channels.push('email');
           setSelChannels(channels);
           setFreePersonalEnabled(!!d.free_personal_enabled);
+          setFreeNatalChartEnabled(!!d.free_natal_chart_enabled);
           setCalendars(d.calendars || []);
           setSelCalendars(d.user_calendar_slugs || []);
         }
@@ -385,6 +387,22 @@ export default function DashboardPage() {
                     </div>
                     <div className="text-sm text-slate-400">
                       Составляется по вашей натальной карте и приходит каждое утро
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* Бесплатная натальная карта */}
+            {freeNatalChartEnabled && (
+              <div className="mt-3 p-4 rounded-xl bg-gradient-to-r from-violet-900/20 to-purple-900/20 border border-violet-500/20">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🌟</span>
+                  <div>
+                    <div className="font-semibold text-violet-200">
+                      Бесплатная натальная карта ✅
+                    </div>
+                    <div className="text-sm text-slate-400">
+                      Полная AI-интерпретация с SVG-колесом вашей натальной карты
                     </div>
                   </div>
                 </div>

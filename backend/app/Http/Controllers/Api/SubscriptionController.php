@@ -34,6 +34,7 @@ class SubscriptionController extends Controller
             'is_on_trial' => $user->isOnTrial(),
             'subscription' => $user->subscription,
             'free_personal_enabled' => (bool) $user->free_personal_enabled,
+            'free_natal_chart_enabled' => (bool) $user->free_natal_chart_enabled,
             'calendars' => Calendar::where('is_active', true)->get(),
             'user_calendar_slugs' => $user->calendars()->pluck('slug')->toArray(),
         ]);

@@ -36,6 +36,9 @@ class UserResource extends Resource
                         Forms\Components\Toggle::make('free_personal_enabled')
                             ->label('🎁 Бесплатный персональный гороскоп')
                             ->helperText('Получает персональный прогноз ежедневно в 9:00'),
+                        Forms\Components\Toggle::make('free_natal_chart_enabled')
+                            ->label('🎁 Бесплатная натальная карта')
+                            ->helperText('Получает полную натальную карту с AI-интерпретацией и SVG-колесом'),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Подписка')
@@ -70,7 +73,8 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('profile.city')->label('Город')->placeholder('—'),
                 Tables\Columns\IconColumn::make('is_admin')->label('Админ')->boolean(),
                 Tables\Columns\IconColumn::make('email_opt_in')->label('📧')->boolean(),
-                Tables\Columns\IconColumn::make('free_personal_enabled')->label('🎁')->boolean(),
+                Tables\Columns\IconColumn::make('free_personal_enabled')->label('🎁 Гороскоп')->boolean(),
+                Tables\Columns\IconColumn::make('free_natal_chart_enabled')->label('🌟 Карта')->boolean(),
                 Tables\Columns\TextColumn::make('subscription.status')
                     ->label('Подписка')->badge()->placeholder('—')
                     ->formatStateUsing(fn ($state) => match ((string) $state) {
@@ -100,6 +104,67 @@ class UserResource extends Resource
                     ->action(function ($record) {
                         $record->update(['email_opt_in' => !$record->email_opt_in]);
                         Notification::make()->title('Рассылка: ' . ($record->email_opt_in ? 'включена' : 'выключена'))->success()->send();
+                    }),
+                Tables\Actions\Action::make('toggle_natal')
+                    ->label(fn ($record) => $record->free_natal_chart_enabled ? '🌟 Отключить натальную карту' : '🌟 Включить натальную карту')
+                    ->color(fn ($record) => $record->free_natal_chart_enabled ? 'warning' : 'success')
+                    ->action(function ($record) {
+                        $record->update(['free_natal_chart_enabled' => !$record->free_natal_chart_enabled]);
+                        Notification::make()->title('Натальная карта: ' . ($record->free_natal_chart_enabled ? 'включена' : 'выключена'))->success()->send();
+                        
+                        // Если включили — генерируем карту
+                        if ($record->free_natal_chart_enabled && $record->profile && $record->profile->birth_date) {
+                            dispatch(function () use ($record) {
+                                try {
+                                    $existing = \App\Models\NatalChart::where('user_id', $record->id)
+                                        ->where('status', 'completed')->exists();
+                                    if ($existing) return;
+                                    
+                                    $chart = \App\Models\NatalChart::create([
+                                        'user_id' => $record->id,
+                                        'birth_date' => $record->profile->birth_date,
+                                        'birth_time' => $record->profile->birth_time,
+                                        'city' => $record->profile->city,
+                                        'latitude' => $record->profile->latitude,
+                                        'longitude' => $record->profile->longitude,
+                                        'status' => 'generating',
+                                    ]);
+                                    
+                                    // SVG колесо
+                                    $svgUrl = 'http://astro-neiro-python:8000/natal-chart/svg?' . http_build_query([
+                                        'name' => $record->name ?? 'User',
+                                        'birth_date' => $record->profile->birth_date->format('Y-m-d'),
+                                        'birth_time' => $record->profile->birth_time ?? '12:00',
+                                        'latitude' => $record->profile->latitude ?? 55.7558,
+                                        'longitude' => $record->profile->longitude ?? 37.6173,
+                                        'timezone' => $record->profile->timezone ?? 'Europe/Moscow',
+                                    ]);
+                                    $svgResponse = \Illuminate\Support\Facades\Http::timeout(30)->get($svgUrl);
+                                    $svgPath = null;
+                                    if ($svgResponse->successful() && strlen($svgResponse->body()) > 1000) {
+                                        $svgPath = 'natal-charts/chart-' . $chart->id . '.svg';
+                                        \Illuminate\Support\Facades\Storage::disk('public')->put($svgPath, $svgResponse->body());
+                                    }
+                                    
+                                    // AI интерпретация
+                                    $ai = app(\App\Services\AiService::class);
+                                    $interpretation = $ai->generateNatalChartInterpretation($chart);
+                                    
+                                    if ($interpretation) {
+                                        $chart->update([
+                                            'interpretation' => $interpretation,
+                                            'chart_data' => ['svg_path' => $svgPath],
+                                            'status' => 'completed',
+                                            'generated_at' => now(),
+                                        ]);
+                                    } else {
+                                        $chart->update(['status' => 'failed']);
+                                    }
+                                } catch (\Exception $e) {
+                                    \Illuminate\Support\Facades\Log::error('Free natal chart error', ['error' => $e->getMessage()]);
+                                }
+                            });
+                        }
                     }),
                 Tables\Actions\EditAction::make(),
             ]);
