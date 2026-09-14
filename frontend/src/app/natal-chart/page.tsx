@@ -265,7 +265,7 @@ export default function NatalChartPage() {
             }`}
           >
             <div className="font-semibold mb-1">Разовая карта</div>
-            <div className="text-2xl font-bold text-violet-400 mb-2">49 ₽</div>
+            <div className="text-2xl font-bold text-violet-400 mb-2"><span className="text-sm text-slate-500 line-through mr-2">160 ₽</span>49 ₽</div>
             <ul className="text-sm text-slate-400 space-y-1">
               <li>✓ Полная интерпретация</li>
               <li>✓ Характер и психотип</li>
@@ -281,7 +281,7 @@ export default function NatalChartPage() {
             }`}
           >
             <div className="font-semibold mb-1">Карта + подписка</div>
-            <div className="text-2xl font-bold text-violet-400 mb-2">299 ₽<span className="text-sm text-slate-400">/мес</span></div>
+            <div className="text-2xl font-bold text-violet-400 mb-2"><span className="text-sm text-slate-500 line-through mr-2">640 ₽</span>299 ₽<span className="text-sm text-slate-400">/мес</span></div>
             <ul className="text-sm text-slate-400 space-y-1">
               <li>✓ Всё из разовой карты</li>
               <li>✓ 4 гороскопа в месяц</li>
