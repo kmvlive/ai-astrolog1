@@ -30,6 +30,7 @@ export default function NatalChartPage() {
   const [chartData, setChartData] = useState<any>(null);
   const [polling, setPolling] = useState(false);
   const [svgContent, setSvgContent] = useState<string | null>(null);
+  const [planetsData, setPlanetsData] = useState<Record<string, any> | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -56,6 +57,7 @@ export default function NatalChartPage() {
             setHasChart(true);
             setChartData(data.chart);
           // Загружаем SVG если есть
+          if (data.chart?.planets) setPlanetsData(data.chart.planets);
           if (data.chart?.svg_url) {
             const token = localStorage.getItem('auth_token');
             fetch(`${API}${data.chart.svg_url}`, {
@@ -92,6 +94,7 @@ export default function NatalChartPage() {
           setHasChart(true);
           setChartData(data.chart);
           // Загружаем SVG если есть
+          if (data.chart?.planets) setPlanetsData(data.chart.planets);
           if (data.chart?.svg_url) {
             const token = localStorage.getItem('auth_token');
             fetch(`${API}${data.chart.svg_url}`, {
@@ -198,6 +201,64 @@ export default function NatalChartPage() {
                 dangerouslySetInnerHTML={{ __html: svgContent }}
                 style={{ maxHeight: '600px' }}
               />
+            </div>
+          )}
+
+          {/* Таблица положений планет */}
+          {planetsData && (
+            <div className="mb-8 overflow-x-auto">
+              <h3 className="text-xl font-bold mb-4">🪐 Положения планет</h3>
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="border-b border-white/10">
+                    <th className="text-left py-3 px-4 text-slate-400 font-medium">Планета</th>
+                    <th className="text-left py-3 px-4 text-slate-400 font-medium">Знак</th>
+                    <th className="text-left py-3 px-4 text-slate-400 font-medium">Градус</th>
+                    <th className="text-left py-3 px-4 text-slate-400 font-medium">Дом</th>
+                    <th className="text-left py-3 px-4 text-slate-400 font-medium">Статус</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(planetsData).map(([name, data]: [string, any]) => {
+                    const signsRu: Record<string, string> = {
+                      Ari: "Овен ♈", Tau: "Телец ♉", Gem: "Близнецы ♊",
+                      Can: "Рак ♋", Leo: "Лев ♌", Vir: "Дева ♍",
+                      Lib: "Весы ♎", Sco: "Скорпион ♏", Sag: "Стрелец ♐",
+                      Cap: "Козерог ♑", Aqu: "Водолей ♒", Pis: "Рыбы ♓",
+                    };
+                    const housesRu: Record<string, string> = {
+                      First_House: "I", Second_House: "II", Third_House: "III",
+                      Fourth_House: "IV", Fifth_House: "V", Sixth_House: "VI",
+                      Seventh_House: "VII", Eighth_House: "VIII", Ninth_House: "IX",
+                      Tenth_House: "X", Eleventh_House: "XI", Twelfth_House: "XII",
+                    };
+                    const planetsRu: Record<string, string> = {
+                      Sun: "☉ Солнце", Moon: "☽ Луна", Mercury: "☿ Меркурий",
+                      Venus: "♀ Венера", Mars: "♂ Марс", Jupiter: "♃ Юпитер",
+                      Saturn: "♄ Сатурн", Uranus: "♅ Уран", Neptune: "♆ Нептун",
+                      Pluto: "♇ Плутон",
+                    };
+                    const deg = data.degree || 0;
+                    const signDeg = Math.floor(deg % 30);
+                    const signMin = Math.floor((deg % 1) * 60);
+                    return (
+                      <tr key={name} className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-3 px-4 font-semibold">{planetsRu[name] || name}</td>
+                        <td className="py-3 px-4">{signsRu[data.sign] || data.sign}</td>
+                        <td className="py-3 px-4">{signDeg}° {signMin}\'</td>
+                        <td className="py-3 px-4">{housesRu[data.house] || data.house}</td>
+                        <td className="py-3 px-4">
+                          {data.retrograde ? (
+                            <span className="text-red-400 font-semibold">℞ Ретроградная</span>
+                          ) : (
+                            <span className="text-green-400">Прямая</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
 

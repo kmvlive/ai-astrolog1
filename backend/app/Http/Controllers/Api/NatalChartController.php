@@ -44,6 +44,11 @@ class NatalChartController extends Controller
                 'status' => $chart->status,
                 'generated_at' => $chart->generated_at?->toIso8601String(),
                 'svg_url' => '/api/natal-chart/' . $chart->id . '/svg',
+                'planets' => $chart->chart_data['planets'] ?? null,
+                'houses' => $chart->chart_data['houses'] ?? null,
+                'ascendant' => $chart->chart_data['ascendant'] ?? null,
+                'sun_sign' => $chart->chart_data['sun_sign'] ?? null,
+                'moon_sign' => $chart->chart_data['moon_sign'] ?? null,
                 'interpretation' => $chart->interpretation,
             ],
             'weekly_opt_in' => (bool) $user->natal_chart_weekly_opt_in,
@@ -252,6 +257,26 @@ class NatalChartController extends Controller
                             \Illuminate\Support\Facades\Storage::disk('public')->put($svgPath, $svgContent);
                         }
                         
+                        // 1.5. Получаем данные планет для таблицы
+                        $planetsData = null;
+                        try {
+                            $planetsUrl = 'http://astro-neiro-python:8000/natal-chart';
+                            $planetsResponse = \Illuminate\Support\Facades\Http::timeout(30)->post($planetsUrl, [
+                                'name' => $chart->user->name ?? 'User',
+                                'birth_date' => $chart->birth_date->format('Y-m-d'),
+                                'birth_time' => $chart->birth_time ?? '12:00',
+                                'birth_city' => $chart->city ?? 'Moscow',
+                                'latitude' => (float) ($chart->latitude ?? 55.7558),
+                                'longitude' => (float) ($chart->longitude ?? 37.6173),
+                                'timezone' => $chart->user->profile->timezone ?? 'Europe/Moscow',
+                            ]);
+                            if ($planetsResponse->successful()) {
+                                $planetsData = $planetsResponse->json();
+                            }
+                        } catch (\Exception $e) {
+                            Log::warning('Не удалось получить данные планет', ['error' => $e->getMessage()]);
+                        }
+
                         // 2. Генерируем AI-интерпретацию
                         $ai = app(AiService::class);
                         $interpretation = $ai->generateNatalChartInterpretation($chart);
@@ -259,7 +284,7 @@ class NatalChartController extends Controller
                         if ($interpretation) {
                             $chart->update([
                                 'interpretation' => $interpretation,
-                                'chart_data' => array_merge($chart->chart_data ?? [], ['svg_path' => $svgPath]),
+                                'chart_data' => array_merge($chart->chart_data ?? [], ['svg_path' => $svgPath, 'planets' => $planetsData['planets'] ?? null, 'houses' => $planetsData['houses'] ?? null, 'ascendant' => $planetsData['ascendant'] ?? null, 'sun_sign' => $planetsData['sun_sign'] ?? null, 'moon_sign' => $planetsData['moon_sign'] ?? null]),
                                 'status' => 'completed',
                                 'generated_at' => now(),
                             ]);

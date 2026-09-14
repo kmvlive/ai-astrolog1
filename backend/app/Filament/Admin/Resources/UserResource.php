@@ -146,6 +146,21 @@ class UserResource extends Resource
                                         \Illuminate\Support\Facades\Storage::disk('public')->put($svgPath, $svgResponse->body());
                                     }
                                     
+                                    // Данные планет
+                                    $planetsData = null;
+                                    try {
+                                        $planetsResp = \Illuminate\Support\Facades\Http::timeout(30)->post('http://astro-neiro-python:8000/natal-chart', [
+                                            'name' => $record->name ?? 'User',
+                                            'birth_date' => $record->profile->birth_date->format('Y-m-d'),
+                                            'birth_time' => $record->profile->birth_time ?? '12:00',
+                                            'birth_city' => $record->profile->city ?? 'Moscow',
+                                            'latitude' => (float) ($record->profile->latitude ?? 55.7558),
+                                            'longitude' => (float) ($record->profile->longitude ?? 37.6173),
+                                            'timezone' => $record->profile->timezone ?? 'Europe/Moscow',
+                                        ]);
+                                        if ($planetsResp->successful()) $planetsData = $planetsResp->json();
+                                    } catch (\Exception $e) {}
+
                                     // AI интерпретация
                                     $ai = app(\App\Services\AiService::class);
                                     $interpretation = $ai->generateNatalChartInterpretation($chart);
@@ -153,7 +168,7 @@ class UserResource extends Resource
                                     if ($interpretation) {
                                         $chart->update([
                                             'interpretation' => $interpretation,
-                                            'chart_data' => ['svg_path' => $svgPath],
+                                            'chart_data' => ['svg_path' => $svgPath, 'planets' => $planetsData['planets'] ?? null, 'houses' => $planetsData['houses'] ?? null, 'ascendant' => $planetsData['ascendant'] ?? null, 'sun_sign' => $planetsData['sun_sign'] ?? null, 'moon_sign' => $planetsData['moon_sign'] ?? null],
                                             'status' => 'completed',
                                             'generated_at' => now(),
                                         ]);
