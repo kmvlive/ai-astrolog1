@@ -135,4 +135,24 @@ class TBankService
         }
         return json_decode($raw, true) ?: ['Success' => false, 'Message' => 'bad json'];
     }
+
+    public function initNatalChart(\App\Models\NatalChartOrder $order, \App\Models\Plan $plan, bool $recurrent = false): array
+    {
+        $params = [
+            'TerminalKey' => $this->terminal,
+            'Amount'      => $order->amount,
+            'OrderId'     => 'nc-' . $order->id,
+            'Description' => 'AI Астролог — ' . $plan->name,
+            'PayType'     => 'O',
+            'SuccessURL'  => 'https://my.neiro-astro.ru/natal-chart?payment=success',
+            'FailURL'     => 'https://my.neiro-astro.ru/natal-chart?payment=fail',
+        ];
+
+        if ($recurrent) {
+            $params['Recurrent'] = 'Y';
+        }
+        $params['Token'] = $this->sign($params);
+
+        return $this->request('Init', $params);
+    }
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AffirmationController;
 use App\Http\Controllers\Api\AffirmationRssController;
+use App\Http\Controllers\Api\NatalChartController;
 use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\MagicLinkController;
 use App\Http\Controllers\Api\UnsubscribeController;
@@ -23,6 +24,10 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::get('/affirmations/today', [AffirmationController::class, 'today']);
 Route::get('/affirmations/{date}', [AffirmationController::class, 'show'])->where('date', '\d{4}-\d{2}-\d{2}');
 Route::get('/affirmations/rss', [AffirmationRssController::class, 'feed']);
+// Натальная карта
+Route::post('/natal-chart/order', [NatalChartController::class, 'order']);
+Route::post('/natal-chart/payment-webhook', [NatalChartController::class, 'paymentWebhook']);
+
 Route::get('/affirmations/calendar', [AffirmationController::class, 'calendar']);
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -137,6 +142,11 @@ Route::get('/daily-horoscopes/{slug}', [DailyHoroscopeController::class, 'show']
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/affirmations/subscribe', [\App\Http\Controllers\Api\AffirmationController::class, 'subscribe']);
     Route::delete('/affirmations/subscribe', [\App\Http\Controllers\Api\AffirmationController::class, 'unsubscribe']);
+        // Натальная карта
+        Route::get('/natal-chart/my', [NatalChartController::class, 'my']);
+        Route::get('/natal-chart/order/{orderId}/status', [NatalChartController::class, 'orderStatus']);
+        Route::post('/natal-chart/toggle-weekly', [NatalChartController::class, 'toggleWeeklyHoroscope']);
+
     Route::get('/affirmations/subscription-status', [\App\Http\Controllers\Api\AffirmationController::class, 'subscriptionStatus']);
     Route::get('/referrals', [\App\Http\Controllers\Api\ReferralController::class, 'index']);
     Route::get('/subscription/settings', [\App\Http\Controllers\Api\SubscriptionController::class, 'getSettings']);
