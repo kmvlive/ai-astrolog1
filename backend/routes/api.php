@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AffirmationController;
 use App\Http\Controllers\Api\AffirmationRssController;
 use App\Http\Controllers\Api\NatalChartController;
+use App\Http\Controllers\Api\PopupNotificationController;
 use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\MagicLinkController;
 use App\Http\Controllers\Api\UnsubscribeController;
@@ -147,6 +148,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/natal-chart/order/{orderId}/status', [NatalChartController::class, 'orderStatus']);
         Route::post('/natal-chart/toggle-weekly', [NatalChartController::class, 'toggleWeeklyHoroscope']);
         Route::get('/natal-chart/{chartId}/svg', [NatalChartController::class, 'chartSvg']);
+        Route::get('/popups', [PopupNotificationController::class, 'index']);
+        Route::post('/popups/{id}/dismiss', [PopupNotificationController::class, 'dismiss']);
 
     Route::get('/affirmations/subscription-status', [\App\Http\Controllers\Api\AffirmationController::class, 'subscriptionStatus']);
     Route::get('/referrals', [\App\Http\Controllers\Api\ReferralController::class, 'index']);

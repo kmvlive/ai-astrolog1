@@ -26,6 +26,7 @@ class User extends Authenticatable implements FilamentUser
     protected $fillable = [
         'free_personal_enabled',
         'free_natal_chart_enabled',
+        'popup_dismissed_ids',
         'referral_code',
         'referred_by',
         'name',

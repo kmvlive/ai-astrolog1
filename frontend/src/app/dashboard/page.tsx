@@ -1,5 +1,7 @@
 "use client";
 
+import PopupNotification from "@/components/PopupNotification";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
@@ -290,6 +292,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+      <PopupNotification />
         <div className="text-center">
           <div className="text-6xl mb-4 animate-pulse">🔮</div>
           <p className="text-slate-400">Загрузка...</p>
