@@ -161,6 +161,54 @@ async def calculate_natal_chart(request: NatalChartRequest):
         raise HTTPException(status_code=500, detail=f"Ошибка расчёта: {str(e)}")
 
 
+
+@app.get("/natal-chart/svg")
+async def get_natal_chart_svg(
+    name: str = "User",
+    birth_date: str = "1990-01-01",
+    birth_time: str = "12:00",
+    latitude: float = 55.7558,
+    longitude: float = 37.6173,
+    timezone: str = "Europe/Moscow"
+):
+    """Генерирует SVG-колесо натальной карты"""
+    from fastapi.responses import Response
+    from kerykeion.charts.kerykeion_chart_svg import KerykeionChartSVG
+    
+    cache_key = f"natal_svg:{hashlib.md5(f'{birth_date}:{birth_time}:{latitude}:{longitude}'.encode()).hexdigest()}"
+    cached_svg = redis_client.get(cache_key)
+    if cached_svg:
+        return Response(content=cached_svg, media_type="image/svg+xml")
+    
+    try:
+        year, month, day = map(int, birth_date.split('-'))
+        hour, minute = map(int, birth_time.split(':'))
+        
+        subject = AstrologicalSubject(
+            name=name,
+            year=year, month=month, day=day,
+            hour=hour, minute=minute,
+            lat=latitude, lng=longitude,
+            tz_str=timezone,
+        )
+        
+        chart = KerykeionChartSVG(subject)
+        svg_string = chart.makeTemplate()
+        
+        if not svg_string:
+            raise HTTPException(status_code=500, detail="Не удалось сгенерировать SVG")
+        
+        # Кэшируем на 24 часа
+        redis_client.setex(cache_key, 86400, svg_string)
+        
+        return Response(content=svg_string, media_type="image/svg+xml")
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка генерации SVG: {str(e)}")
+
+
 @app.get("/")
 async def root():
     return {"service": "astro-service", "status": "ok"}
