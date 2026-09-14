@@ -146,6 +146,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/natal-chart/my', [NatalChartController::class, 'my']);
         Route::get('/natal-chart/order/{orderId}/status', [NatalChartController::class, 'orderStatus']);
         Route::post('/natal-chart/toggle-weekly', [NatalChartController::class, 'toggleWeeklyHoroscope']);
+        Route::get('/natal-chart/{chartId}/svg', [NatalChartController::class, 'chartSvg']);
 
     Route::get('/affirmations/subscription-status', [\App\Http\Controllers\Api\AffirmationController::class, 'subscriptionStatus']);
     Route::get('/referrals', [\App\Http\Controllers\Api\ReferralController::class, 'index']);

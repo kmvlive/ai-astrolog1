@@ -43,6 +43,7 @@ class NatalChartController extends Controller
                 'city' => $chart->city,
                 'status' => $chart->status,
                 'generated_at' => $chart->generated_at?->toIso8601String(),
+                'svg_url' => '/api/natal-chart/' . $chart->id . '/svg',
                 'interpretation' => $chart->interpretation,
             ],
             'weekly_opt_in' => (bool) $user->natal_chart_weekly_opt_in,
@@ -231,16 +232,38 @@ class NatalChartController extends Controller
                 // Генерируем асинхронно через dispatch
                 dispatch(function () use ($chart) {
                     try {
+                        // 1. Генерируем SVG-колесо через Python-сервис
+                        $svgUrl = 'http://astro-neiro-python:8000/natal-chart/svg?' . http_build_query([
+                            'name' => $chart->user->name ?? 'User',
+                            'birth_date' => $chart->birth_date->format('Y-m-d'),
+                            'birth_time' => $chart->birth_time ?? '12:00',
+                            'latitude' => $chart->latitude ?? 55.7558,
+                            'longitude' => $chart->longitude ?? 37.6173,
+                            'timezone' => $chart->user->profile->timezone ?? 'Europe/Moscow',
+                        ]);
+                        
+                        $svgResponse = \Illuminate\Support\Facades\Http::timeout(30)->get($svgUrl);
+                        $svgContent = $svgResponse->successful() ? $svgResponse->body() : null;
+                        
+                        // Сохраняем SVG в storage
+                        $svgPath = null;
+                        if ($svgContent && strlen($svgContent) > 1000) {
+                            $svgPath = 'natal-charts/chart-' . $chart->id . '.svg';
+                            \Illuminate\Support\Facades\Storage::disk('public')->put($svgPath, $svgContent);
+                        }
+                        
+                        // 2. Генерируем AI-интерпретацию
                         $ai = app(AiService::class);
                         $interpretation = $ai->generateNatalChartInterpretation($chart);
                         
                         if ($interpretation) {
                             $chart->update([
                                 'interpretation' => $interpretation,
+                                'chart_data' => array_merge($chart->chart_data ?? [], ['svg_path' => $svgPath]),
                                 'status' => 'completed',
                                 'generated_at' => now(),
                             ]);
-                            Log::info('Натальная карта сгенерирована', ['chart_id' => $chart->id]);
+                            Log::info('Натальная карта сгенерирована', ['chart_id' => $chart->id, 'svg' => $svgPath ? 'yes' : 'no']);
                         } else {
                             $chart->update(['status' => 'failed']);
                             Log::error('Натальная карта: AI вернул null', ['chart_id' => $chart->id]);
@@ -285,5 +308,42 @@ class NatalChartController extends Controller
             'success' => true,
             'weekly_opt_in' => $newState,
         ]);
+    }
+
+    /**
+     * Получить SVG натальной карты
+     */
+    public function chartSvg(Request $request, int $chartId)
+    {
+        $chart = NatalChart::where('id', $chartId)
+            ->where('user_id', $request->user()->id)
+            ->where('status', 'completed')
+            ->first();
+
+        if (!$chart) {
+            return response()->json(['error' => 'not_found'], 404);
+        }
+
+        $svgPath = $chart->chart_data['svg_path'] ?? null;
+        if (!$svgPath || !\Illuminate\Support\Facades\Storage::disk('public')->exists($svgPath)) {
+            // Генерируем на лету если нет сохранённого
+            $svgUrl = 'http://astro-neiro-python:8000/natal-chart/svg?' . http_build_query([
+                'name' => $chart->user->name ?? 'User',
+                'birth_date' => $chart->birth_date->format('Y-m-d'),
+                'birth_time' => $chart->birth_time ?? '12:00',
+                'latitude' => $chart->latitude ?? 55.7558,
+                'longitude' => $chart->longitude ?? 37.6173,
+                'timezone' => $chart->user->profile->timezone ?? 'Europe/Moscow',
+            ]);
+            
+            $response = \Illuminate\Support\Facades\Http::timeout(30)->get($svgUrl);
+            if ($response->successful()) {
+                return response($response->body())->header('Content-Type', 'image/svg+xml');
+            }
+            return response()->json(['error' => 'svg_generation_failed'], 500);
+        }
+
+        $svg = \Illuminate\Support\Facades\Storage::disk('public')->get($svgPath);
+        return response($svg)->header('Content-Type', 'image/svg+xml');
     }
 }
