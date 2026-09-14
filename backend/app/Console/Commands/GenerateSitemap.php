@@ -25,7 +25,17 @@ class GenerateSitemap extends Command
             '/affirmations' => ['priority' => '0.9', 'changefreq' => 'daily'],
             '/blog' => ['priority' => '0.8', 'changefreq' => 'daily'],
             '/divinations' => ['priority' => '0.7', 'changefreq' => 'weekly'],
-            '/pricing' => ['priority' => '0.6', 'changefreq' => 'monthly'],
+            '/pricing' => ['priority' => '0.8', 'changefreq' => 'monthly'],
+            '/natal-chart' => ['priority' => '0.8', 'changefreq' => 'monthly'],
+            '/calendars' => ['priority' => '0.7', 'changefreq' => 'daily'],
+            '/moon' => ['priority' => '0.6', 'changefreq' => 'daily'],
+            '/biorhythms' => ['priority' => '0.5', 'changefreq' => 'daily'],
+            '/dreams' => ['priority' => '0.7', 'changefreq' => 'weekly'],
+            '/names' => ['priority' => '0.6', 'changefreq' => 'monthly'],
+            '/tarot' => ['priority' => '0.6', 'changefreq' => 'weekly'],
+            '/crystal-ball' => ['priority' => '0.5', 'changefreq' => 'weekly'],
+            '/terms' => ['priority' => '0.3', 'changefreq' => 'yearly'],
+            '/register' => ['priority' => '0.5', 'changefreq' => 'monthly'],
         ];
         
         foreach ($staticPages as $path => $meta) {
@@ -70,6 +80,55 @@ class GenerateSitemap extends Command
             ];
         }
         
+        // Гадания
+        $divinationTypes = ['coffee-grounds', 'tarot-future', 'tarot-love', 'tarot-yes-no', 'tarot-birthdate', 'celtic-cross', 'runes'];
+        foreach ($divinationTypes as $type) {
+            $urls[] = [
+                'loc' => $baseUrl . '/divinations/' . $type,
+                'lastmod' => $now,
+                'changefreq' => 'weekly',
+                'priority' => '0.6',
+            ];
+        }
+
+        // Календари
+        $calendarSlugs = ['lunar', 'orthodox', 'garden', 'beauty', 'health', 'business'];
+        foreach ($calendarSlugs as $slug) {
+            $urls[] = [
+                'loc' => $baseUrl . '/calendars/' . $slug,
+                'lastmod' => $now,
+                'changefreq' => 'daily',
+                'priority' => '0.6',
+            ];
+        }
+
+        // Бесплатные гороскопы по системам
+        $freeSystems = ['zoroastrian', 'flowers', 'japanese', 'chinese', 'tibetan', 'celtic', 'egyptian', 'indian', 'mayan', 'runes', 'numerology', 'karmic'];
+        foreach ($freeSystems as $system) {
+            $urls[] = [
+                'loc' => $baseUrl . '/horoscopes/free/' . $system,
+                'lastmod' => $now,
+                'changefreq' => 'daily',
+                'priority' => '0.7',
+            ];
+            foreach ($signs as $sign) {
+                $urls[] = [
+                    'loc' => $baseUrl . '/horoscopes/free/' . $system . '/' . $sign,
+                    'lastmod' => $now,
+                    'changefreq' => 'daily',
+                    'priority' => '0.5',
+                ];
+            }
+        }
+
+        // Совместимость
+        $urls[] = [
+            'loc' => $baseUrl . '/horoscopes/compatibility',
+            'lastmod' => $now,
+            'changefreq' => 'monthly',
+            'priority' => '0.7',
+        ];
+
         // Генерируем XML
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
