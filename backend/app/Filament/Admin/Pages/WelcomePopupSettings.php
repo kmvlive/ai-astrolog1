@@ -115,9 +115,17 @@ class WelcomePopupSettings extends Page implements HasForms
         ];
 
         foreach ($fields as $key => $value) {
-            $escaped = str_replace('"', '\"', $value ?? '');
+            // Экранируем: кавычки и переносы строк
+            $escaped = str_replace(['"', "
+", "
+", ""], ['\"', '\\n', '\\n', '\\n'], $value ?? '');
             if (str_contains($env, "{$key}=")) {
-                $env = preg_replace('/' . preg_quote($key, '/') . '=.*/', "{$key}=\"{$escaped}\"", $env);
+                // Удаляем старое значение (может быть многострочным)
+                $env = preg_replace('/' . preg_quote($key, '/') . '="[^"]*"(?:\n[^A-Z]*)*/', "{$key}=\"{$escaped}\"", $env);
+                // Fallback для однострочных
+                if (str_contains($env, "{$key}=") && !str_contains($env, "{$key}=\"{$escaped}\"")) {
+                    $env = preg_replace('/' . preg_quote($key, '/') . '=.*/', "{$key}=\"{$escaped}\"", $env);
+                }
             } else {
                 $env .= "\n{$key}=\"{$escaped}\"\n";
             }
