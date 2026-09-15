@@ -529,9 +529,12 @@ PROMPT;
 
     private function extractKeywords(string $text): string
     {
-        // Берём первые 2-3 слова из заголовка
-        $words = array_filter(preg_split('/\s+/', mb_strtolower($text)));
-        $keywords = array_slice($words, 0, min(3, count($words)));
+        // Берём 3-5 значимых слов из заголовка для уникальности промпта
+        $stopWords = ['и', 'в', 'на', 'с', 'по', 'для', 'от', 'из', 'к', 'а', 'the', 'of', 'and', 'in', 'a'];
+        $words = array_filter(preg_split('/[\s,.:;!?—–-]+/u', mb_strtolower($text)));
+        $filtered = array_filter($words, fn($w) => !in_array($w, $stopWords) && mb_strlen($w) > 2);
+        $keywords = array_slice(array_values($filtered), 0, min(5, count($filtered)));
+        if (empty($keywords)) $keywords = array_slice(array_values($words), 0, 3);
         return implode(' ', $keywords);
     }
 
