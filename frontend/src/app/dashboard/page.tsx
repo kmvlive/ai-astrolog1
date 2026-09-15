@@ -1,6 +1,5 @@
 "use client";
 
-import PopupNotification from "@/components/PopupNotification";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -303,7 +302,6 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <PopupNotification />
       <SiteHeader />
       <div className="max-w-4xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-violet-400 to-amber-400 bg-clip-text text-transparent">

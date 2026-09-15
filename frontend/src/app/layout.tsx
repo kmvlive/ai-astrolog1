@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import AnalyticsCounters from "@/components/AnalyticsCounters";
+import PopupNotification from "@/components/PopupNotification";
 import ReferralTracker from "@/components/ReferralTracker";
 import { Suspense } from "react";
 
@@ -32,6 +33,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-slate-950 text-white antialiased`}>
       <Suspense><ReferralTracker /></Suspense>
         {children}
+        <PopupNotification />
         <AnalyticsCounters />
       </body>
     </html>

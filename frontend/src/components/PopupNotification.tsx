@@ -35,21 +35,27 @@ export default function PopupNotification() {
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
+    console.log("[Popup] token:", token ? "exists" : "null");
     if (!token) return;
 
-    // Небольшая задержка чтобы не мешать загрузке страницы
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`${API}/popups`, {
+        const url = `${API}/api/popups`;
+        console.log("[Popup] fetching:", url);
+        const res = await fetch(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("[Popup] status:", res.status);
         if (!res.ok) return;
         const data = await res.json();
+        console.log("[Popup] data:", JSON.stringify(data));
         if (data.popups && data.popups.length > 0) {
           setPopup(data.popups[0]);
           setVisible(true);
         }
-      } catch {}
+      } catch (e) {
+        console.error("[Popup] error:", e);
+      }
     }, 2000);
 
     return () => clearTimeout(timer);
@@ -61,7 +67,7 @@ export default function PopupNotification() {
     
     const token = localStorage.getItem("auth_token");
     try {
-      await fetch(`${API}/popups/${popup.id}/dismiss`, {
+      await fetch(`${API}/api/popups/${popup.id}/dismiss`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
