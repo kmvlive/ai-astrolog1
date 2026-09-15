@@ -53,13 +53,11 @@ class WelcomePopupSettings extends Page implements HasForms
                         TextInput::make('welcome_title')
                             ->label('Заголовок')
                             ->required()
-                            ->maxLength(255)
-                            ->placeholder('Добро пожаловать в AI Астролог! 🌟'),
+                            ->maxLength(255),
                         Textarea::make('welcome_body')
                             ->label('Текст')
                             ->required()
-                            ->rows(8)
-                            ->placeholder("Здесь вы найдёте:\n\n🔮 Персональные гороскопы..."),
+                            ->rows(8),
                     ])->columns(2),
 
                 Section::make('Кнопки')
@@ -101,7 +99,6 @@ class WelcomePopupSettings extends Page implements HasForms
     public function save(): void
     {
         $data = $this->form->getState();
-
         $envPath = base_path('.env');
         $env = File::get($envPath);
 
@@ -115,20 +112,9 @@ class WelcomePopupSettings extends Page implements HasForms
         ];
 
         foreach ($fields as $key => $value) {
-            // Экранируем переносы строк и кавычки для .env
-            $safe = str_replace(["
-", "
-", "", '"'], ['\n', '\n', '\n', '\"'], $value ?? '');
-            // Удаляем старую строку
+            $safe = str_replace(["\r\n", "\n", "\r", '"'], ['\\n', '\\n', '\\n', '\\"'], $value ?? '');
             $env = preg_replace('/^' . preg_quote($key, '/') . '=.*$/m', '', $env);
-            // Добавляем новую
-            $env = rtrim($env) . "
-{$key}=\"{$safe}\"
-";
-        }
-            } else {
-                $env .= "\n{$key}=\"{$escaped}\"\n";
-            }
+            $env = rtrim($env) . "\n{$key}=\"{$safe}\"\n";
         }
 
         File::put($envPath, $env);
@@ -148,7 +134,7 @@ class WelcomePopupSettings extends Page implements HasForms
             ->icon('heroicon-o-arrow-path')
             ->requiresConfirmation()
             ->modalHeading('Сбросить приветственный popup?')
-            ->modalDescription('Все пользователи увидят приветствие заново. Продолжить?')
+            ->modalDescription('Все пользователи увидят приветствие заново.')
             ->action(function () {
                 User::query()->update(['welcome_popup_shown' => false]);
                 Notification::make()
