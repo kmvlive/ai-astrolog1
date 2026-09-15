@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import ShareButtons from "@/components/ShareButtons";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
@@ -205,6 +206,13 @@ export default function RetrogradePage() {
             Когда планета возвращается в директное движение — наступает время действий и новых начинаний.
           </p>
         </div>
+
+
+        <ShareButtons
+          title="Поделиться с друзьями"
+          text="☿ Ретроградные планеты — узнайте какие планеты сейчас в ретрограде и как это влияет на вашу жизнь"
+          className="mt-8"
+        />
 
         <div className="mt-8 text-center">
           <Link
