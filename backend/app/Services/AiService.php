@@ -543,9 +543,24 @@ PROMPT;
         $category = random_int(0, count(self::COVER_PROMPTS) - 1);
         $prompts = self::COVER_PROMPTS[$category];
         $prompt = $prompts[random_int(0, count($prompts) - 1)];
-        
+
         $keyword = $this->extractKeywords($postTitle);
-        return str_replace('{keyword}', $keyword, $prompt) . ', masterpiece, highly detailed, cinematic lighting, no text, no watermark';
+
+        // Уникальный seed для каждой генерации — гарантирует разные картинки
+        $seed = random_int(100000, 999999);
+        $styles = [
+            'oil painting style', 'watercolor illustration', 'digital art',
+            'art nouveau style', 'ethereal photography', 'concept art',
+            'impressionist painting', 'surrealist art', 'fantasy illustration',
+            'cinematic matte painting',
+        ];
+        $style = $styles[array_rand($styles)];
+        $moods = ['serene', 'mystical', 'ethereal', 'majestic', 'tranquil', 'enchanting', 'celestial', 'luminous'];
+        $mood = $moods[array_rand($moods)];
+
+        return str_replace('{keyword}', $keyword, $prompt)
+            . ", {$style}, {$mood} atmosphere, unique composition seed {$seed}"
+            . ', masterpiece, highly detailed, cinematic lighting, no text, no watermark, no people';
     }
 
     private function generateViaTimeweb(string $prompt): ?string
