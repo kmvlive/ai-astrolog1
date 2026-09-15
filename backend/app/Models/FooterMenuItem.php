@@ -12,4 +12,10 @@ class FooterMenuItem extends Model
         'is_active' => 'boolean',
         'open_in_new_tab' => 'boolean',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::observe(\App\Observers\FooterMenuItemObserver::class);
+    }
 }
