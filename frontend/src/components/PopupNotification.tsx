@@ -153,22 +153,26 @@ export default function PopupNotification() {
             <p className="text-slate-400 text-xs leading-relaxed mb-3 whitespace-pre-line">{toast.body}</p>
 
             {/* Actions */}
-            <div className="flex gap-2">
-              {toast.link_url && (
-                <button
-                  onClick={() => handleLink(toast)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium text-white transition ${accentColors[toast.type] || accentColors.info} hover:opacity-80`}
-                >
-                  {toast.link_text || "Подробнее"}
-                </button>
-              )}
-              <button
-                onClick={() => dismiss(toast)}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white border border-white/10 hover:border-white/20 transition"
-              >
-                {toast.dismiss_text || "Закрыть"}
-              </button>
-            </div>
+            {(toast.link_url || toast.dismiss_text) && (
+              <div className="flex gap-2">
+                {toast.link_url && toast.link_text && (
+                  <button
+                    onClick={() => handleLink(toast)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium text-white transition ${accentColors[toast.type] || accentColors.info} hover:opacity-80`}
+                  >
+                    {toast.link_text}
+                  </button>
+                )}
+                {toast.dismiss_text && (
+                  <button
+                    onClick={() => dismiss(toast)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white border border-white/10 hover:border-white/20 transition"
+                  >
+                    {toast.dismiss_text}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       ))}
