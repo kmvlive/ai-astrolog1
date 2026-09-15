@@ -149,9 +149,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/natal-chart/toggle-weekly', [NatalChartController::class, 'toggleWeeklyHoroscope']);
         Route::get('/natal-chart/{chartId}/svg', [NatalChartController::class, 'chartSvg']);
         Route::get('/popups', [PopupNotificationController::class, 'index']);
-        Route::post('/popups/{id}/dismiss', [PopupNotificationController::class, 'dismiss']);
         Route::get('/popups/welcome', [PopupNotificationController::class, 'welcome']);
         Route::post('/popups/welcome/dismiss', [PopupNotificationController::class, 'dismissWelcome']);
+        Route::post('/popups/{id}/dismiss', [PopupNotificationController::class, 'dismiss']);
 
     Route::get('/affirmations/subscription-status', [\App\Http\Controllers\Api\AffirmationController::class, 'subscriptionStatus']);
     Route::get('/referrals', [\App\Http\Controllers\Api\ReferralController::class, 'index']);
