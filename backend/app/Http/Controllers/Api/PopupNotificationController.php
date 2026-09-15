@@ -67,9 +67,9 @@ class PopupNotificationController extends Controller
                 'title' => config('popup.welcome_title', 'Добро пожаловать в AI Астролог! 🌟'),
                 'body' => config('popup.welcome_body', "Здесь вы найдёте:\n\n🔮 Персональные гороскопы по натальной карте\n🌙 Лунные календари на каждый день\n🃏 Гадания на Таро и рунах\n💫 Ежедневные аффирмации\n\nИсследуйте все возможности — звёзды ждут вас!"),
                 'icon' => config('popup.welcome_icon', '✨'),
-                'link_url' => config('popup.welcome_link_url', '/dashboard'),
-                'link_text' => config('popup.welcome_link_text', 'Начать'),
-                'dismiss_text' => config('popup.welcome_dismiss_text', 'Позже'),
+                'link_url' => config('popup.welcome_link_url') ?: null,
+                'link_text' => config('popup.welcome_link_text') ?: null,
+                'dismiss_text' => config('popup.welcome_dismiss_text') ?: null,
                 'type' => 'horoscope',
             ],
         ]);

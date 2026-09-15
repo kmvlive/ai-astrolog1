@@ -107,8 +107,8 @@ class WelcomePopupSettings extends Page implements HasForms
             'POPUP_WELCOME_TITLE' => $data['welcome_title'],
             'POPUP_WELCOME_BODY' => $data['welcome_body'],
             'POPUP_WELCOME_LINK_URL' => $data['welcome_link_url'] ?? '',
-            'POPUP_WELCOME_LINK_TEXT' => $data['welcome_link_text'] ?? 'Начать',
-            'POPUP_WELCOME_DISMISS_TEXT' => $data['welcome_dismiss_text'] ?? 'Позже',
+            'POPUP_WELCOME_LINK_TEXT' => $data['welcome_link_text'] ?? '',
+            'POPUP_WELCOME_DISMISS_TEXT' => $data['welcome_dismiss_text'] ?? '',
         ];
 
         foreach ($fields as $key => $value) {
