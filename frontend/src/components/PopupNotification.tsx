@@ -83,11 +83,13 @@ export default function PopupNotification() {
   };
 
   const dismiss = async (toast: ToastItem) => {
+    // Анимация закрытия
     setToasts(prev => prev.map(t => 
       (t.isWelcome ? t.isWelcome === toast.isWelcome : t.id === toast.id) 
         ? { ...t, closing: true } : t
     ));
 
+    // Ждём сохранения на сервере
     const token = localStorage.getItem("auth_token");
     try {
       if (toast.isWelcome) {
@@ -103,21 +105,43 @@ export default function PopupNotification() {
       }
     } catch {}
 
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => 
-        toast.isWelcome ? !t.isWelcome : t.id !== toast.id
-      ));
-    }, 300);
+    // Удаляем из UI после сохранения
+    setToasts(prev => prev.filter(t => 
+      toast.isWelcome ? !t.isWelcome : t.id !== toast.id
+    ));
   };
 
-  const handleLink = (toast: ToastItem) => {
-    if (toast.link_url) {
-      dismiss(toast);
-      if (toast.link_url.startsWith("http")) {
-        window.open(toast.link_url, "_blank");
-      } else {
-        window.location.href = toast.link_url;
+  const handleLink = async (toast: ToastItem) => {
+    if (!toast.link_url) return;
+    
+    const url = toast.link_url;
+    
+    // Сначала сохраняем dismiss на сервере, ждём ответа
+    const token = localStorage.getItem("auth_token");
+    try {
+      if (toast.isWelcome) {
+        await fetch(`${API}/api/popups/welcome/dismiss`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } else if (toast.id) {
+        await fetch(`${API}/api/popups/${toast.id}/dismiss`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
       }
+    } catch {}
+    
+    // Убираем из UI
+    setToasts(prev => prev.filter(t =>
+      toast.isWelcome ? !t.isWelcome : t.id !== toast.id
+    ));
+    
+    // Переходим ПОСЛЕ сохранения
+    if (url.startsWith("http")) {
+      window.open(url, "_blank");
+    } else {
+      window.location.href = url;
     }
   };
 
