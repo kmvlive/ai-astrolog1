@@ -27,6 +27,7 @@ class User extends Authenticatable implements FilamentUser
         'free_personal_enabled',
         'free_natal_chart_enabled',
         'popup_dismissed_ids',
+        'welcome_popup_shown',
         'referral_code',
         'referred_by',
         'name',

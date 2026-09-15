@@ -4,18 +4,19 @@ import { useEffect, useState } from "react";
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
 interface Popup {
-  id: number;
+  id?: number;
   title: string;
   body: string;
   icon: string;
   link_url?: string;
   link_text?: string;
   dismiss_text?: string;
-  type: "info" | "promo" | "urgent" | "horoscope";
+  type: "info" | "promo" | "urgent" | "horoscope" | "welcome";
 }
 
 interface ToastItem extends Popup {
   closing?: boolean;
+  isWelcome?: boolean;
 }
 
 const borderColors: Record<string, string> = {
@@ -23,6 +24,7 @@ const borderColors: Record<string, string> = {
   promo: "border-green-500/40",
   urgent: "border-red-500/40",
   horoscope: "border-violet-500/40",
+  welcome: "border-amber-500/40",
 };
 
 const accentColors: Record<string, string> = {
@@ -30,6 +32,7 @@ const accentColors: Record<string, string> = {
   promo: "bg-green-500",
   urgent: "bg-red-500",
   horoscope: "bg-violet-500",
+  welcome: "bg-amber-500",
 };
 
 export default function PopupNotification() {
@@ -39,51 +42,81 @@ export default function PopupNotification() {
     const token = localStorage.getItem("auth_token");
     if (!token) return;
 
+    const headers = { Authorization: `Bearer ${token}` };
+
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`${API}/api/popups`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.popups && data.popups.length > 0) {
-          // Показываем по одному с задержкой
-          data.popups.forEach((p: Popup, i: number) => {
-            setTimeout(() => {
-              setToasts(prev => [...prev, p]);
-            }, i * 400);
-          });
+        // 1. Сначала проверяем приветственный popup
+        const welcomeRes = await fetch(`${API}/api/popups/welcome`, { headers });
+        if (welcomeRes.ok) {
+          const welcomeData = await welcomeRes.json();
+          if (welcomeData.show && welcomeData.popup) {
+            setToasts(prev => [...prev, { ...welcomeData.popup, isWelcome: true, type: "welcome" }]);
+            
+            // Если есть welcome — обычные показываем с доп. задержкой
+            setTimeout(() => fetchRegularPopups(headers), 1500);
+            return;
+          }
         }
+
+        // 2. Обычные popups
+        await fetchRegularPopups(headers);
       } catch {}
     }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const dismiss = async (id: number) => {
-    // Анимация закрытия
-    setToasts(prev => prev.map(t => t.id === id ? { ...t, closing: true } : t));
+  const fetchRegularPopups = async (headers: HeadersInit) => {
+    try {
+      const res = await fetch(`${API}/api/popups`, { headers });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.popups && data.popups.length > 0) {
+        data.popups.forEach((p: Popup, i: number) => {
+          setTimeout(() => {
+            setToasts(prev => [...prev, p]);
+          }, i * 400);
+        });
+      }
+    } catch {}
+  };
+
+  const dismiss = async (toast: ToastItem) => {
+    setToasts(prev => prev.map(t => 
+      (t.isWelcome ? t.isWelcome === toast.isWelcome : t.id === toast.id) 
+        ? { ...t, closing: true } : t
+    ));
 
     const token = localStorage.getItem("auth_token");
     try {
-      await fetch(`${API}/api/popups/${id}/dismiss`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      if (toast.isWelcome) {
+        await fetch(`${API}/api/popups/welcome/dismiss`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } else if (toast.id) {
+        await fetch(`${API}/api/popups/${toast.id}/dismiss`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
     } catch {}
 
     setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
+      setToasts(prev => prev.filter(t => 
+        toast.isWelcome ? !t.isWelcome : t.id !== toast.id
+      ));
     }, 300);
   };
 
-  const handleLink = (popup: Popup) => {
-    if (popup.link_url) {
-      dismiss(popup.id);
-      if (popup.link_url.startsWith("http")) {
-        window.open(popup.link_url, "_blank");
+  const handleLink = (toast: ToastItem) => {
+    if (toast.link_url) {
+      dismiss(toast);
+      if (toast.link_url.startsWith("http")) {
+        window.open(toast.link_url, "_blank");
       } else {
-        window.location.href = popup.link_url;
+        window.location.href = toast.link_url;
       }
     }
   };
@@ -92,9 +125,9 @@ export default function PopupNotification() {
 
   return (
     <div className="fixed bottom-4 right-4 z-[100] flex flex-col-reverse gap-3 max-w-sm w-full pointer-events-none">
-      {toasts.map(toast => (
+      {toasts.map((toast, idx) => (
         <div
-          key={toast.id}
+          key={toast.isWelcome ? "welcome" : toast.id}
           className={`pointer-events-auto relative rounded-xl border ${borderColors[toast.type] || borderColors.info} bg-slate-900/95 backdrop-blur-md shadow-2xl shadow-black/40 overflow-hidden transition-all duration-300 ${toast.closing ? "opacity-0 translate-x-full scale-95" : "opacity-100 translate-x-0 scale-100"}`}
           style={{ animation: toast.closing ? undefined : "slideInRight 0.4s ease-out" }}
         >
@@ -109,7 +142,7 @@ export default function PopupNotification() {
                 <h4 className="font-semibold text-sm text-white leading-tight">{toast.title}</h4>
               </div>
               <button
-                onClick={() => dismiss(toast.id)}
+                onClick={() => dismiss(toast)}
                 className="text-slate-500 hover:text-white transition text-xs leading-none shrink-0 mt-0.5"
               >
                 ✕
@@ -117,7 +150,7 @@ export default function PopupNotification() {
             </div>
 
             {/* Body */}
-            <p className="text-slate-400 text-xs leading-relaxed mb-3">{toast.body}</p>
+            <p className="text-slate-400 text-xs leading-relaxed mb-3 whitespace-pre-line">{toast.body}</p>
 
             {/* Actions */}
             <div className="flex gap-2">
@@ -130,7 +163,7 @@ export default function PopupNotification() {
                 </button>
               )}
               <button
-                onClick={() => dismiss(toast.id)}
+                onClick={() => dismiss(toast)}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white border border-white/10 hover:border-white/20 transition"
               >
                 {toast.dismiss_text || "Закрыть"}
@@ -140,7 +173,6 @@ export default function PopupNotification() {
         </div>
       ))}
 
-      {/* CSS анимация */}
       <style jsx global>{`
         @keyframes slideInRight {
           from { opacity: 0; transform: translateX(100%); }

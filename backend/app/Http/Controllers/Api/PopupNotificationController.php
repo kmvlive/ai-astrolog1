@@ -48,4 +48,39 @@ class PopupNotificationController extends Controller
 
         return response()->json(['ok' => true]);
     }
+
+    /**
+     * Получить приветственный popup (для новых пользователей)
+     */
+    public function welcome(Request $request)
+    {
+        $user = $request->user();
+        
+        if ($user->welcome_popup_shown) {
+            return response()->json(['show' => false]);
+        }
+
+        // Приветственный popup хранится в настройках или хардкодом
+        return response()->json([
+            'show' => true,
+            'popup' => [
+                'title' => config('popup.welcome_title', 'Добро пожаловать в AI Астролог! 🌟'),
+                'body' => config('popup.welcome_body', "Здесь вы найдёте:\n\n🔮 Персональные гороскопы по натальной карте\n🌙 Лунные календари на каждый день\n🃏 Гадания на Таро и рунах\n💫 Ежедневные аффирмации\n\nИсследуйте все возможности — звёзды ждут вас!"),
+                'icon' => '✨',
+                'link_url' => '/dashboard',
+                'link_text' => 'Начать',
+                'dismiss_text' => 'Позже',
+                'type' => 'horoscope',
+            ],
+        ]);
+    }
+
+    /**
+     * Отметить приветственный popup как показанный
+     */
+    public function dismissWelcome(Request $request)
+    {
+        $request->user()->update(['welcome_popup_shown' => true]);
+        return response()->json(['ok' => true]);
+    }
 }
