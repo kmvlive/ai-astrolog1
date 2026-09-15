@@ -1,6 +1,7 @@
 "use client";
 
 import DreamsCount from "@/components/DreamsCount";
+import RetrogradeWidget from "@/components/RetrogradeWidget";
 import { CALENDARS } from "@/lib/calendars";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -437,6 +438,17 @@ export default function HomePage() {
             <div className="font-semibold text-white">{affirmationTitle || "Загрузка..."}</div>
           </div>
         </Link>
+      </section>
+
+
+      <section className="max-w-6xl mx-auto px-4 py-12">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3">☿ Ретроградные планеты</h2>
+          <p className="text-slate-400 max-w-2xl mx-auto">
+            Узнайте какие планеты сейчас в ретроградном движении и как это влияет на вашу жизнь
+          </p>
+        </div>
+        <RetrogradeWidget />
       </section>
 
 <section className="bg-slate-900/50 py-16">

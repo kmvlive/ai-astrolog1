@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AffirmationController;
 use App\Http\Controllers\Api\AffirmationRssController;
 use App\Http\Controllers\Api\NatalChartController;
 use App\Http\Controllers\Api\PopupNotificationController;
+use App\Http\Controllers\Api\RetrogradeController;
 use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\MagicLinkController;
 use App\Http\Controllers\Api\UnsubscribeController;
@@ -140,6 +141,8 @@ Route::get('/daily-horoscopes', [DailyHoroscopeController::class, 'index']);
 Route::get('/daily-horoscopes/{slug}', [DailyHoroscopeController::class, 'show']);
 
 // ===== Protected routes =====
+Route::get('/retrograde', [RetrogradeController::class, 'index']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/affirmations/subscribe', [\App\Http\Controllers\Api\AffirmationController::class, 'subscribe']);
     Route::delete('/affirmations/subscribe', [\App\Http\Controllers\Api\AffirmationController::class, 'unsubscribe']);
