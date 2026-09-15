@@ -14,75 +14,72 @@ interface Popup {
   type: "info" | "promo" | "urgent" | "horoscope";
 }
 
-const typeStyles: Record<string, string> = {
-  info: "from-blue-900/40 to-slate-900/90 border-blue-500/30",
-  promo: "from-green-900/40 to-slate-900/90 border-green-500/30",
-  urgent: "from-red-900/40 to-slate-900/90 border-red-500/30",
-  horoscope: "from-violet-900/40 to-slate-900/90 border-violet-500/30",
+interface ToastItem extends Popup {
+  closing?: boolean;
+}
+
+const borderColors: Record<string, string> = {
+  info: "border-blue-500/40",
+  promo: "border-green-500/40",
+  urgent: "border-red-500/40",
+  horoscope: "border-violet-500/40",
 };
 
-const btnStyles: Record<string, string> = {
-  info: "bg-blue-600 hover:bg-blue-500",
-  promo: "bg-green-600 hover:bg-green-500",
-  urgent: "bg-red-600 hover:bg-red-500",
-  horoscope: "bg-violet-600 hover:bg-violet-500",
+const accentColors: Record<string, string> = {
+  info: "bg-blue-500",
+  promo: "bg-green-500",
+  urgent: "bg-red-500",
+  horoscope: "bg-violet-500",
 };
 
 export default function PopupNotification() {
-  const [popup, setPopup] = useState<Popup | null>(null);
-  const [visible, setVisible] = useState(false);
-  const [closing, setClosing] = useState(false);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
-    console.log("[Popup] token:", token ? "exists" : "null");
     if (!token) return;
 
     const timer = setTimeout(async () => {
       try {
-        const url = `${API}/api/popups`;
-        console.log("[Popup] fetching:", url);
-        const res = await fetch(url, {
+        const res = await fetch(`${API}/api/popups`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("[Popup] status:", res.status);
         if (!res.ok) return;
         const data = await res.json();
-        console.log("[Popup] data:", JSON.stringify(data));
         if (data.popups && data.popups.length > 0) {
-          setPopup(data.popups[0]);
-          setVisible(true);
+          // Показываем по одному с задержкой
+          data.popups.forEach((p: Popup, i: number) => {
+            setTimeout(() => {
+              setToasts(prev => [...prev, p]);
+            }, i * 400);
+          });
         }
-      } catch (e) {
-        console.error("[Popup] error:", e);
-      }
+      } catch {}
     }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const dismiss = async () => {
-    if (!popup) return;
-    setClosing(true);
-    
+  const dismiss = async (id: number) => {
+    // Анимация закрытия
+    setToasts(prev => prev.map(t => t.id === id ? { ...t, closing: true } : t));
+
     const token = localStorage.getItem("auth_token");
     try {
-      await fetch(`${API}/api/popups/${popup.id}/dismiss`, {
+      await fetch(`${API}/api/popups/${id}/dismiss`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
     } catch {}
 
     setTimeout(() => {
-      setVisible(false);
-      setPopup(null);
-      setClosing(false);
+      setToasts(prev => prev.filter(t => t.id !== id));
     }, 300);
   };
 
-  const handleLink = () => {
-    if (popup?.link_url) {
-      dismiss();
+  const handleLink = (popup: Popup) => {
+    if (popup.link_url) {
+      dismiss(popup.id);
       if (popup.link_url.startsWith("http")) {
         window.open(popup.link_url, "_blank");
       } else {
@@ -91,53 +88,65 @@ export default function PopupNotification() {
     }
   };
 
-  if (!visible || !popup) return null;
+  if (toasts.length === 0) return null;
 
   return (
-    <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity duration-300 ${closing ? "opacity-0" : "opacity-100"}`}>
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
-        onClick={dismiss}
-      />
-
-      {/* Modal */}
-      <div className={`relative w-full max-w-md rounded-2xl border bg-gradient-to-br ${typeStyles[popup.type] || typeStyles.info} p-6 shadow-2xl transform transition-all duration-300 ${closing ? "scale-95" : "scale-100"}`}>
-        {/* Close button */}
-        <button
-          onClick={dismiss}
-          className="absolute top-3 right-3 text-slate-400 hover:text-white transition text-xl leading-none"
+    <div className="fixed bottom-4 right-4 z-[100] flex flex-col-reverse gap-3 max-w-sm w-full pointer-events-none">
+      {toasts.map(toast => (
+        <div
+          key={toast.id}
+          className={`pointer-events-auto relative rounded-xl border ${borderColors[toast.type] || borderColors.info} bg-slate-900/95 backdrop-blur-md shadow-2xl shadow-black/40 overflow-hidden transition-all duration-300 ${toast.closing ? "opacity-0 translate-x-full scale-95" : "opacity-100 translate-x-0 scale-100"}`}
+          style={{ animation: toast.closing ? undefined : "slideInRight 0.4s ease-out" }}
         >
-          ✕
-        </button>
+          {/* Accent line */}
+          <div className={`absolute top-0 left-0 right-0 h-0.5 ${accentColors[toast.type] || accentColors.info}`} />
 
-        {/* Icon */}
-        <div className="text-4xl mb-3">{popup.icon}</div>
+          <div className="p-4">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{toast.icon}</span>
+                <h4 className="font-semibold text-sm text-white leading-tight">{toast.title}</h4>
+              </div>
+              <button
+                onClick={() => dismiss(toast.id)}
+                className="text-slate-500 hover:text-white transition text-xs leading-none shrink-0 mt-0.5"
+              >
+                ✕
+              </button>
+            </div>
 
-        {/* Title */}
-        <h3 className="text-xl font-bold mb-2 text-white">{popup.title}</h3>
+            {/* Body */}
+            <p className="text-slate-400 text-xs leading-relaxed mb-3">{toast.body}</p>
 
-        {/* Body */}
-        <p className="text-slate-300 text-sm leading-relaxed mb-5 whitespace-pre-line">{popup.body}</p>
-
-        {/* Buttons */}
-        <div className="flex gap-3">
-          {popup.link_url && (
-            <button
-              onClick={handleLink}
-              className={`flex-1 px-4 py-2.5 rounded-xl font-semibold text-sm text-white transition ${btnStyles[popup.type] || btnStyles.info}`}
-            >
-              {popup.link_text || "Подробнее"}
-            </button>
-          )}
-          <button
-            onClick={dismiss}
-            className="flex-1 px-4 py-2.5 rounded-xl font-semibold text-sm text-slate-300 hover:text-white border border-white/10 hover:border-white/20 transition"
-          >
-            {popup.dismiss_text || "Закрыть"}
-          </button>
+            {/* Actions */}
+            <div className="flex gap-2">
+              {toast.link_url && (
+                <button
+                  onClick={() => handleLink(toast)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium text-white transition ${accentColors[toast.type] || accentColors.info} hover:opacity-80`}
+                >
+                  {toast.link_text || "Подробнее"}
+                </button>
+              )}
+              <button
+                onClick={() => dismiss(toast.id)}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white border border-white/10 hover:border-white/20 transition"
+              >
+                {toast.dismiss_text || "Закрыть"}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      ))}
+
+      {/* CSS анимация */}
+      <style jsx global>{`
+        @keyframes slideInRight {
+          from { opacity: 0; transform: translateX(100%); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+      `}</style>
     </div>
   );
 }
