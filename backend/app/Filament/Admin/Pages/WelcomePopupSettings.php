@@ -30,8 +30,12 @@ class WelcomePopupSettings extends Page implements HasForms
     public function mount(): void
     {
         $this->form->fill([
+            'welcome_icon' => config('popup.welcome_icon', '✨'),
             'welcome_title' => config('popup.welcome_title'),
             'welcome_body' => config('popup.welcome_body'),
+            'welcome_link_url' => config('popup.welcome_link_url', '/dashboard'),
+            'welcome_link_text' => config('popup.welcome_link_text', 'Начать'),
+            'welcome_dismiss_text' => config('popup.welcome_dismiss_text', 'Позже'),
         ]);
     }
 
@@ -39,9 +43,13 @@ class WelcomePopupSettings extends Page implements HasForms
     {
         return $form
             ->schema([
-                Section::make('Текст приветствия')
+                Section::make('Содержание')
                     ->description('Показывается новым пользователям один раз при первом входе')
                     ->schema([
+                        TextInput::make('welcome_icon')
+                            ->label('Иконка (эмодзи)')
+                            ->default('✨')
+                            ->maxLength(10),
                         TextInput::make('welcome_title')
                             ->label('Заголовок')
                             ->required()
@@ -52,7 +60,23 @@ class WelcomePopupSettings extends Page implements HasForms
                             ->required()
                             ->rows(8)
                             ->placeholder("Здесь вы найдёте:\n\n🔮 Персональные гороскопы..."),
-                    ]),
+                    ])->columns(2),
+
+                Section::make('Кнопки')
+                    ->schema([
+                        TextInput::make('welcome_link_url')
+                            ->label('URL ссылки')
+                            ->placeholder('/dashboard или https://...')
+                            ->helperText('Оставьте пустым чтобы скрыть кнопку'),
+                        TextInput::make('welcome_link_text')
+                            ->label('Текст кнопки ссылки')
+                            ->default('Начать')
+                            ->maxLength(50),
+                        TextInput::make('welcome_dismiss_text')
+                            ->label('Текст кнопки закрытия')
+                            ->default('Позже')
+                            ->maxLength(50),
+                    ])->columns(3),
 
                 Section::make('Предпросмотр')
                     ->schema([
@@ -78,28 +102,28 @@ class WelcomePopupSettings extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        // Сохраняем в .env
         $envPath = base_path('.env');
         $env = File::get($envPath);
 
-        $title = str_replace('"', '\"', $data['welcome_title']);
-        $body = str_replace('"', '\"', $data['welcome_body']);
+        $fields = [
+            'POPUP_WELCOME_ICON' => $data['welcome_icon'] ?? '✨',
+            'POPUP_WELCOME_TITLE' => $data['welcome_title'],
+            'POPUP_WELCOME_BODY' => $data['welcome_body'],
+            'POPUP_WELCOME_LINK_URL' => $data['welcome_link_url'] ?? '',
+            'POPUP_WELCOME_LINK_TEXT' => $data['welcome_link_text'] ?? 'Начать',
+            'POPUP_WELCOME_DISMISS_TEXT' => $data['welcome_dismiss_text'] ?? 'Позже',
+        ];
 
-        if (str_contains($env, 'POPUP_WELCOME_TITLE=')) {
-            $env = preg_replace('/POPUP_WELCOME_TITLE=.*/', 'POPUP_WELCOME_TITLE="' . $title . '"', $env);
-        } else {
-            $env .= "\nPOPUP_WELCOME_TITLE=\"" . $title . "\"\n";
-        }
-
-        if (str_contains($env, 'POPUP_WELCOME_BODY=')) {
-            $env = preg_replace('/POPUP_WELCOME_BODY=.*/', 'POPUP_WELCOME_BODY="' . $body . '"', $env);
-        } else {
-            $env .= "POPUP_WELCOME_BODY=\"" . $body . "\"\n";
+        foreach ($fields as $key => $value) {
+            $escaped = str_replace('"', '\"', $value ?? '');
+            if (str_contains($env, "{$key}=")) {
+                $env = preg_replace('/' . preg_quote($key, '/') . '=.*/', "{$key}=\"{$escaped}\"", $env);
+            } else {
+                $env .= "\n{$key}=\"{$escaped}\"\n";
+            }
         }
 
         File::put($envPath, $env);
-
-        // Сбрасываем кэш конфига
         \Artisan::call('config:clear');
 
         Notification::make()
