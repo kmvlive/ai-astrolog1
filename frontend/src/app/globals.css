@@ -1808,3 +1808,14 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   font-weight: 600;
   color: var(--accent);
 }
+
+/* Компактная сетка знаков на главной */
+.zodiac-grid-compact .zodiac-card-emoji {
+  font-size: 2.6rem;
+}
+.zodiac-grid-compact .zodiac-card {
+  padding: 1.1rem 0.6rem;
+}
+.zodiac-grid-compact .zodiac-card-star {
+  font-size: 8px;
+}

@@ -313,16 +313,19 @@ export default function HomePage() {
       <section className="max-w-6xl mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-2">Гороскоп на сегодня</h2>
         <p className="text-slate-400 text-center mb-10">Выберите знак — читайте бесплатно, без регистрации</p>
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+        <div className="zodiac-grid-compact grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
           {SIGNS.map((sign) => (
-<Link
+            <Link
               key={sign.slug}
               href={`/horoscopes/${sign.slug}`}
-              className="group bg-slate-900 hover:bg-slate-800 border border-white/10 hover:border-violet-500/50 rounded-2xl p-4 text-center transition hover:scale-105"
+              className="zodiac-card group relative bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 rounded-2xl p-4 text-center overflow-hidden block"
             >
-              <div className="text-3xl mb-2 group-hover:scale-110 transition">{sign.emoji}</div>
-              <div className="font-semibold text-sm">{sign.name}</div>
-              <div className="text-[10px] text-slate-500 mt-1">{sign.dates}</div>
+              <span className="zodiac-card-star zodiac-card-star-1">✦</span>
+              <span className="zodiac-card-star zodiac-card-star-2">✧</span>
+              <span className="zodiac-card-star zodiac-card-star-3">✦</span>
+              <div className="zodiac-card-emoji">{sign.emoji}</div>
+              <div className="font-semibold text-sm mt-2">{sign.name}</div>
+              <div className="zodiac-card-dates mt-1">{sign.dates}</div>
             </Link>
           ))}
         </div>
