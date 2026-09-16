@@ -364,59 +364,34 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-        <div className="grid md:grid-cols-4 gap-6">
-          <Link href="/crystal-ball" className="group relative overflow-hidden bg-gradient-to-br from-violet-900/50 to-indigo-950 border border-violet-500/30 rounded-3xl p-8 transition hover:-translate-y-1 hover:border-violet-400/50">
-              <div className="absolute top-4 right-4 text-4xl opacity-20 group-hover:opacity-40 transition">🔮</div>
-              <div className="text-3xl mb-3">🔮</div>
-              <h3 className="text-xl font-bold text-violet-200 mb-2">Хрустальный Шар</h3>
-              <p className="text-slate-400 text-sm mb-4">Задайте вопрос — древний оракул откроет завесу будущего. AI-предсказание за секунды.</p>
-              <span className="text-violet-400 text-sm font-semibold group-hover:text-violet-300">Спросить шар →</span>
-            </Link>
-            <a href="/tarot" className="group relative overflow-hidden bg-gradient-to-br from-fuchsia-900/50 to-violet-950 border border-fuchsia-500/30 rounded-3xl p-8 transition hover:-translate-y-1 hover:border-fuchsia-400/50">
-            <div className="absolute -top-8 -right-8 text-[120px] opacity-20 group-hover:opacity-30 group-hover:scale-110 transition">🎴</div>
-            <div className="relative">
-              <div className="text-5xl mb-4">🎴</div>
-              <h3 className="text-2xl font-bold mb-2">Карта Таро дня</h3>
-              <p className="text-slate-300 mb-6">Послание на сегодня от колоды Старших Арканов. Одна карта — одно важное сообщение для вас.</p>
-              <span className="inline-block bg-fuchsia-600 group-hover:bg-fuchsia-500 rounded-xl px-5 py-2.5 text-sm font-semibold transition">Открыть карту →</span>
-            </div>
-          </a>
-          <a href="/biorhythms" className="group relative overflow-hidden bg-gradient-to-br from-cyan-900/50 to-slate-950 border border-cyan-500/30 rounded-3xl p-8 transition hover:-translate-y-1 hover:border-cyan-400/50">
-            <div className="absolute -top-8 -right-8 text-[120px] opacity-20 group-hover:opacity-30 group-hover:scale-110 transition">📊</div>
-            <div className="relative">
-              <div className="text-5xl mb-4">📊</div>
-              <h3 className="text-2xl font-bold mb-2">Биоритмы сегодня</h3>
-              <p className="text-slate-300 mb-6">Физическая, эмоциональная и интеллектуальная энергия на сегодня + прогноз на 30 дней по дате рождения.</p>
-              <span className="inline-block bg-cyan-600 group-hover:bg-cyan-500 rounded-xl px-5 py-2.5 text-sm font-semibold transition">Рассчитать →</span>
-            </div>
-          </a>
-          <a href="/dreams" className="group relative overflow-hidden bg-gradient-to-br from-indigo-900/50 to-slate-950 border border-indigo-500/30 rounded-3xl p-8 transition hover:-translate-y-1 hover:border-indigo-400/50">
-            <div className="absolute -top-8 -right-8 text-[120px] opacity-20 group-hover:opacity-30 group-hover:scale-110 transition">🌙</div>
-            <div className="relative">
-              <div className="text-5xl mb-4">🌙</div>
-              <h3 className="text-2xl font-bold mb-2">Сонник</h3>
-              <p className="text-slate-300 mb-6"><DreamsCount /> толкований снов. Не нашли свой символ — AI растолкует его специально для вас.</p>
-              <span className="inline-block bg-indigo-600 group-hover:bg-indigo-500 rounded-xl px-5 py-2.5 text-sm font-semibold transition">Растолковать сон →</span>
-            </div>
-          </a>
-          <a href="/names" className="group relative overflow-hidden bg-gradient-to-br from-purple-900/50 to-indigo-950 border border-purple-500/30 rounded-3xl p-8 transition hover:-translate-y-1 hover:border-purple-400/50">
-            <div className="absolute -top-8 -right-8 text-[120px] opacity-20 group-hover:opacity-30 group-hover:scale-110 transition">✨</div>
-            <div className="relative">
-              <div className="text-5xl mb-4">✨</div>
-              <h3 className="text-2xl font-bold mb-2">Значение имени</h3>
-              <p className="text-slate-300 mb-6">Происхождение, значение и характер имени. AI расскажет про любое имя за секунды.</p>
-              <span className="inline-block bg-purple-600 group-hover:bg-purple-500 rounded-xl px-5 py-2.5 text-sm font-semibold transition">Узнать значение →</span>
-            </div>
-          </a>
-          <a href="/names/compatibility" className="group relative overflow-hidden bg-gradient-to-br from-pink-900/50 to-rose-950 border border-pink-500/30 rounded-3xl p-8 transition hover:-translate-y-1 hover:border-pink-400/50">
-            <div className="absolute -top-8 -right-8 text-[120px] opacity-20 group-hover:opacity-30 group-hover:scale-110 transition">💕</div>
-            <div className="relative">
-              <div className="text-5xl mb-4">💕</div>
-              <h3 className="text-2xl font-bold mb-2">Совместимость имён</h3>
-              <p className="text-slate-300 mb-6">Как сочетаются два имени в любви, дружбе и работе? AI проанализирует пару за секунды.</p>
-              <span className="inline-block bg-pink-600 group-hover:bg-pink-500 rounded-xl px-5 py-2.5 text-sm font-semibold transition">Проверить пару →</span>
-            </div>
-          </a>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[
+            { href: "/crystal-ball", emoji: "🔮", title: "Хрустальный Шар", accent: "#8b5cf6", cta: "Спросить шар", desc: <>Задайте вопрос — древний оракул откроет завесу будущего. AI-предсказание за секунды.</> },
+            { href: "/tarot", emoji: "🎴", title: "Карта Таро дня", accent: "#d946ef", cta: "Открыть карту", desc: <>Послание на сегодня от колоды Старших Арканов. Одна карта — одно важное сообщение для вас.</> },
+            { href: "/biorhythms", emoji: "📊", title: "Биоритмы сегодня", accent: "#06b6d4", cta: "Рассчитать", desc: <>Физическая, эмоциональная и интеллектуальная энергия на сегодня + прогноз на 30 дней по дате рождения.</> },
+            { href: "/dreams", emoji: "🌙", title: "Сонник", accent: "#6366f1", cta: "Растолковать сон", desc: <><DreamsCount /> толкований снов. Не нашли свой символ — AI растолкует его специально для вас.</> },
+            { href: "/names", emoji: "✨", title: "Значение имени", accent: "#a855f7", cta: "Узнать значение", desc: <>Происхождение, значение и характер имени. AI расскажет про любое имя за секунды.</> },
+            { href: "/names/compatibility", emoji: "💕", title: "Совместимость имён", accent: "#ec4899", cta: "Проверить пару", desc: <>Как сочетаются два имени в любви, дружбе и работе? AI проанализирует пару за секунды.</> },
+          ].map((t) => (
+            <a
+              key={t.href}
+              href={t.href}
+              style={{ ["--accent" as any]: t.accent }}
+              className="cal-card group relative p-7 rounded-3xl bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 flex flex-col overflow-hidden"
+            >
+              <span className="cal-watermark" aria-hidden="true">{t.emoji}</span>
+              <span className="cal-shine" aria-hidden="true" />
+              <div className="cal-medal mb-5">
+                <span className="cal-card-emoji text-3xl">{t.emoji}</span>
+              </div>
+              <h3 className="text-xl font-bold mb-2 text-white">{t.title}</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-1">{t.desc}</p>
+              <div className="flex items-center justify-between">
+                <span className="cal-card-arrow">{t.cta}</span>
+                <span className="cal-go">→</span>
+              </div>
+            </a>
+          ))}
         </div>
       </section>
 
