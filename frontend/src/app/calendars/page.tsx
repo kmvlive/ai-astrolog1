@@ -10,6 +10,17 @@ export const metadata = {
   description: "Календарь праздников, православный и мусульманский календари, лунный календарь, календарь садовода и стрижек — на каждый день.",
 };
 
+const ACCENTS: Record<string, string> = {
+  holidays: "#f472b6",
+  orthodox: "#fbbf24",
+  muslim: "#34d399",
+  lunar: "#a78bfa",
+  gardener: "#4ade80",
+  haircut: "#e879f9",
+  names: "#38bdf8",
+  conception: "#fb7185",
+};
+
 export default function Page() {
   return (
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
@@ -28,11 +39,23 @@ export default function Page() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {CALENDARS.map((c) => (
-            <Link key={c.slug} href={`/calendars/${c.slug}`} className="cal-card group relative p-6 rounded-3xl bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 block overflow-hidden">
-              <div className="cal-card-emoji text-5xl mb-4">{c.emoji}</div>
+            <Link
+              key={c.slug}
+              href={`/calendars/${c.slug}`}
+              style={{ ["--accent" as any]: ACCENTS[c.slug] || "#a78bfa" }}
+              className="cal-card group relative p-6 rounded-3xl bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 flex flex-col overflow-hidden"
+            >
+              <span className="cal-watermark" aria-hidden="true">{c.emoji}</span>
+              <span className="cal-shine" aria-hidden="true" />
+              <div className="cal-medal mb-4">
+                <span className="cal-card-emoji text-3xl">{c.emoji}</span>
+              </div>
               <h2 className={`text-xl font-bold mb-2 bg-gradient-to-r ${c.gradient} bg-clip-text text-transparent`}>{c.name}</h2>
-              <p className="text-slate-400 text-sm mb-4">{c.short}</p>
-              <div className="cal-card-arrow">Открыть →</div>
+              <p className="text-slate-400 text-sm mb-5 flex-1">{c.short}</p>
+              <div className="flex items-center justify-between">
+                <span className="cal-card-arrow">Открыть</span>
+                <span className="cal-go">→</span>
+              </div>
             </Link>
           ))}
         </div>
