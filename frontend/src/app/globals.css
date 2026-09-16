@@ -524,12 +524,28 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.4s;
+  opacity: 0.3;
   pointer-events: none;
+  animation:
+    div-card-glow 3.5s ease-in-out infinite,
+    zodiac-shimmer 5s ease-in-out infinite;
 }
 
-.div-card:hover::before { opacity: 1; }
+/* Мерцание вразнобой — каждая карточка в своей фазе */
+.div-card:nth-child(2)::before { animation-delay: 0.9s, 0s; }
+.div-card:nth-child(3)::before { animation-delay: 1.8s, 0s; }
+.div-card:nth-child(4)::before { animation-delay: 2.7s, 0s; }
+
+@keyframes div-card-glow {
+  0%, 100% { opacity: 0.18; }
+  50% { opacity: 0.55; }
+}
+
+/* При наведении — разгорается на полную */
+.div-card:hover::before {
+  opacity: 1;
+  animation: zodiac-shimmer 5s ease-in-out infinite;
+}
 
 .div-card-emoji {
   display: inline-block;
