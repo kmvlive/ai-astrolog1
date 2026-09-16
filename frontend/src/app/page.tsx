@@ -9,7 +9,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-const ACCENTS_HOME = {
+const ACCENTS_HOME: Record<string, Record<string, string>> = {
   free: { chinese: "#dc2626", japanese: "#f59e0b", zoroastrian: "#f97316", druids: "#16a34a", flowers: "#ec4899", compatibility: "#a855f7" },
   periods: { today: "#fbbf24", tomorrow: "#3b82f6", week: "#10b981", month: "#a855f7", year: "#ef4444" },
   tools: { "crystal-ball": "#8b5cf6", tarot: "#d946ef", biorhythms: "#06b6d4", dreams: "#6366f1", names: "#a855f7", compatibility: "#ec4899" },
