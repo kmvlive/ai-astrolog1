@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import ShareButtons from "@/components/ShareButtons";
+import BioGraph3D from "@/components/BioGraph3D";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
@@ -100,9 +101,6 @@ const load = async () => {
     if (birthDate) load();
   }, [birthDate]);
 
-  const maxVal = 100;
-  const h = 180;
-  const w = 800;
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
@@ -158,48 +156,13 @@ const load = async () => {
               </div>
             </div>
 
-            <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 overflow-x-auto mb-8">
-              <h3 className="font-bold mb-4">Прогноз на 30 дней</h3>
-              <svg viewBox={`0 0 ${w} ${h + 40}`} className="w-full" style={{ minWidth: 600 }}>
-                <line x1="0" y1={h / 2} x2={w} y2={h / 2} stroke="#475569" strokeWidth="1" strokeDasharray="3,3" />
-
-                {["physical", "emotional", "intellectual"].map((key, idx) => {
-                  const colors = ["#ef4444", "#3b82f6", "#eab308"];
-                  const points = forecast.map((f, i) => {
-                    const x = (i / (forecast.length - 1)) * w;
-                    const y = h / 2 - (f[key] / maxVal) * (h / 2);
-                    return `${x},${y}`;
-                  }).join(" ");
-                  return <polyline key={key} points={points} fill="none" stroke={colors[idx]} strokeWidth="2" className="bio-graph-line" />;
-                })}
-
-                {forecast.findIndex(f => f.today) >= 0 && (
-                  <line
-                    x1={(forecast.findIndex(f => f.today) / (forecast.length - 1)) * w}
-                    y1="0"
-                    x2={(forecast.findIndex(f => f.today) / (forecast.length - 1)) * w}
-                    y2={h}
-                    stroke="#a78bfa"
-                    strokeWidth="2"
-                    strokeDasharray="5,5"
-                  />
-                )}
-
-                {forecast.filter((_, i) => i % 6 === 0).map((f, i) => {
-                  const idx = forecast.indexOf(f);
-                  const x = (idx / (forecast.length - 1)) * w;
-                  return (
-                    <text key={i} x={x} y={h + 25} fill="#94a3b8" fontSize="12" textAnchor="middle">
-                      {f.date}
-                    </text>
-                  );
-                })}
-              </svg>
-
+            <div className="mb-8">
+              <h3 className="font-bold mb-4">📊 Прогноз на 30 дней</h3>
+              <BioGraph3D forecast={forecast} />
               <div className="flex flex-wrap gap-4 justify-center mt-4 text-sm">
-                <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-red-500"></span> Физический</div>
-                <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-blue-500"></span> Эмоциональный</div>
-                <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-yellow-500"></span> Интеллектуальный</div>
+                <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-red-500"></span> Физический (23 дня)</div>
+                <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-blue-500"></span> Эмоциональный (28 дней)</div>
+                <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-yellow-500"></span> Интеллектуальный (33 дня)</div>
               </div>
             </div>
 
