@@ -70,14 +70,14 @@ const SYNODIC = 29.53058867;
 const KNOWN_NEW_MOON = Date.UTC(2000, 0, 6, 18, 14, 0);
 
 const PHASES = [
-  { name: "Новолуние", emoji: "🌑", img: "/moon/moon-0.png" },
-  { name: "Растущий серп", emoji: "🌒", img: "/moon/moon-1.png" },
-  { name: "Первая четверть", emoji: "🌓", img: "/moon/moon-2.png" },
-  { name: "Растущая Луна", emoji: "🌔", img: "/moon/moon-3.png" },
-  { name: "Полнолуние", emoji: "🌕", img: "/moon/moon-4.png" },
-  { name: "Убывающая Луна", emoji: "🌖", img: "/moon/moon-5.png" },
-  { name: "Последняя четверть", emoji: "🌗", img: "/moon/moon-6.png" },
-  { name: "Убывающий серп", emoji: "🌘", img: "/moon/moon-7.png" },
+  { name: "Новолуние", emoji: "🌑", img: "/moon/moon-0.svg" },
+  { name: "Растущий серп", emoji: "🌒", img: "/moon/moon-1.svg" },
+  { name: "Первая четверть", emoji: "🌓", img: "/moon/moon-2.svg" },
+  { name: "Растущая Луна", emoji: "🌔", img: "/moon/moon-3.svg" },
+  { name: "Полнолуние", emoji: "🌕", img: "/moon/moon-4.svg" },
+  { name: "Убывающая Луна", emoji: "🌖", img: "/moon/moon-5.svg" },
+  { name: "Последняя четверть", emoji: "🌗", img: "/moon/moon-6.svg" },
+  { name: "Убывающий серп", emoji: "🌘", img: "/moon/moon-7.svg" },
 ];
 
 function getMoon(date: Date) {

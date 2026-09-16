@@ -48,3 +48,27 @@ img[src*="/moon/moon-4"] { animation-delay: 2s; }
 img[src*="/moon/moon-5"] { animation-delay: 2.5s; }
 img[src*="/moon/moon-6"] { animation-delay: 3s; }
 img[src*="/moon/moon-7"] { animation-delay: 3.5s; }
+
+/* --- SVG Луна: свечение + парение --- */
+@keyframes moon-float {
+  0%, 100% { 
+    transform: translateY(0) scale(1); 
+    filter: drop-shadow(0 0 20px rgba(200, 220, 255, 0.6)) brightness(1);
+  }
+  50% { 
+    transform: translateY(-8px) scale(1.03); 
+    filter: drop-shadow(0 0 35px rgba(200, 220, 255, 0.9)) brightness(1.2);
+  }
+}
+img[src*="/moon/moon-"],
+img[src$=".svg"] {
+  animation: moon-float 7s ease-in-out infinite;
+  will-change: transform, filter;
+}
+img[src*="/moon/moon-1"] { animation-delay: .6s; }
+img[src*="/moon/moon-2"] { animation-delay: 1.2s; }
+img[src*="/moon/moon-3"] { animation-delay: 1.8s; }
+img[src*="/moon/moon-4"] { animation-delay: 2.4s; }
+img[src*="/moon/moon-5"] { animation-delay: 3s; }
+img[src*="/moon/moon-6"] { animation-delay: 3.6s; }
+img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
