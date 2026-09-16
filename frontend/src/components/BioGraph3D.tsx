@@ -17,254 +17,217 @@ interface Props {
 
 export default function BioGraph3D({ forecast }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
+  const [started, setStarted] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const animRef = useRef<number>(0);
 
-  // Анимация прорисовки
+  // Старт анимации когда график попал в поле зрения
   useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStarted(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.35 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  // Анимация прорисовки (медленнее: 3.2s)
+  useEffect(() => {
+    if (!started) return;
     setProgress(0);
     const start = performance.now();
-    const duration = 2500;
-    
+    const duration = 3200;
+
     const animate = (now: number) => {
-      const elapsed = now - start;
-      const p = Math.min(1, elapsed / duration);
-      // Easing: ease-out-cubic
-      const eased = 1 - Math.pow(1 - p, 3);
-      setProgress(eased);
-      if (p < 1) {
-        animRef.current = requestAnimationFrame(animate);
-      }
+      const p = Math.min(1, (now - start) / duration);
+      setProgress(1 - Math.pow(1 - p, 3)); // ease-out-cubic
+      if (p < 1) animRef.current = requestAnimationFrame(animate);
     };
     animRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animRef.current);
-  }, [forecast]);
+  }, [forecast, started]);
 
   // Отрисовка canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || forecast.length === 0) return;
-    
+
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    
-    // High-DPI
+
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
     ctx.scale(dpr, dpr);
-    
+
     const W = rect.width;
     const H = rect.height;
-    
-    // 3D параметры
-    const tiltX = tilt.x; // наклон по горизонтали (-0.3 до 0.3)
-    const tiltY = 0.25 + tilt.y * 0.1; // наклон плоскости
-    
-    // Цвета
+
+    // Компактная компоновка: линии занимают почти всю высоту
+    const centerY = H * 0.44;   // линия 0%
+    const amp = H * 0.34;       // амплитуда (линии от 0.10H до 0.78H)
+    const gridY = H * 0.82;     // сетка-пол
+    const dateY = H * 0.96;     // подписи дат
+
+    const tiltX = tilt.x;
+    const tiltY = 0.22 + tilt.y * 0.08;
+
     const colors = {
-      physical: { main: "#ef4444", glow: "rgba(239, 68, 68, 0.4)" },
-      emotional: { main: "#3b82f6", glow: "rgba(59, 130, 246, 0.4)" },
-      intellectual: { main: "#eab308", glow: "rgba(234, 179, 8, 0.4)" },
+      physical: { main: "#ef4444", glow: "rgba(239, 68, 68, 0.35)" },
+      emotional: { main: "#3b82f6", glow: "rgba(59, 130, 246, 0.35)" },
+      intellectual: { main: "#eab308", glow: "rgba(234, 179, 8, 0.35)" },
     };
-    
-    // Функция 3D-проекции
+
     const project = (x: number, y: number, z: number) => {
-      // Перспективная проекция
       const fov = 800;
       const scale = fov / (fov + z);
       return {
         x: W / 2 + (x - W / 2) * scale + tiltX * z * 0.5,
-        y: H * 0.55 + (y - H * 0.5) * scale * (1 - tiltY) - z * tiltY * 0.3,
+        y: centerY + (y - centerY) * scale * (1 - tiltY) - z * tiltY * 0.25,
         scale,
       };
     };
-    
-    // Очистка
+
     ctx.clearRect(0, 0, W, H);
-    
-    // Фон-градиент
+
+    // Фон
     const bg = ctx.createLinearGradient(0, 0, 0, H);
     bg.addColorStop(0, "rgba(15, 23, 42, 0.8)");
     bg.addColorStop(1, "rgba(30, 41, 59, 0.6)");
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
-    
+
     // Сетка-пол
     ctx.strokeStyle = "rgba(148, 163, 184, 0.08)";
     ctx.lineWidth = 1;
-    const gridDepth = 8;
-    const gridWidth = 20;
-    
-    // Горизонтальные линии (в глубину)
-    for (let i = 0; i <= gridWidth; i++) {
-      const x = (i / gridWidth) * W;
-      const p1 = project(x, H * 0.7, -200);
-      const p2 = project(x, H * 0.7, 200);
-      ctx.beginPath();
-      ctx.moveTo(p1.x, p1.y);
-      ctx.lineTo(p2.x, p2.y);
-      ctx.stroke();
+    for (let i = 0; i <= 20; i++) {
+      const x = (i / 20) * W;
+      const p1 = project(x, gridY, -200);
+      const p2 = project(x, gridY, 200);
+      ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
     }
-    
-    // Вертикальные линии (по ширине)
-    for (let i = 0; i <= gridDepth; i++) {
-      const z = -200 + (i / gridDepth) * 400;
-      const p1 = project(0, H * 0.7, z);
-      const p2 = project(W, H * 0.7, z);
-      ctx.beginPath();
-      ctx.moveTo(p1.x, p1.y);
-      ctx.lineTo(p2.x, p2.y);
-      ctx.stroke();
+    for (let i = 0; i <= 8; i++) {
+      const z = -200 + (i / 8) * 400;
+      const p1 = project(0, gridY, z);
+      const p2 = project(W, gridY, z);
+      ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
     }
-    
+
     // Средняя линия (0%)
     ctx.strokeStyle = "rgba(148, 163, 184, 0.2)";
     ctx.setLineDash([5, 5]);
-    const midP1 = project(0, H * 0.45, 0);
-    const midP2 = project(W, H * 0.45, 0);
-    ctx.beginPath();
-    ctx.moveTo(midP1.x, midP1.y);
-    ctx.lineTo(midP2.x, midP2.y);
-    ctx.stroke();
+    const m1 = project(0, centerY, 0);
+    const m2 = project(W, centerY, 0);
+    ctx.beginPath(); ctx.moveTo(m1.x, m1.y); ctx.lineTo(m2.x, m2.y); ctx.stroke();
     ctx.setLineDash([]);
-    
-    // Вертикальная линия "сегодня"
+
+    // Маркер "сегодня"
     const todayIdx = forecast.findIndex(f => f.today);
     if (todayIdx >= 0) {
       const x = (todayIdx / (forecast.length - 1)) * W;
       ctx.strokeStyle = "rgba(167, 139, 250, 0.6)";
       ctx.lineWidth = 2;
       ctx.setLineDash([8, 4]);
-      const topP = project(x, H * 0.15, 0);
-      const botP = project(x, H * 0.75, 0);
-      ctx.beginPath();
-      ctx.moveTo(topP.x, topP.y);
-      ctx.lineTo(botP.x, botP.y);
-      ctx.stroke();
+      const top = project(x, H * 0.06, 0);
+      const bot = project(x, gridY, 0);
+      ctx.beginPath(); ctx.moveTo(top.x, top.y); ctx.lineTo(bot.x, bot.y); ctx.stroke();
       ctx.setLineDash([]);
-      
-      // Точка "сегодня"
       ctx.fillStyle = "rgba(167, 139, 250, 0.9)";
-      ctx.beginPath();
-      ctx.arc(topP.x, topP.y - 10, 4, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(top.x, top.y, 4, 0, Math.PI * 2); ctx.fill();
     }
-    
-    // Функция рисования линии со свечением
+
+    // Линии со свечением
     const drawLine = (key: "physical" | "emotional" | "intellectual", color: typeof colors.physical) => {
-      const points: { x: number; y: number; val: number }[] = [];
       const drawCount = Math.floor(forecast.length * progress);
-      
-      for (let i = 0; i < drawCount; i++) {
-        const f = forecast[i];
-        const x = (i / (forecast.length - 1)) * W;
-        const yNorm = f[key] / 100; // -1 до 1
-        const y = H * 0.45 - yNorm * H * 0.28;
-        points.push({ x, y, val: f[key] });
-      }
-      
-      if (points.length < 2) return;
-      
-      // Свечение (толстая прозрачная линия)
+      if (drawCount < 2) return;
+      const pts = forecast.slice(0, drawCount).map((f, i) => ({
+        x: (i / (forecast.length - 1)) * W,
+        y: centerY - (f[key] / 100) * amp,
+      }));
+
+      // Отражение
+      ctx.strokeStyle = color.glow.replace("0.35", "0.12");
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      pts.forEach((p, i) => {
+        const pp = project(p.x, 2 * centerY - p.y, 0);
+        i === 0 ? ctx.moveTo(pp.x, pp.y) : ctx.lineTo(pp.x, pp.y);
+      });
+      ctx.stroke();
+
+      // Свечение
       ctx.strokeStyle = color.glow;
       ctx.lineWidth = 8;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.beginPath();
-      points.forEach((p, i) => {
+      pts.forEach((p, i) => {
         const pp = project(p.x, p.y, 0);
-        if (i === 0) ctx.moveTo(pp.x, pp.y);
-        else ctx.lineTo(pp.x, pp.y);
+        i === 0 ? ctx.moveTo(pp.x, pp.y) : ctx.lineTo(pp.x, pp.y);
       });
       ctx.stroke();
-      
+
       // Основная линия
       ctx.strokeStyle = color.main;
       ctx.lineWidth = 3;
       ctx.beginPath();
-      points.forEach((p, i) => {
+      pts.forEach((p, i) => {
         const pp = project(p.x, p.y, 0);
-        if (i === 0) ctx.moveTo(pp.x, pp.y);
-        else ctx.lineTo(pp.x, pp.y);
+        i === 0 ? ctx.moveTo(pp.x, pp.y) : ctx.lineTo(pp.x, pp.y);
       });
       ctx.stroke();
-      
-      // Точки на концах
-      if (points.length > 0) {
-        const last = points[points.length - 1];
-        const pp = project(last.x, last.y, 0);
-        
-        // Внешний круг (свечение)
-        ctx.fillStyle = color.glow;
-        ctx.beginPath();
-        ctx.arc(pp.x, pp.y, 8, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Внутренний круг
-        ctx.fillStyle = color.main;
-        ctx.beginPath();
-        ctx.arc(pp.x, pp.y, 4, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      
-      // Отражение (ниже плоскости, полупрозрачное)
-      ctx.strokeStyle = color.glow.replace("0.4", "0.15");
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      points.forEach((p, i) => {
-        const reflectedY = H * 0.45 + (H * 0.45 - p.y);
-        const pp = project(p.x, reflectedY, 0);
-        if (i === 0) ctx.moveTo(pp.x, pp.y);
-        else ctx.lineTo(pp.x, pp.y);
-      });
-      ctx.stroke();
+
+      // Точка на конце
+      const last = pts[pts.length - 1];
+      const lp = project(last.x, last.y, 0);
+      ctx.fillStyle = color.glow;
+      ctx.beginPath(); ctx.arc(lp.x, lp.y, 8, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = color.main;
+      ctx.beginPath(); ctx.arc(lp.x, lp.y, 4, 0, Math.PI * 2); ctx.fill();
     };
-    
-    // Рисуем все три линии
+
     drawLine("physical", colors.physical);
     drawLine("emotional", colors.emotional);
     drawLine("intellectual", colors.intellectual);
-    
-    // Даты снизу
+
+    // Даты
     ctx.fillStyle = "rgba(148, 163, 184, 0.7)";
     ctx.font = "11px system-ui";
     ctx.textAlign = "center";
     for (let i = 0; i < forecast.length; i += 6) {
-      const f = forecast[i];
       const x = (i / (forecast.length - 1)) * W;
-      const p = project(x, H * 0.82, 0);
-      ctx.fillText(f.date, p.x, p.y);
+      const p = project(x, dateY, 0);
+      ctx.fillText(forecast[i].date, p.x, p.y);
     }
-    
   }, [forecast, progress, tilt]);
 
-  // Обработка движения мыши для интерактивности
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setTilt({ x: x * 0.3, y: y * 0.3 });
-  };
-
-  const handleMouseLeave = () => {
-    setTilt({ x: 0, y: 0 });
+    setTilt({
+      x: ((e.clientX - rect.left) / rect.width - 0.5) * 0.3,
+      y: ((e.clientY - rect.top) / rect.height - 0.5) * 0.3,
+    });
   };
 
   return (
-    <div 
+    <div
+      ref={wrapRef}
       className="relative rounded-2xl overflow-hidden bg-slate-900/50 border border-white/10"
       onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      onMouseLeave={() => setTilt({ x: 0, y: 0 })}
     >
-      <canvas
-        ref={canvasRef}
-        className="w-full"
-        style={{ height: "420px" }}
-      />
+      <canvas ref={canvasRef} className="w-full block" style={{ height: "320px" }} />
       <div className="absolute top-3 left-4 text-xs text-slate-500 flex items-center gap-2">
         <span>📊 3D</span>
         <span>Двигайте мышкой для эффекта</span>
