@@ -83,8 +83,14 @@ export default function MoonPage() {
         </div>
 
         <div className="relative rounded-3xl overflow-hidden border border-violet-500/30 shadow-2xl shadow-violet-900/40 mb-8">
+          {/* Кометы */}
+          <div className="moon-comets">
+            <div className="comet comet-1" />
+            <div className="comet comet-2" />
+            <div className="comet comet-3" />
+          </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={p.img} alt={`Луна: ${p.name}`} className="w-full h-auto" />
+          <img src={p.img} alt={`Луна: ${p.name}`} className="w-full h-auto relative z-0" />
           <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950/90 to-transparent p-6">
             <div className="text-3xl font-bold">
               {p.emoji} {p.name}
