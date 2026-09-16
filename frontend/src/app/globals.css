@@ -506,6 +506,619 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
               0 0 25px -5px rgba(217, 70, 239, 0.25);
 }
 
+/* Рамка — заметно мерцает */
+.div-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  padding: 2px;
+  background: linear-gradient(135deg,
+    rgba(168, 85, 247, 0.7) 0%,
+    rgba(236, 72, 153, 0.4) 33%,
+    rgba(14, 165, 233, 0.5) 66%,
+    rgba(168, 85, 247, 0.7) 100%);
+  background-size: 200% 200%;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.5;
+  pointer-events: none;
+  animation: div-card-glow 3s ease-in-out infinite, zodiac-shimmer 5s ease-in-out infinite;
+}
+
+/* Разные фазы мерцания */
+.div-card:nth-child(2)::before { animation-delay: 0.75s, 0s; }
+.div-card:nth-child(3)::before { animation-delay: 1.5s, 0s; }
+.div-card:nth-child(4)::before { animation-delay: 2.25s, 0s; }
+
+@keyframes div-card-glow {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.9; }
+}
+
+/* При hover — рамка постоянная и яркая */
+.div-card:hover::before {
+  opacity: 1;
+  animation: zodiac-shimmer 5s ease-in-out infinite;
+}
+
+/* Внутренний свет — пульсирует в противофазе к рамке */
+.div-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%,
+    rgba(168, 85, 247, 0.12) 0%,
+    transparent 70%);
+  opacity: 0.5;
+  animation: div-card-inner 3s ease-in-out infinite;
+}
+
+.div-card:nth-child(2)::after { animation-delay: 0.75s; }
+.div-card:nth-child(3)::after { animation-delay: 1.5s; }
+.div-card:nth-child(4)::after { animation-delay: 2.25s; }
+
+@keyframes div-card-inner {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.2; }
+}
+
+.div-card:hover::after {
+  opacity: 1;
+  animation: none;
+  background: radial-gradient(ellipse at 50% 0%,
+    rgba(168, 85, 247, 0.25) 0%,
+    transparent 70%);
+}
+
+.div-card-emoji {
+  display: inline-block;
+  transition: transform 0.4s;
+  animation: div-emoji-pulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.3));
+  position: relative;
+  z-index: 1;
+}
+
+.div-card:nth-child(odd) .div-card-emoji { animation-delay: 0s; }
+.div-card:nth-child(even) .div-card-emoji { animation-delay: 1.5s; }
+
+.div-card:hover .div-card-emoji {
+  transform: scale(1.15) rotate(-5deg);
+}
+
+@keyframes div-emoji-pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.25)); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 16px rgba(217, 70, 239, 0.6)); }
+}
+
+.div-card-arrow {
+  transition: transform 0.3s, opacity 0.3s;
+  opacity: 0;
+  position: relative;
+  z-index: 1;
+}
+.div-card:hover .div-card-arrow {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+/* Поднимаем контент карточки над псевдоэлементами */
+.div-card > * { position: relative; z-index: 1; }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* --- Луна: живые PNG через CSS-анимацию --- */
+@keyframes moon-breathe {
+  0%, 100% { transform: translateY(0) scale(1); filter: brightness(1); }
+  50%      { transform: translateY(-6px) scale(1.02); filter: brightness(1.15); }
+}
+img[src*="/moon/moon-"] {
+  animation: moon-breathe 6s ease-in-out infinite;
+  will-change: transform, filter;
+}
+img[src*="/moon/moon-1"] { animation-delay: .5s; }
+img[src*="/moon/moon-2"] { animation-delay: 1s; }
+img[src*="/moon/moon-3"] { animation-delay: 1.5s; }
+img[src*="/moon/moon-4"] { animation-delay: 2s; }
+img[src*="/moon/moon-5"] { animation-delay: 2.5s; }
+img[src*="/moon/moon-6"] { animation-delay: 3s; }
+img[src*="/moon/moon-7"] { animation-delay: 3.5s; }
+
+/* --- SVG Луна: свечение + парение --- */
+@keyframes moon-float {
+  0%, 100% { 
+    transform: translateY(0) scale(1); 
+    filter: drop-shadow(0 0 20px rgba(200, 220, 255, 0.6)) brightness(1);
+  }
+  50% { 
+    transform: translateY(-8px) scale(1.03); 
+    filter: drop-shadow(0 0 35px rgba(200, 220, 255, 0.9)) brightness(1.2);
+  }
+}
+img[src*="/moon/moon-"],
+img[src$=".svg"] {
+  animation: moon-float 7s ease-in-out infinite;
+  will-change: transform, filter;
+}
+img[src*="/moon/moon-1"] { animation-delay: .6s; }
+img[src*="/moon/moon-2"] { animation-delay: 1.2s; }
+img[src*="/moon/moon-3"] { animation-delay: 1.8s; }
+img[src*="/moon/moon-4"] { animation-delay: 2.4s; }
+img[src*="/moon/moon-5"] { animation-delay: 3s; }
+img[src*="/moon/moon-6"] { animation-delay: 3.6s; }
+img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
+
+/* --- Кометы: редкие пролёты над луной --- */
+.moon-comets {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.comet {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: radial-gradient(circle, #fff 0%, rgba(200,220,255,0.8) 40%, transparent 70%);
+  border-radius: 50%;
+  box-shadow: 0 0 12px 4px rgba(200,220,255,0.6);
+  opacity: 0;
+}
+
+.comet::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(to left, rgba(200,220,255,0.9) 0%, rgba(200,220,255,0.4) 40%, transparent 100%);
+  transform: translateY(-50%);
+  filter: blur(1px);
+}
+
+@keyframes comet-fly {
+  0% {
+    transform: translate(-20vw, 30vh) rotate(-15deg);
+    opacity: 0;
+  }
+  5% { opacity: 1; }
+  45% { opacity: 1; }
+  100% {
+    transform: translate(120vw, -20vh) rotate(-15deg);
+    opacity: 0;
+  }
+}
+
+@keyframes comet-fly-2 {
+  0% {
+    transform: translate(120vw, 60vh) rotate(-165deg);
+    opacity: 0;
+  }
+  5% { opacity: 1; }
+  45% { opacity: 1; }
+  100% {
+    transform: translate(-20vw, -10vh) rotate(-165deg);
+    opacity: 0;
+  }
+}
+
+@keyframes comet-fly-3 {
+  0% {
+    transform: translate(-10vw, -10vh) rotate(25deg);
+    opacity: 0;
+  }
+  5% { opacity: 0.8; }
+  45% { opacity: 0.8; }
+  100% {
+    transform: translate(110vw, 40vh) rotate(25deg);
+    opacity: 0;
+  }
+}
+
+.comet-1 { animation: comet-fly 12s ease-in-out 2s infinite; }
+.comet-2 { animation: comet-fly-2 15s ease-in-out 7s infinite; }
+.comet-3 { animation: comet-fly-3 18s ease-in-out 12s infinite; }
+
+/* Уменьшаем на мобильных */
+@media (max-width: 640px) {
+  .comet::before { width: 40px; }
+  .comet { width: 2px; height: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comet { animation: none; display: none; }
+}
+
+/* --- Биоритмы: анимации --- */
+@keyframes bio-card-in {
+  0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.bio-card {
+  animation: bio-card-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.bio-card:nth-child(1) { animation-delay: 0.1s; }
+.bio-card:nth-child(2) { animation-delay: 0.2s; }
+.bio-card:nth-child(3) { animation-delay: 0.3s; }
+.bio-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes bio-graph-draw {
+  0% { stroke-dashoffset: 3000; opacity: 0.3; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+.bio-graph-line {
+  stroke-dasharray: 3000;
+  stroke-dashoffset: 3000;
+  animation: bio-graph-draw 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.bio-graph-line:nth-child(2) { animation-delay: 0.2s; }
+.bio-graph-line:nth-child(3) { animation-delay: 0.4s; }
+.bio-graph-line:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes bio-advice-in {
+  0% { opacity: 0; transform: translateX(-20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+.bio-advice {
+  animation: bio-advice-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: 0.6s;
+}
+
+.bio-auto-loaded {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.1));
+  border-color: rgba(139, 92, 246, 0.4) !important;
+}
+
+/* --- Астрологические карточки: пульс + переливы --- */
+@keyframes zodiac-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.3));
+  }
+  50% { 
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.7));
+  }
+}
+
+@keyframes zodiac-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes zodiac-appear {
+  0% { 
+    opacity: 0; 
+    transform: translateY(30px) scale(0.85);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.02);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes zodiac-star-float {
+  0%, 100% { 
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% { 
+    transform: translate(10px, -15px) rotate(180deg);
+    opacity: 0.8;
+  }
+}
+
+.zodiac-card {
+  position: relative;
+  animation: zodiac-appear 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Staggered появление */
+.zodiac-card:nth-child(1)  { animation-delay: 0.05s; }
+.zodiac-card:nth-child(2)  { animation-delay: 0.10s; }
+.zodiac-card:nth-child(3)  { animation-delay: 0.15s; }
+.zodiac-card:nth-child(4)  { animation-delay: 0.20s; }
+.zodiac-card:nth-child(5)  { animation-delay: 0.25s; }
+.zodiac-card:nth-child(6)  { animation-delay: 0.30s; }
+.zodiac-card:nth-child(7)  { animation-delay: 0.35s; }
+.zodiac-card:nth-child(8)  { animation-delay: 0.40s; }
+.zodiac-card:nth-child(9)  { animation-delay: 0.45s; }
+.zodiac-card:nth-child(10) { animation-delay: 0.50s; }
+.zodiac-card:nth-child(11) { animation-delay: 0.55s; }
+.zodiac-card:nth-child(12) { animation-delay: 0.60s; }
+
+.zodiac-card-emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+  display: inline-block;
+  animation: zodiac-pulse 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.4));
+}
+
+/* Каждый знак пульсирует со своим сдвигом */
+.zodiac-card:nth-child(3n+1) .zodiac-card-emoji { animation-delay: 0s; }
+.zodiac-card:nth-child(3n+2) .zodiac-card-emoji { animation-delay: 1.3s; }
+.zodiac-card:nth-child(3n+3) .zodiac-card-emoji { animation-delay: 2.6s; }
+
+.zodiac-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  padding: 2px;
+  background: linear-gradient(135deg, 
+    rgba(167, 139, 250, 0.4) 0%, 
+    rgba(139, 92, 246, 0.1) 25%,
+    rgba(236, 72, 153, 0.3) 50%,
+    rgba(139, 92, 246, 0.1) 75%,
+    rgba(167, 139, 250, 0.4) 100%);
+  background-size: 200% 200%;
+  animation: zodiac-shimmer 6s ease-in-out infinite;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+.zodiac-card:hover::before {
+  opacity: 1;
+}
+
+.zodiac-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 
+    0 20px 40px -15px rgba(139, 92, 246, 0.35),
+    0 0 30px -5px rgba(167, 139, 250, 0.2);
+}
+
+.zodiac-card-star {
+  position: absolute;
+  color: rgba(167, 139, 250, 0.6);
+  pointer-events: none;
+  font-size: 10px;
+  animation: zodiac-star-float 6s ease-in-out infinite;
+}
+
+.zodiac-card-star-1 { top: 10%; left: 15%; animation-delay: 0s; }
+.zodiac-card-star-2 { top: 75%; right: 12%; animation-delay: 2s; }
+.zodiac-card-star-3 { bottom: 20%; left: 80%; animation-delay: 4s; }
+
+.zodiac-card-dates {
+  font-size: 0.7rem;
+  color: rgba(148, 163, 184, 0.7);
+  letter-spacing: 0.05em;
+}
+
+/* Уменьшаем на мобильных */
+@media (max-width: 640px) {
+  .zodiac-card-emoji { font-size: 2.5rem; }
+}
+
+/* --- Случайные кометы --- */
+.comet-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.comet-r {
+  position: absolute;
+  transform: rotate(var(--angle));
+  pointer-events: none;
+}
+.comet-core {
+  display: block;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 12px 3px var(--glow);
+  opacity: 0;
+  animation: comet-r-fly var(--dur) cubic-bezier(0.2, 0.6, 0.4, 1) var(--delay) infinite;
+}
+.comet-core::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: var(--tail);
+  height: 2px;
+  background: linear-gradient(to left, var(--glow), transparent);
+  transform: translateY(-50%);
+  filter: blur(0.5px);
+}
+@keyframes comet-r-fly {
+  0%   { transform: translateX(0); opacity: 0; }
+  8%   { opacity: var(--op); }
+  45%  { opacity: var(--op); }
+  62%  { transform: translateX(var(--dist)); opacity: 0; }
+  100% { transform: translateX(var(--dist)); opacity: 0; }
+}
+
+/* --- Подсветка знака зодиака (hero) --- */
+.zodiac-hero {
+  position: relative;
+  display: inline-block;
+  animation: zodiac-hero-in 1s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.zodiac-hero-emoji {
+  font-size: 5.5rem;
+  line-height: 1.2;
+  display: inline-block;
+  animation: zodiac-pulse 4s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+.zodiac-hero::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0 35%, rgba(167, 139, 250, 0.9) 50%, transparent 65% 100%);
+  animation: zodiac-ring-spin 5s linear infinite;
+  filter: blur(3px);
+  z-index: 1;
+}
+.zodiac-hero::after {
+  content: '';
+  position: absolute;
+  inset: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.35), transparent 70%);
+  animation: zodiac-halo 4s ease-in-out infinite;
+  z-index: 0;
+}
+@keyframes zodiac-ring-spin { to { transform: rotate(360deg); } }
+@keyframes zodiac-halo {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+@keyframes zodiac-hero-in {
+  0% { opacity: 0; transform: scale(0.3) rotate(-30deg); }
+  60% { opacity: 1; transform: scale(1.1) rotate(5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+/* --- Анимации появления страницы --- */
+@keyframes page-fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+.page-anim { animation: page-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+.page-anim-1 { animation-delay: 0.1s; }
+.page-anim-2 { animation-delay: 0.25s; }
+.page-anim-3 { animation-delay: 0.4s; }
+.page-anim-4 { animation-delay: 0.55s; }
+
+/* --- Звёздное поле: эффект иллюминатора --- */
+.star-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-repeat: repeat;
+  background-image:
+    radial-gradient(1px 1px at 25px 35px, rgba(255,255,255,.45), transparent),
+    radial-gradient(1px 1px at 120px 90px, rgba(255,255,255,.30), transparent),
+    radial-gradient(1px 1px at 200px 160px, rgba(255,255,255,.40), transparent),
+    radial-gradient(1px 1px at 80px 200px, rgba(255,255,255,.28), transparent),
+    radial-gradient(1px 1px at 160px 40px, rgba(255,255,255,.40), transparent),
+    radial-gradient(1.5px 1.5px at 40px 60px, rgba(255,255,255,.65), transparent),
+    radial-gradient(1.5px 1.5px at 180px 140px, rgba(200,220,255,.55), transparent),
+    radial-gradient(1.5px 1.5px at 280px 40px, rgba(255,255,255,.50), transparent),
+    radial-gradient(1.5px 1.5px at 100px 260px, rgba(255,240,220,.55), transparent),
+    radial-gradient(2px 2px at 60px 80px, rgba(255,255,255,.90), transparent),
+    radial-gradient(2px 2px at 300px 200px, rgba(167,139,250,.75), transparent),
+    radial-gradient(2px 2px at 200px 320px, rgba(255,255,255,.80), transparent);
+  background-size:
+    240px 240px, 240px 240px, 240px 240px, 240px 240px, 240px 240px,
+    320px 320px, 320px 320px, 320px 320px, 320px 320px,
+    400px 400px, 400px 400px, 400px 400px;
+  animation: star-drift 70s linear infinite;
+}
+
+/* Каждый слой смещается на свой тайл → разная скорость = параллакс */
+@keyframes star-drift {
+  from {
+    background-position:
+      0 0, 0 0, 0 0, 0 0, 0 0,
+      0 0, 0 0, 0 0, 0 0,
+      0 0, 0 0, 0 0;
+  }
+  to {
+    background-position:
+      -240px 240px, -240px 240px, -240px 240px, -240px 240px, -240px 240px,
+      -320px 320px, -320px 320px, -320px 320px, -320px 320px,
+      -400px 400px, -400px 400px, -400px 400px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-layer { animation: none; }
+}
+
+/* --- Космос-подложка: контент поверх на всех страницах --- */
+main.isolate > *:not(.comet-field) { position: relative; z-index: 10; }
+main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
+
+/* --- Карточки гаданий --- */
+.div-card {
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: div-card-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.div-card:nth-child(1) { animation-delay: 0.05s; }
+.div-card:nth-child(2) { animation-delay: 0.10s; }
+.div-card:nth-child(3) { animation-delay: 0.15s; }
+.div-card:nth-child(4) { animation-delay: 0.20s; }
+.div-card:nth-child(5) { animation-delay: 0.25s; }
+.div-card:nth-child(6) { animation-delay: 0.30s; }
+
+@keyframes div-card-in {
+  0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+  60% { opacity: 1; transform: translateY(-3px) scale(1.02); }
+  100% { opacity: 1; transform: none; }
+}
+
+.div-card:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 15px 35px -10px rgba(168, 85, 247, 0.35),
+              0 0 25px -5px rgba(217, 70, 239, 0.25);
+}
+
 .div-card::before {
   content: '';
   position: absolute;
