@@ -8,7 +8,7 @@ import CalShare from "@/components/CalShare";
 import { CALENDARS, getDayInfo, parseDate, fmtDate, toKey } from "@/lib/calendars";
 
 const SITE = "https://my.neiro-astro.ru";
-const MONTHS_SHORT = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+const MONTHS_GEN = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
 
 const ACCENTS: Record<string, string> = {
   holidays: "#f472b6",
@@ -82,7 +82,7 @@ export default async function Page(props: any) {
             </div>
             <div className="cal-date-number mb-3">
               <span className="cal-date-day">{d.getDate()}</span>
-              <div className="cal-date-month">{MONTHS_SHORT[d.getMonth()]}</div>
+              <div className="cal-date-month">{MONTHS_GEN[d.getMonth()]}</div>
             </div>
             <h1 className={`text-2xl md:text-3xl font-bold mb-3 bg-gradient-to-r ${c.gradient} bg-clip-text text-transparent`}>
               {c.name} на {fmtDate(d)}

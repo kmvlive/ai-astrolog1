@@ -1715,7 +1715,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 }
 
 .cal-date-month {
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
