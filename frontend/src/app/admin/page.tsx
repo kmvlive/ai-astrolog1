@@ -32,7 +32,7 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
     if (!token) { router.push("/login"); return; }
 
     fetch(`${API}/api/me`, { headers: { Authorization: `Bearer ${token}` } })
@@ -46,7 +46,7 @@ export default function AdminPage() {
 
   const loadPlans = () => {
     setLoading(true);
-    const token = localStorage.getItem("auth_token")!;
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null)!;
     fetch(`${API}/api/admin/plans`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(d => { setPlans(d.plans || []); setLoading(false); });
@@ -55,7 +55,7 @@ export default function AdminPage() {
   const save = async () => {
     if (!editing) return;
     setSaving(true);
-    const token = localStorage.getItem("auth_token")!;
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null)!;
     const url = editing.id
       ? `${API}/api/admin/plans/${editing.id}`
       : `${API}/api/admin/plans`;
@@ -78,7 +78,7 @@ export default function AdminPage() {
 
   const remove = async (id: number) => {
     if (!confirm("Удалить тариф?")) return;
-    const token = localStorage.getItem("auth_token")!;
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null)!;
     await fetch(`${API}/api/admin/plans/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },

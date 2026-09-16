@@ -48,8 +48,8 @@ export default function LoginPage() {
         throw new Error(data.message || "Неверный email или пароль");
       }
 
-      localStorage.setItem("auth_token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      if (typeof window !== "undefined") localStorage.setItem("auth_token", data.token);
+      if (typeof window !== "undefined") localStorage.setItem("user", JSON.stringify(data.user));
 
       router.push("/dashboard");
     } catch (err: any) {

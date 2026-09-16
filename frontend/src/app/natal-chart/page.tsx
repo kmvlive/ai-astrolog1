@@ -35,7 +35,7 @@ export default function NatalChartPage() {
   const [planetsData, setPlanetsData] = useState<Record<string, any> | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
     if (token) {
       setIsLoggedIn(true);
       // Загружаем данные профиля
@@ -61,7 +61,7 @@ export default function NatalChartPage() {
           // Загружаем SVG если есть
           if (data.chart?.planets) setPlanetsData(data.chart.planets);
           if (data.chart?.svg_url) {
-            const token = localStorage.getItem('auth_token');
+            const token = (typeof window !== "undefined" ? localStorage.getItem('auth_token') : null);
             fetch(`${API}${data.chart.svg_url}`, {
               headers: token ? { Authorization: `Bearer ${token}` } : {},
             })
@@ -86,7 +86,7 @@ export default function NatalChartPage() {
     if (paymentStatus === "success" && isLoggedIn) {
       setPolling(true);
       const interval = setInterval(async () => {
-        const token = localStorage.getItem("auth_token");
+        const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
         if (!token) return;
         const res = await fetch(`${API}/api/natal-chart/my`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -98,7 +98,7 @@ export default function NatalChartPage() {
           // Загружаем SVG если есть
           if (data.chart?.planets) setPlanetsData(data.chart.planets);
           if (data.chart?.svg_url) {
-            const token = localStorage.getItem('auth_token');
+            const token = (typeof window !== "undefined" ? localStorage.getItem('auth_token') : null);
             fetch(`${API}${data.chart.svg_url}`, {
               headers: token ? { Authorization: `Bearer ${token}` } : {},
             })
@@ -140,7 +140,7 @@ export default function NatalChartPage() {
       };
 
       const headers: Record<string, string> = { "Content-Type": "application/json" };
-      const token = localStorage.getItem("auth_token");
+      const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
       const res = await fetch(`${API}/api/natal-chart/order`, {
@@ -164,7 +164,7 @@ export default function NatalChartPage() {
   };
 
   const toggleWeekly = async () => {
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
     if (!token) return;
     const res = await fetch(`${API}/api/natal-chart/toggle-weekly`, {
       method: "POST",

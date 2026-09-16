@@ -16,7 +16,7 @@ export default function ConnectMaxPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const uid = params.get("uid");
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
 
     if (!uid) return;
 
@@ -43,7 +43,7 @@ export default function ConnectMaxPage() {
 
   const handleManualConnect = async () => {
     if (!maxUserId.trim()) return;
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
     if (!token) {
       router.replace(`/login?redirect=${encodeURIComponent(`/connect-max?uid=${maxUserId}`)}`);
       return;

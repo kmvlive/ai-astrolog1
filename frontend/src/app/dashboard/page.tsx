@@ -63,7 +63,7 @@ export default function DashboardPage() {
   const [natalChartSubscribed, setNatalChartSubscribed] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
     if (!token) {
       window.location.href = "/login";
       return;
@@ -182,7 +182,7 @@ export default function DashboardPage() {
     setSelChannels((prev) => (prev.includes(slug) ? prev.filter((s2) => s2 !== slug) : [...prev, slug]));
 
   const saveSettings = async () => {
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
     if (!token) return;
     setSettingsSaving(true);
     setSettingsSaved(false);
@@ -205,7 +205,7 @@ export default function DashboardPage() {
   };
 
   const toggleAutoRenew = async (enabled: boolean) => {
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
     if (!token || !subscription) return;
     setAutoSaving(true);
     try {
@@ -231,7 +231,7 @@ export default function DashboardPage() {
   };
 
   const handleAffirmationSubscription = async () => {
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
     if (!token) return;
     
     setAffirmationLoading(true);
@@ -278,7 +278,7 @@ export default function DashboardPage() {
   const saveCalendars = async () => {
     setCalendarsSaving(true);
     try {
-      const token = localStorage.getItem("auth_token");
+      const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
       await fetch(`${API_URL}/api/subscription/calendars`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },

@@ -21,8 +21,8 @@ export default function BiorhythmsPage() {
   const calc = (days: number, period: number) => Math.sin(2 * Math.PI * days / period) * 100;
 
   useEffect(() => {
-    const saved = localStorage.getItem("birth_date");
-    const token = localStorage.getItem("auth_token");
+    const saved = (typeof window !== "undefined" ? localStorage.getItem("birth_date") : null);
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
     
     // Если авторизован — тянем дату из профиля
     if (token && !saved) {
@@ -34,7 +34,7 @@ export default function BiorhythmsPage() {
           if (d?.profile?.birth_date) {
             const bd = String(d.profile.birth_date).slice(0, 10);
             setBirthDate(bd);
-            localStorage.setItem("birth_date", bd);
+            if (typeof window !== "undefined") localStorage.setItem("birth_date", bd);
           } else if (saved) {
             setBirthDate(saved);
           }
@@ -49,7 +49,7 @@ export default function BiorhythmsPage() {
 
   
     // Подсветка если автозагружено из профиля
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
     if (token) {
       setTimeout(() => {
         const el = document.getElementById("bio-input");
@@ -59,7 +59,7 @@ export default function BiorhythmsPage() {
 const load = async () => {
     if (!birthDate) return;
     setLoading(true);
-    localStorage.setItem("birth_date", birthDate);
+    if (typeof window !== "undefined") localStorage.setItem("birth_date", birthDate);
 
     const today = await fetch(`${API}/api/biorhythms?birth_date=${birthDate}`)
       .then(r => r.ok ? r.json() : null);

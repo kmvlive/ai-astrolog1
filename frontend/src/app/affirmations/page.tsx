@@ -29,7 +29,7 @@ export default function AffirmationsPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
     setIsLoggedIn(!!token);
 
     const requests: Promise<any>[] = [
@@ -56,7 +56,7 @@ export default function AffirmationsPage() {
   }, []);
 
   const handleSubscribe = async () => {
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
     if (!token) {
       router.push("/login");
       return;

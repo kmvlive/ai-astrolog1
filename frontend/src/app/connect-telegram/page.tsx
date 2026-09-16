@@ -14,7 +14,7 @@ export default function ConnectTelegramPage() {
 
   useEffect(() => {
     const chat = new URLSearchParams(window.location.search).get("chat");
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
 
     if (!chat) {
       router.replace("/dashboard");

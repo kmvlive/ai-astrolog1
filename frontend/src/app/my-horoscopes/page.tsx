@@ -23,7 +23,7 @@ export default function HoroscopesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
     if (!token) {
       setIsLoggedIn(false);
       setLoading(false);

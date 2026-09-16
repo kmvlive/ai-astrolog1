@@ -53,8 +53,8 @@ function MagicLoginContent() {
           return;
         }
 
-        localStorage.setItem("auth_token", data.token);
-        if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
+        if (typeof window !== "undefined") localStorage.setItem("auth_token", data.token);
+        if (data.user) if (typeof window !== "undefined") localStorage.setItem("user", JSON.stringify(data.user));
         setStatus("success");
 
         if (data.has_password) {
