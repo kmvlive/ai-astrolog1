@@ -39,7 +39,7 @@ function ogImage(t: { og: string }) {
       return `${SITE_URL}${t.og}`;
     }
   } catch {}
-  return `${SITE_URL}/moon/moon-4.svg`;
+  return `${SITE_URL}/moon/moon-4.png`;
 }
 
 export async function generateMetadata({ params }: any) {
