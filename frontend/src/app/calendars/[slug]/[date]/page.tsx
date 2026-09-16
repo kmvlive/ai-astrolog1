@@ -8,6 +8,7 @@ import CalShare from "@/components/CalShare";
 import { CALENDARS, getDayInfo, parseDate, fmtDate, toKey } from "@/lib/calendars";
 
 const SITE = "https://my.neiro-astro.ru";
+const MONTHS_SHORT = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
 
 const ACCENTS: Record<string, string> = {
   holidays: "#f472b6",
