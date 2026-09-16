@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ShareButtons from "@/components/ShareButtons";
+import CometField from "@/components/CometField";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import ManageSubscription from "../../../components/ManageSubscription";
@@ -138,7 +139,7 @@ export default function SignHoroscopePage() {
       <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">🔍</div>
-          <h1 className="text-2xl font-bold mb-4">Знак не найден</h1>
+          <h1 className="page-anim page-anim-1 text-2xl font-bold mb-4">Знак не найден</h1>
           <Link href="/horoscopes" className="text-violet-400 hover:text-violet-300">← Вернуться ко всем знакам</Link>
         </div>
       </main>
@@ -146,22 +147,23 @@ export default function SignHoroscopePage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden">
       <SiteHeader />
+      <CometField count={10} />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <Link href="/horoscopes" className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition">
           ← Все знаки зодиака
         </Link>
 
         <div className="text-center mb-8">
-          <div className="text-7xl mb-4">{currentSign.emoji}</div>
+          <div className="text-7xl mb-4"><span className="zodiac-hero"><span className="zodiac-hero-emoji">{currentSign.emoji}</span></span></div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-2">
             Гороскоп для {currentSign.genitive}
           </h1>
         </div>
 
         {/* Период */}
-        <div className="flex flex-wrap justify-center gap-2 mb-6">
+        <div className="page-anim page-anim-2 flex flex-wrap justify-center gap-2 mb-6">
           {PERIODS.map((p) => (
             <button
               key={p.slug}
@@ -179,7 +181,7 @@ export default function SignHoroscopePage() {
         </div>
 
         {/* Тип */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
+        <div className="page-anim page-anim-3 flex flex-wrap justify-center gap-2 mb-8">
           {TYPES.map((t) => (
             <button
               key={t.slug}
@@ -206,7 +208,7 @@ export default function SignHoroscopePage() {
         ) : (
           <>
             {/* Сам гороскоп */}
-            <article className="bg-gradient-to-br from-slate-900 to-slate-800 border border-white/10 rounded-2xl p-8 sm:p-10 mb-8">
+            <article className="page-anim page-anim-4 bg-gradient-to-br from-slate-900 to-slate-800 border border-white/10 rounded-2xl p-8 sm:p-10 mb-8">
               <div className="text-slate-100 leading-relaxed text-lg whitespace-pre-line">
                 {horoscope.horoscope.content}
               </div>
@@ -312,7 +314,7 @@ export default function SignHoroscopePage() {
             {/* Другие знаки */}
             <div className="mt-12">
               <h3 className="text-center text-slate-400 mb-4">Другие знаки:</h3>
-              <div className="flex flex-wrap justify-center gap-2">
+              <div className="page-anim page-anim-4 flex flex-wrap justify-center gap-2">
                 {ALL_SIGNS.filter((s) => s.slug !== slug).map((s) => (
                   <Link
                     key={s.slug}

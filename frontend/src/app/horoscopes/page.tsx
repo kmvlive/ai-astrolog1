@@ -5,6 +5,7 @@ import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import AdBlock from "@/components/AdBlock";
 import SiteFooter from "@/components/SiteFooter";
+import CometField from "@/components/CometField";
 
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
@@ -43,8 +44,9 @@ export default function HoroscopesPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden">
       <SiteHeader />
+      <CometField count={8} />
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
           <div className="inline-block text-6xl mb-4 animate-pulse">🔮</div>

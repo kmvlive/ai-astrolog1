@@ -334,3 +334,103 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 @media (max-width: 640px) {
   .zodiac-card-emoji { font-size: 2.5rem; }
 }
+
+/* --- Случайные кометы --- */
+.comet-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+.comet-r {
+  position: absolute;
+  transform: rotate(var(--angle));
+  pointer-events: none;
+}
+.comet-core {
+  display: block;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 12px 3px var(--glow);
+  opacity: 0;
+  animation: comet-r-fly var(--dur) cubic-bezier(0.2, 0.6, 0.4, 1) var(--delay) infinite;
+}
+.comet-core::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: var(--tail);
+  height: 2px;
+  background: linear-gradient(to left, var(--glow), transparent);
+  transform: translateY(-50%);
+  filter: blur(0.5px);
+}
+.comet-core.rev::before {
+  right: auto;
+  left: 100%;
+  background: linear-gradient(to right, var(--glow), transparent);
+}
+@keyframes comet-r-fly {
+  0%   { transform: translateX(0); opacity: 0; }
+  8%   { opacity: var(--op); }
+  45%  { opacity: var(--op); }
+  62%  { transform: translateX(var(--dist)); opacity: 0; }
+  100% { transform: translateX(var(--dist)); opacity: 0; }
+}
+
+/* --- Подсветка знака зодиака (hero) --- */
+.zodiac-hero {
+  position: relative;
+  display: inline-block;
+  animation: zodiac-hero-in 1s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.zodiac-hero-emoji {
+  font-size: 5.5rem;
+  line-height: 1.2;
+  display: inline-block;
+  animation: zodiac-pulse 4s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+.zodiac-hero::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0 35%, rgba(167, 139, 250, 0.9) 50%, transparent 65% 100%);
+  animation: zodiac-ring-spin 5s linear infinite;
+  filter: blur(3px);
+  z-index: 1;
+}
+.zodiac-hero::after {
+  content: '';
+  position: absolute;
+  inset: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.35), transparent 70%);
+  animation: zodiac-halo 4s ease-in-out infinite;
+  z-index: 0;
+}
+@keyframes zodiac-ring-spin { to { transform: rotate(360deg); } }
+@keyframes zodiac-halo {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+@keyframes zodiac-hero-in {
+  0% { opacity: 0; transform: scale(0.3) rotate(-30deg); }
+  60% { opacity: 1; transform: scale(1.1) rotate(5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+/* --- Анимации появления страницы --- */
+@keyframes page-fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+.page-anim { animation: page-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+.page-anim-1 { animation-delay: 0.1s; }
+.page-anim-2 { animation-delay: 0.25s; }
+.page-anim-3 { animation-delay: 0.4s; }
+.page-anim-4 { animation-delay: 0.55s; }
