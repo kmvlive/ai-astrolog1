@@ -227,8 +227,12 @@ export default function DivinationPage({
         <AdBlock />
 
         {/* Другие гадания */}
-        <div className="mt-10">
-          <h3 className="text-lg font-bold mb-4 text-center">Другие гадания</h3>
+        <div className="mt-12">
+          <h3 className="text-xl font-bold mb-6 text-center">
+            <span className="bg-gradient-to-r from-purple-300 via-fuchsia-300 to-violet-300 bg-clip-text text-transparent">
+              Попробуйте другие гадания
+            </span>
+          </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {ALL_DIVINATIONS.filter((d) => d.slug !== type)
               .slice(0, 4)
@@ -236,10 +240,15 @@ export default function DivinationPage({
                 <Link
                   key={d.slug}
                   href={`/divinations/${d.slug}`}
-                  className="p-3 rounded-xl bg-slate-900/50 border border-white/5 hover:border-white/20 text-center transition"
+                  className="div-card group relative p-4 rounded-xl bg-gradient-to-br from-slate-900/80 to-indigo-950/30 border border-white/5 text-center block overflow-hidden"
                 >
-                  <div className="text-2xl mb-1">{d.emoji}</div>
-                  <div className="text-xs text-slate-300">{d.name}</div>
+                  <div className="div-card-emoji text-3xl mb-2">{d.emoji}</div>
+                  <div className="text-sm font-medium text-slate-200 group-hover:text-white transition">
+                    {d.name}
+                  </div>
+                  <div className="div-card-arrow inline-block mt-2 text-xs text-violet-300">
+                    погадать →
+                  </div>
                 </Link>
               ))}
           </div>
