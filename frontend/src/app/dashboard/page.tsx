@@ -293,6 +293,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center relative overflow-hidden isolate">
+        <CometField count={8} />
         <div className="text-center">
           <div className="text-6xl mb-4 animate-pulse">🔮</div>
           <p className="text-slate-400">Загрузка...</p>
