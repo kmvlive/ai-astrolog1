@@ -57,12 +57,40 @@ export default function SignHoroscopePage() {
   const [email, setEmail] = useState("");
   const [subscribeStatus, setSubscribeStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [subscribeMessage, setSubscribeMessage] = useState("");
+  const [subStatus, setSubStatus] = useState<{ has_email: boolean; has_plan: boolean; loaded: boolean }>({
+    has_email: false,
+    has_plan: false,
+    loaded: false,
+  });
 
   const currentSign = ALL_SIGNS.find((s) => s.slug === slug);
 
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-    setIsLoggedIn(!!token);
+    const loggedIn = !!token;
+    setIsLoggedIn(loggedIn);
+
+    if (loggedIn) {
+      fetch(`${API_URL}/api/subscription/settings`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => {
+          if (d) {
+            setSubStatus({
+              has_email: !!d.has_email_subscription,
+              has_plan: !!d.has_active_subscription,
+              loaded: true,
+            });
+            if (d.email && !email) setEmail(d.email);
+          } else {
+            setSubStatus((s) => ({ ...s, loaded: true }));
+          }
+        })
+        .catch(() => setSubStatus((s) => ({ ...s, loaded: true })));
+    } else {
+      setSubStatus((s) => ({ ...s, loaded: true }));
+    }
   }, []);
 
   useEffect(() => {
@@ -243,8 +271,8 @@ export default function SignHoroscopePage() {
               )}
             </div>
 
-            {/* ⚙️ БЛОК: УПРАВЛЕНИЕ РАССЫЛКОЙ — для существующих подписчиков */}
-            <ManageSubscription />
+            {/* ⚙️ БЛОК: УПРАВЛЕНИЕ РАССЫЛКОЙ — только для подписанных */}
+            {subStatus.has_email && <ManageSubscription />}
 
             {/* ✨ БЛОК: ПЕРСОНАЛЬНЫЙ ГОРОСКОП — апсейл */}
             <div className="bg-gradient-to-br from-violet-900/30 to-indigo-900/30 border border-violet-500/30 rounded-3xl p-8 text-center">
