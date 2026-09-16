@@ -28,11 +28,11 @@ export default function Page() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {CALENDARS.map((c) => (
-            <Link key={c.slug} href={`/calendars/${c.slug}`} className="group p-6 rounded-3xl bg-slate-900/60 border border-white/10 hover:border-violet-500/40 hover:bg-slate-900 transition shadow-lg">
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">{c.emoji}</div>
+            <Link key={c.slug} href={`/calendars/${c.slug}`} className="cal-card group relative p-6 rounded-3xl bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 block overflow-hidden">
+              <div className="cal-card-emoji text-5xl mb-4">{c.emoji}</div>
               <h2 className={`text-xl font-bold mb-2 bg-gradient-to-r ${c.gradient} bg-clip-text text-transparent`}>{c.name}</h2>
               <p className="text-slate-400 text-sm mb-4">{c.short}</p>
-              <div className="text-violet-300 text-sm font-semibold group-hover:text-violet-200">Открыть →</div>
+              <div class="cal-card-arrow">Открыть →</div>
             </Link>
           ))}
         </div>
