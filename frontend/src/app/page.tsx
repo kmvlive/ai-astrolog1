@@ -100,8 +100,14 @@ const MoonWidget = () => {
   if (!phase) return null;
 
   return (
-    <section className="max-w-6xl mx-auto px-4 pb-12">
-      <Link href="/moon" className="group block max-w-2xl mx-auto">
+    <section className="max-w-6xl mx-auto px-4 pb-12 relative">
+      {/* Кометы */}
+      <div className="moon-comets">
+        <div className="comet comet-1" />
+        <div className="comet comet-2" />
+        <div className="comet comet-3" />
+      </div>
+      <Link href="/moon" className="group block max-w-2xl mx-auto relative z-10">
         <div className="relative overflow-hidden rounded-2xl border border-violet-500/30 bg-slate-900 hover:border-violet-500/60 transition shadow-xl shadow-violet-900/30">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={phase.img} alt={phase.name} className="w-full h-48 object-cover" />
