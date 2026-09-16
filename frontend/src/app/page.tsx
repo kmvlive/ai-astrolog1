@@ -437,17 +437,25 @@ export default function HomePage() {
 
             {/* Здоровье и настрой */}
       <section className="max-w-4xl mx-auto px-4 py-12">
-        <Link href="/affirmations" className="block bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 rounded-2xl p-8 hover:border-violet-500/60 transition group">
-          <div className="flex items-start justify-between mb-4">
+        <Link
+          href="/affirmations"
+          style={{ ["--accent" as any]: "#a855f7" }}
+          className="home-panel group block p-8 md:p-10"
+        >
+          <span className="cal-shine" aria-hidden="true" />
+          <div className="relative z-10 flex items-start justify-between mb-6 gap-4">
             <div>
-              <h2 className="text-3xl font-bold mb-2">💫 Здоровье и настрой</h2>
+              <div className="cal-medal mb-4" style={{ width: "64px", height: "64px", borderRadius: "20px" }}>
+                <span className="text-3xl">💫</span>
+              </div>
+              <h2 className="text-3xl font-bold mb-2 text-white">Здоровье и настрой</h2>
               <p className="text-slate-400">Ежедневные аффирмации для гармонии и вдохновения</p>
             </div>
-            <span className="text-4xl text-violet-400 group-hover:translate-x-1 transition-transform">→</span>
+            <span className="cal-go shrink-0 mt-2">→</span>
           </div>
-          <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
-            <div className="text-sm text-violet-300 mb-1">Сегодня</div>
-            <div className="font-semibold text-white">{affirmationTitle || "Загрузка..."}</div>
+          <div className="quote-card relative z-10">
+            <div className="text-sm mb-1 text-violet-300">Аффирмация сегодня</div>
+            <div className="font-semibold text-white text-lg">{affirmationTitle || "Загрузка..."}</div>
           </div>
         </Link>
       </section>
@@ -455,7 +463,7 @@ export default function HomePage() {
 
       <section className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-3">☿ Ретроградные планеты</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 bg-gradient-to-r from-sky-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent">☿ Ретроградные планеты</h2>
           <p className="text-slate-400 max-w-2xl mx-auto">
             Узнайте какие планеты сейчас в ретроградном движении и как это влияет на вашу жизнь
           </p>
@@ -466,13 +474,13 @@ export default function HomePage() {
 <section className="bg-slate-900/50 py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-3">📖 Блог AI-астролога</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-3 bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent">📖 Блог AI-астролога</h2>
             <p className="text-slate-400">Энергии дня, лунные циклы и астрологические прогнозы</p>
           </div>
           {blogPosts.length > 0 ? (
             <div className="grid md:grid-cols-3 gap-6">
-              {blogPosts.map((post) => (
-                <a key={post.slug} href={post.url} className="group bg-slate-800/60 hover:bg-slate-800 border border-white/10 rounded-2xl overflow-hidden transition hover:-translate-y-1">
+              {blogPosts.map((post, i) => (
+                <a key={post.slug} href={post.url} style={{ ["--accent" as any]: ["#fbbf24", "#a855f7", "#38bdf8"][i % 3] }} className="cal-card group relative bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 rounded-2xl overflow-hidden flex flex-col">
                   {post.cover_image ? (
                     <div className="aspect-video overflow-hidden bg-slate-900">
                       <img src={post.cover_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition" />
@@ -480,11 +488,15 @@ export default function HomePage() {
                   ) : (
                     <div className="aspect-video bg-gradient-to-br from-violet-600/40 to-indigo-700/40 flex items-center justify-center text-5xl">✨</div>
                   )}
-                  <div className="p-5">
+                  <span className="cal-shine" aria-hidden="true" />
+                  <div className="p-5 flex flex-col flex-1 relative z-10">
                     <div className="text-xs text-violet-400 mb-2">{post.published_at}</div>
                     <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-violet-300 transition">{post.title}</h3>
-                    <p className="text-sm text-slate-400 line-clamp-3 mb-4">{post.excerpt}</p>
-                    <span className="text-violet-400 text-sm font-semibold group-hover:text-violet-300">Читать →</span>
+                    <p className="text-sm text-slate-400 line-clamp-3 mb-4 flex-1">{post.excerpt}</p>
+                    <div className="flex items-center justify-between mt-auto">
+                      <span className="cal-card-arrow">Читать</span>
+                      <span className="cal-go" style={{ width: "30px", height: "30px", fontSize: "0.85rem" }}>→</span>
+                    </div>
                   </div>
                 </a>
               ))}
@@ -493,7 +505,7 @@ export default function HomePage() {
             <div className="text-center text-slate-500 py-8">Статьи загружаются...</div>
           )}
           <div className="text-center mt-10">
-            <a href="/blog" className="inline-block bg-violet-600 hover:bg-violet-500 rounded-xl px-6 py-3 font-semibold transition">
+            <a href="/blog" className="cta-btn">
               Все статьи блога →
             </a>
           </div>
@@ -504,26 +516,30 @@ export default function HomePage() {
 {!isLoggedIn && (
       <section id="how" className="bg-slate-900/50 py-16">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Как это работает</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-sky-200 via-violet-200 to-emerald-200 bg-clip-text text-transparent">Как это работает</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-slate-900 border border-white/10 rounded-2xl p-8 text-center">
-              <div className="text-5xl mb-4">📝</div>
-              <div className="text-violet-400 text-sm font-semibold mb-2">ШАГ 1</div>
-              <h3 className="text-xl font-bold mb-3">Регистрация за 30 секунд</h3>
-              <p className="text-slate-400">Укажите дату, время и город рождения — мы построим вашу натальную карту по швейцарским эфемеридам.</p>
-            </div>
-            <div className="bg-slate-900 border border-white/10 rounded-2xl p-8 text-center">
-              <div className="text-5xl mb-4">🧠</div>
-              <div className="text-violet-400 text-sm font-semibold mb-2">ШАГ 2</div>
-              <h3 className="text-xl font-bold mb-3">ИИ анализирует карту</h3>
-              <p className="text-slate-400">Нейросеть изучает 10 планет в 12 домах, ретроградность и аспекты — и пишет прогноз именно для вас.</p>
-            </div>
-            <div className="bg-slate-900 border border-white/10 rounded-2xl p-8 text-center">
-              <div className="text-5xl mb-4">📬</div>
-              <div className="text-violet-400 text-sm font-semibold mb-2">ШАГ 3</div>
-              <h3 className="text-xl font-bold mb-3">Гороскоп каждое утро</h3>
-              <p className="text-slate-400">Читайте в личном кабинете или получайте на email в 8:00. Любовь, карьера, финансы, здоровье.</p>
-            </div>
+            {[
+              { n: 1, emoji: "📝", accent: "#38bdf8", title: "Регистрация за 30 секунд", desc: "Укажите дату, время и город рождения — мы построим вашу натальную карту по швейцарским эфемеридам." },
+              { n: 2, emoji: "🧠", accent: "#a855f7", title: "ИИ анализирует карту", desc: "Нейросеть изучает 10 планет в 12 домах, ретроградность и аспекты — и пишет прогноз именно для вас." },
+              { n: 3, emoji: "📬", accent: "#34d399", title: "Гороскоп каждое утро", desc: "Читайте в личном кабинете или получайте на email в 8:00. Любовь, карьера, финансы, здоровье." },
+            ].map((s) => (
+              <div
+                key={s.n}
+                style={{ ["--accent" as any]: s.accent }}
+                className="cal-card relative rounded-3xl bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 p-8 text-center overflow-hidden"
+              >
+                <span className="step-num">{s.n}</span>
+                <span className="cal-shine" aria-hidden="true" />
+                <div className="cal-medal mb-4 mx-auto">
+                  <span className="cal-card-emoji text-3xl">{s.emoji}</span>
+                </div>
+                <div className="relative z-10 inline-block px-3 py-1 rounded-full text-xs font-bold mb-3" style={{ background: "color-mix(in srgb, var(--accent) 15%, transparent)", color: "var(--accent)", border: "1px solid color-mix(in srgb, var(--accent) 35%, transparent)" }}>
+                  ШАГ {s.n}
+                </div>
+                <h3 className="relative z-10 text-xl font-bold mb-3 text-white">{s.title}</h3>
+                <p className="relative z-10 text-slate-400 text-sm">{s.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -533,36 +549,29 @@ export default function HomePage() {
       {/* ПРЕИМУЩЕСТВА */}
 {!isLoggedIn && (
       <section className="max-w-6xl mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Почему нам доверяют</h2>
-        <div className="grid sm:grid-cols-2 gap-6">
-          <div className="flex gap-4 bg-slate-900 border border-white/10 rounded-2xl p-6">
-            <div className="text-3xl">🎯</div>
-            <div>
-              <h3 className="font-bold mb-1">Настоящая астрология</h3>
-              <p className="text-slate-400 text-sm">Расчёты по швейцарским эфемеридам (Swiss Ephemeris) — те же данные, что используют профессиональные астрологи.</p>
+        <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-pink-200 via-violet-200 to-amber-200 bg-clip-text text-transparent">Почему нам доверяют</h2>
+        <div className="grid sm:grid-cols-2 gap-5">
+          {[
+            { emoji: "🎯", accent: "#f472b6", title: "Настоящая астрология", desc: "Расчёты по швейцарским эфемеридам (Swiss Ephemeris) — те же данные, что используют профессиональные астрологи." },
+            { emoji: "🤖", accent: "#a855f7", title: "ИИ вместо шаблонов", desc: "Каждый гороскоп уникален: нейросеть пишет текст на основе именно ваших планет, а не общих фраз для знака." },
+            { emoji: "🔒", accent: "#34d399", title: "Приватность", desc: "Данные рождения хранятся в зашифрованном виде и не передаются третьим лицам." },
+            { emoji: "⚡", accent: "#fbbf24", title: "Мгновенно", desc: "Натальная карта и первый гороскоп — сразу после регистрации. Без ожидания и «консультантов»." },
+          ].map((f) => (
+            <div
+              key={f.title}
+              style={{ ["--accent" as any]: f.accent }}
+              className="cal-card relative flex gap-4 rounded-3xl bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 p-6 overflow-hidden"
+            >
+              <span className="cal-shine" aria-hidden="true" />
+              <div className="cal-medal shrink-0" style={{ width: "56px", height: "56px", borderRadius: "18px" }}>
+                <span className="text-2xl">{f.emoji}</span>
+              </div>
+              <div className="relative z-10">
+                <h3 className="font-bold mb-1 text-white">{f.title}</h3>
+                <p className="text-slate-400 text-sm">{f.desc}</p>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-4 bg-slate-900 border border-white/10 rounded-2xl p-6">
-            <div className="text-3xl">🤖</div>
-            <div>
-              <h3 className="font-bold mb-1">ИИ вместо шаблонов</h3>
-              <p className="text-slate-400 text-sm">Каждый гороскоп уникален: нейросеть пишет текст на основе именно ваших планет, а не общих фраз для знака.</p>
-            </div>
-          </div>
-          <div className="flex gap-4 bg-slate-900 border border-white/10 rounded-2xl p-6">
-            <div className="text-3xl">🔒</div>
-            <div>
-              <h3 className="font-bold mb-1">Приватность</h3>
-              <p className="text-slate-400 text-sm">Данные рождения хранятся в зашифрованном виде и не передаются третьим лицам.</p>
-            </div>
-          </div>
-          <div className="flex gap-4 bg-slate-900 border border-white/10 rounded-2xl p-6">
-            <div className="text-3xl">⚡</div>
-            <div>
-              <h3 className="font-bold mb-1">Мгновенно</h3>
-              <p className="text-slate-400 text-sm">Натальная карта и первый гороскоп — сразу после регистрации. Без ожидания и «консультантов».</p>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
@@ -571,12 +580,23 @@ export default function HomePage() {
       {/* Финальный CTA */}
 {!isLoggedIn && (
       <section className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <div className="text-5xl mb-6">🌟</div>
-        <h2 className="text-3xl sm:text-4xl font-bold mb-4">Звёзды уже знают ваше завтра</h2>
-        <p className="text-slate-400 text-lg mb-8">Присоединяйтесь — первый персональный гороскоп будет готов через минуту после регистрации.</p>
-        <Link href="/register" className="inline-block bg-violet-600 hover:bg-violet-500 rounded-xl px-10 py-4 text-lg font-semibold transition shadow-lg shadow-violet-600/30">
-          Создать аккаунт бесплатно →
-        </Link>
+        <div
+          style={{ ["--accent" as any]: "#a855f7" }}
+          className="home-panel relative p-10 md:p-14"
+        >
+          <span className="cal-watermark" aria-hidden="true">🌟</span>
+          <span className="cal-shine" aria-hidden="true" />
+          <div className="relative z-10">
+            <div className="cal-medal mb-6 mx-auto" style={{ width: "84px", height: "84px", borderRadius: "26px" }}>
+              <span className="text-4xl">🌟</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-r from-white via-violet-200 to-fuchsia-200 bg-clip-text text-transparent">Звёзды уже знают ваше завтра</h2>
+            <p className="text-slate-400 text-lg mb-8 max-w-xl mx-auto">Присоединяйтесь — первый персональный гороскоп будет готов через минуту после регистрации.</p>
+            <Link href="/register" className="cta-btn">
+              Создать аккаунт бесплатно →
+            </Link>
+          </div>
+        </div>
       </section>
 
       )}
