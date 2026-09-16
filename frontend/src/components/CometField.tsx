@@ -45,7 +45,7 @@ export default function CometField({ count = 10 }: { count?: number }) {
           } as React.CSSProperties}
         >
           <i
-            className={"comet-core" + (c.reverse ? " rev" : "")}
+            className="comet-core"
             style={{
               width: c.size,
               height: c.size,

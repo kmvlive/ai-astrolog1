@@ -44,10 +44,10 @@ export default function HoroscopesPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
       <CometField count={8} />
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto px-4 py-12 relative z-10">
         <div className="text-center mb-10">
           <div className="inline-block text-6xl mb-4 animate-pulse">🔮</div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-300 via-fuchsia-300 to-violet-300 bg-clip-text text-transparent">

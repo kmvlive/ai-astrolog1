@@ -341,7 +341,7 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
 }
 .comet-r {
   position: absolute;
@@ -366,11 +366,6 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
   background: linear-gradient(to left, var(--glow), transparent);
   transform: translateY(-50%);
   filter: blur(0.5px);
-}
-.comet-core.rev::before {
-  right: auto;
-  left: 100%;
-  background: linear-gradient(to right, var(--glow), transparent);
 }
 @keyframes comet-r-fly {
   0%   { transform: translateX(0); opacity: 0; }
