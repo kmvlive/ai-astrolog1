@@ -477,5 +477,5 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 }
 
 /* --- Космос-подложка: контент поверх на всех страницах --- */
-main.isolate > * { position: relative; z-index: 10; }
-main.isolate > .comet-field { z-index: 0; }
+main.isolate > *:not(.comet-field) { position: relative; z-index: 10; }
+main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
