@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="360" viewBox="0 0 360 360">
+  <defs>
+    <radialGradient id="lit-7" cx="0.35" cy="0.35" r="0.65">
+      <stop offset="0%" stop-color="#ece8d7" />
+      <stop offset="70%" stop-color="#c8c4b5" />
+      <stop offset="100%" stop-color="#9a9688" />
+    </radialGradient>
+    <radialGradient id="dark-7" cx="0.35" cy="0.35" r="0.65">
+      <stop offset="0%" stop-color="#1e2536" />
+      <stop offset="100%" stop-color="#111525" />
+    </radialGradient>
+  </defs>
+  
+  <circle cx="180" cy="180" r="140" fill="url(#dark-7)" />
+  <path d="M 180 40 A 140 140 0 0 0 180 320 A 99 140 0 0 1 180 40 Z"  fill="url(#lit-7)" />
+  <circle cx="150" cy="155" r="18" fill="rgba(0,0,0,0.3)" /><circle cx="205" cy="190" r="24" fill="rgba(255,255,255,0.08)" /><circle cx="170" cy="220" r="14" fill="rgba(0,0,0,0.3)" /><circle cx="220" cy="140" r="12" fill="rgba(255,255,255,0.08)" /><circle cx="135" cy="195" r="10" fill="rgba(0,0,0,0.3)" /><circle cx="195" cy="145" r="8" fill="rgba(255,255,255,0.08)" /><circle cx="155" cy="210" r="11" fill="rgba(0,0,0,0.3)" /><circle cx="215" cy="205" r="9" fill="rgba(255,255,255,0.08)" /><circle cx="180" cy="130" r="7" fill="rgba(255,255,255,0.08)" /><circle cx="200" cy="225" r="8" fill="rgba(255,255,255,0.08)" />
+  
+</svg>
