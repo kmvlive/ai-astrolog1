@@ -66,6 +66,16 @@ const DIVINATIONS = [
   },
 ];
 
+const ACCENTS: Record<string, string> = {
+  "tarot-yes-no": "#a855f7",
+  "celtic-cross": "#34d399",
+  "tarot-love": "#fb7185",
+  "tarot-future": "#8b5cf6",
+  "tarot-birthdate": "#fbbf24",
+  "coffee-grounds": "#d97706",
+  "runes": "#38bdf8",
+};
+
 export default function DivinationsPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
@@ -90,14 +100,20 @@ export default function DivinationsPage() {
             <Link
               key={d.slug}
               href={`/divinations/${d.slug}`}
-              className={`group block p-6 rounded-3xl bg-gradient-to-br ${d.gradient} border ${d.border} transition hover:-translate-y-1 hover:shadow-2xl`}
+              style={{ ["--accent" as any]: ACCENTS[d.slug] || "#a78bfa" }}
+              className="cal-card group relative p-6 rounded-3xl bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 flex flex-col overflow-hidden"
             >
-              <div className="text-4xl mb-3">{d.emoji}</div>
-              <h2 className="text-xl font-bold mb-2 group-hover:text-white">{d.name}</h2>
-              <p className="text-slate-400 text-sm mb-4 group-hover:text-slate-300">{d.desc}</p>
-              <span className="text-sm font-semibold text-white/80 group-hover:text-white">
-                Погадать →
-              </span>
+              <span className="cal-watermark" aria-hidden="true">{d.emoji}</span>
+              <span className="cal-shine" aria-hidden="true" />
+              <div className="cal-medal mb-4">
+                <span className="cal-card-emoji text-3xl">{d.emoji}</span>
+              </div>
+              <h2 className="text-xl font-bold mb-2 text-white">{d.name}</h2>
+              <p className="text-slate-400 text-sm mb-5 flex-1 group-hover:text-slate-300 transition">{d.desc}</p>
+              <div className="flex items-center justify-between">
+                <span className="cal-card-arrow">Погадать</span>
+                <span className="cal-go">→</span>
+              </div>
             </Link>
           ))}
         </div>
