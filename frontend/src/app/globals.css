@@ -31,3 +31,20 @@ body {
     text-wrap: balance;
   }
 }
+
+/* --- Луна: живые PNG через CSS-анимацию --- */
+@keyframes moon-breathe {
+  0%, 100% { transform: translateY(0) scale(1); filter: brightness(1); }
+  50%      { transform: translateY(-6px) scale(1.02); filter: brightness(1.15); }
+}
+img[src*="/moon/moon-"] {
+  animation: moon-breathe 6s ease-in-out infinite;
+  will-change: transform, filter;
+}
+img[src*="/moon/moon-1"] { animation-delay: .5s; }
+img[src*="/moon/moon-2"] { animation-delay: 1s; }
+img[src*="/moon/moon-3"] { animation-delay: 1.5s; }
+img[src*="/moon/moon-4"] { animation-delay: 2s; }
+img[src*="/moon/moon-5"] { animation-delay: 2.5s; }
+img[src*="/moon/moon-6"] { animation-delay: 3s; }
+img[src*="/moon/moon-7"] { animation-delay: 3.5s; }
