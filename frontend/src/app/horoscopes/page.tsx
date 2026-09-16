@@ -46,12 +46,13 @@ export default function HoroscopesPage() {
     <main className="min-h-screen bg-slate-950 text-white">
       <SiteHeader />
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4">
+        <div className="text-center mb-10">
+          <div className="inline-block text-6xl mb-4 animate-pulse">🔮</div>
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-300 via-fuchsia-300 to-violet-300 bg-clip-text text-transparent">
             Гороскоп {PERIOD_LABELS[selectedPeriod]}
           </h1>
           <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Выберите свой знак зодиака и читайте прогноз на нужный период
+            Выберите свой знак зодиака — звёзды уже написали для вас прогноз
           </p>
         </div>
 
@@ -79,15 +80,29 @@ export default function HoroscopesPage() {
               <Link
                 key={sign.slug}
                 href={`/horoscopes/${sign.slug}?period=${selectedPeriod}`}
-                className="group relative bg-gradient-to-br from-slate-900 to-slate-800 hover:from-violet-900/40 hover:to-indigo-900/40 border border-white/10 hover:border-violet-500/50 rounded-2xl p-6 transition-all duration-300 hover:scale-105"
+                className="zodiac-card group relative overflow-hidden bg-gradient-to-br from-slate-900/90 via-slate-900 to-indigo-950/40 border border-white/5 rounded-2xl p-6 block"
               >
-                <div className="text-5xl mb-3">{sign.emoji}</div>
-                <h3 className="text-xl font-semibold mb-1">{sign.name}</h3>
-                <p className="text-xs text-slate-500">
-                  {PERIOD_LABELS[selectedPeriod]}
-                </p>
-                <div className="absolute top-4 right-4 text-slate-600 group-hover:text-violet-400 transition">
-                  →
+                {/* Плавающие звёздочки */}
+                <span className="zodiac-card-star zodiac-card-star-1">✦</span>
+                <span className="zodiac-card-star zodiac-card-star-2">✧</span>
+                <span className="zodiac-card-star zodiac-card-star-3">✦</span>
+                
+                {/* Внутреннее свечение при hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-violet-500/10 via-transparent to-fuchsia-500/10 pointer-events-none" />
+                
+                {/* Контент */}
+                <div className="relative text-center">
+                  <div className="zodiac-card-emoji mb-3">{sign.emoji}</div>
+                  <h3 className="text-xl font-bold mb-1 text-white group-hover:text-violet-200 transition">
+                    {sign.name}
+                  </h3>
+                  <p className="zodiac-card-dates mb-2">
+                    {sign.dates || ""}
+                  </p>
+                  <div className="inline-flex items-center gap-1 text-xs text-violet-300/70 group-hover:text-violet-300 transition">
+                    <span>{PERIOD_LABELS[selectedPeriod]}</span>
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:translate-x-1">→</span>
+                  </div>
                 </div>
               </Link>
             ))}

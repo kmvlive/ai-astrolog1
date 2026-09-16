@@ -199,3 +199,138 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
   background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.1));
   border-color: rgba(139, 92, 246, 0.4) !important;
 }
+
+/* --- Астрологические карточки: пульс + переливы --- */
+@keyframes zodiac-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.3));
+  }
+  50% { 
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.7));
+  }
+}
+
+@keyframes zodiac-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes zodiac-appear {
+  0% { 
+    opacity: 0; 
+    transform: translateY(30px) scale(0.85);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.02);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes zodiac-star-float {
+  0%, 100% { 
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% { 
+    transform: translate(10px, -15px) rotate(180deg);
+    opacity: 0.8;
+  }
+}
+
+.zodiac-card {
+  position: relative;
+  animation: zodiac-appear 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Staggered появление */
+.zodiac-card:nth-child(1)  { animation-delay: 0.05s; }
+.zodiac-card:nth-child(2)  { animation-delay: 0.10s; }
+.zodiac-card:nth-child(3)  { animation-delay: 0.15s; }
+.zodiac-card:nth-child(4)  { animation-delay: 0.20s; }
+.zodiac-card:nth-child(5)  { animation-delay: 0.25s; }
+.zodiac-card:nth-child(6)  { animation-delay: 0.30s; }
+.zodiac-card:nth-child(7)  { animation-delay: 0.35s; }
+.zodiac-card:nth-child(8)  { animation-delay: 0.40s; }
+.zodiac-card:nth-child(9)  { animation-delay: 0.45s; }
+.zodiac-card:nth-child(10) { animation-delay: 0.50s; }
+.zodiac-card:nth-child(11) { animation-delay: 0.55s; }
+.zodiac-card:nth-child(12) { animation-delay: 0.60s; }
+
+.zodiac-card-emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+  display: inline-block;
+  animation: zodiac-pulse 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.4));
+}
+
+/* Каждый знак пульсирует со своим сдвигом */
+.zodiac-card:nth-child(3n+1) .zodiac-card-emoji { animation-delay: 0s; }
+.zodiac-card:nth-child(3n+2) .zodiac-card-emoji { animation-delay: 1.3s; }
+.zodiac-card:nth-child(3n+3) .zodiac-card-emoji { animation-delay: 2.6s; }
+
+.zodiac-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  padding: 2px;
+  background: linear-gradient(135deg, 
+    rgba(167, 139, 250, 0.4) 0%, 
+    rgba(139, 92, 246, 0.1) 25%,
+    rgba(236, 72, 153, 0.3) 50%,
+    rgba(139, 92, 246, 0.1) 75%,
+    rgba(167, 139, 250, 0.4) 100%);
+  background-size: 200% 200%;
+  animation: zodiac-shimmer 6s ease-in-out infinite;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+.zodiac-card:hover::before {
+  opacity: 1;
+}
+
+.zodiac-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 
+    0 20px 40px -15px rgba(139, 92, 246, 0.35),
+    0 0 30px -5px rgba(167, 139, 250, 0.2);
+}
+
+.zodiac-card-star {
+  position: absolute;
+  color: rgba(167, 139, 250, 0.6);
+  pointer-events: none;
+  font-size: 10px;
+  animation: zodiac-star-float 6s ease-in-out infinite;
+}
+
+.zodiac-card-star-1 { top: 10%; left: 15%; animation-delay: 0s; }
+.zodiac-card-star-2 { top: 75%; right: 12%; animation-delay: 2s; }
+.zodiac-card-star-3 { bottom: 20%; left: 80%; animation-delay: 4s; }
+
+.zodiac-card-dates {
+  font-size: 0.7rem;
+  color: rgba(148, 163, 184, 0.7);
+  letter-spacing: 0.05em;
+}
+
+/* Уменьшаем на мобильных */
+@media (max-width: 640px) {
+  .zodiac-card-emoji { font-size: 2.5rem; }
+}
