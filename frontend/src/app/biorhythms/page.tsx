@@ -19,10 +19,41 @@ export default function BiorhythmsPage() {
 
   useEffect(() => {
     const saved = localStorage.getItem("birth_date");
-    if (saved) setBirthDate(saved);
+    const token = localStorage.getItem("auth_token");
+    
+    // Если авторизован — тянем дату из профиля
+    if (token && !saved) {
+      fetch(`${API}/api/user/profile`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then(d => {
+          if (d?.profile?.birth_date) {
+            const bd = String(d.profile.birth_date).slice(0, 10);
+            setBirthDate(bd);
+            localStorage.setItem("birth_date", bd);
+          } else if (saved) {
+            setBirthDate(saved);
+          }
+        })
+        .catch(() => {
+          if (saved) setBirthDate(saved);
+        });
+    } else if (saved) {
+      setBirthDate(saved);
+    }
   }, []);
 
-  const load = async () => {
+  
+    // Подсветка если автозагружено из профиля
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      setTimeout(() => {
+        const el = document.getElementById("bio-input");
+        if (el) el.classList.add("bio-auto-loaded");
+      }, 100);
+    }
+const load = async () => {
     if (!birthDate) return;
     setLoading(true);
     localStorage.setItem("birth_date", birthDate);
@@ -83,7 +114,7 @@ export default function BiorhythmsPage() {
           <p className="text-slate-400">Физический, эмоциональный и интеллектуальный циклы</p>
         </div>
 
-        <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 mb-8">
+        <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 mb-8" id="bio-input">
           <label className="block text-sm text-slate-400 mb-2">Ваша дата рождения</label>
           <div className="flex gap-3 flex-col sm:flex-row">
             <input
@@ -105,22 +136,22 @@ export default function BiorhythmsPage() {
         {data && (
           <>
             <div className="grid sm:grid-cols-4 gap-4 mb-8">
-              <div className="bg-gradient-to-br from-violet-900/40 to-slate-900 border border-violet-500/30 rounded-2xl p-5 text-center">
+              <div className="bio-card bg-gradient-to-br from-violet-900/40 to-slate-900 border border-violet-500/30 rounded-2xl p-5 text-center">
                 <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">Общий</div>
                 <div className="text-4xl font-bold text-violet-300">{data.average}%</div>
                 <div className="text-xs text-slate-400 mt-2">{data.date}</div>
               </div>
-              <div className="bg-gradient-to-br from-red-900/30 to-slate-900 border border-red-500/30 rounded-2xl p-5 text-center">
+              <div className="bio-card bg-gradient-to-br from-red-900/30 to-slate-900 border border-red-500/30 rounded-2xl p-5 text-center">
                 <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">💪 Физический</div>
                 <div className="text-4xl font-bold text-red-300">{data.physical}%</div>
                 <div className="text-xs text-slate-400 mt-2">23 дня</div>
               </div>
-              <div className="bg-gradient-to-br from-blue-900/30 to-slate-900 border border-blue-500/30 rounded-2xl p-5 text-center">
+              <div className="bio-card bg-gradient-to-br from-blue-900/30 to-slate-900 border border-blue-500/30 rounded-2xl p-5 text-center">
                 <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">💙 Эмоциональный</div>
                 <div className="text-4xl font-bold text-blue-300">{data.emotional}%</div>
                 <div className="text-xs text-slate-400 mt-2">28 дней</div>
               </div>
-              <div className="bg-gradient-to-br from-yellow-900/30 to-slate-900 border border-yellow-500/30 rounded-2xl p-5 text-center">
+              <div className="bio-card bg-gradient-to-br from-yellow-900/30 to-slate-900 border border-yellow-500/30 rounded-2xl p-5 text-center">
                 <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">🧠 Интеллектуальный</div>
                 <div className="text-4xl font-bold text-yellow-300">{data.intellectual}%</div>
                 <div className="text-xs text-slate-400 mt-2">33 дня</div>
@@ -139,7 +170,7 @@ export default function BiorhythmsPage() {
                     const y = h / 2 - (f[key] / maxVal) * (h / 2);
                     return `${x},${y}`;
                   }).join(" ");
-                  return <polyline key={key} points={points} fill="none" stroke={colors[idx]} strokeWidth="2" />;
+                  return <polyline key={key} points={points} fill="none" stroke={colors[idx]} strokeWidth="2" className="bio-graph-line" />;
                 })}
 
                 {forecast.findIndex(f => f.today) >= 0 && (
@@ -188,7 +219,7 @@ export default function BiorhythmsPage() {
               {adviceLoading ? (
                 <div className="text-slate-400 animate-pulse">AI анализирует ваши биоритмы...</div>
               ) : advice ? (
-                <p className="text-slate-200 leading-relaxed">{advice}</p>
+                <p className="bio-advice text-slate-200 leading-relaxed">{advice}</p>
               ) : null}
             </div>
 

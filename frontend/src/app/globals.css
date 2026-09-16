@@ -156,3 +156,46 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 @media (prefers-reduced-motion: reduce) {
   .comet { animation: none; display: none; }
 }
+
+/* --- Биоритмы: анимации --- */
+@keyframes bio-card-in {
+  0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.bio-card {
+  animation: bio-card-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.bio-card:nth-child(1) { animation-delay: 0.1s; }
+.bio-card:nth-child(2) { animation-delay: 0.2s; }
+.bio-card:nth-child(3) { animation-delay: 0.3s; }
+.bio-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes bio-graph-draw {
+  0% { stroke-dashoffset: 3000; opacity: 0.3; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+.bio-graph-line {
+  stroke-dasharray: 3000;
+  stroke-dashoffset: 3000;
+  animation: bio-graph-draw 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.bio-graph-line:nth-child(2) { animation-delay: 0.2s; }
+.bio-graph-line:nth-child(3) { animation-delay: 0.4s; }
+.bio-graph-line:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes bio-advice-in {
+  0% { opacity: 0; transform: translateX(-20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+.bio-advice {
+  animation: bio-advice-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: 0.6s;
+}
+
+.bio-auto-loaded {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.1));
+  border-color: rgba(139, 92, 246, 0.4) !important;
+}
