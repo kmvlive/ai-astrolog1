@@ -5,6 +5,7 @@ import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import AdBlock from "@/components/AdBlock";
 import SiteFooter from "@/components/SiteFooter";
+import CometField from "@/components/CometField";
 import DivinationAnimation from "@/components/DivinationAnimation";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
@@ -109,8 +110,9 @@ export default function DivinationPage({
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
+      <CometField count={8} />
 
       <div className="max-w-3xl mx-auto px-4 py-12">
         {/* Хлебные крошки */}
