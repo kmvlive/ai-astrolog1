@@ -32,7 +32,7 @@ export default function Page() {
               <div className="cal-card-emoji text-5xl mb-4">{c.emoji}</div>
               <h2 className={`text-xl font-bold mb-2 bg-gradient-to-r ${c.gradient} bg-clip-text text-transparent`}>{c.name}</h2>
               <p className="text-slate-400 text-sm mb-4">{c.short}</p>
-              <div class="cal-card-arrow">Открыть →</div>
+              <div className="cal-card-arrow">Открыть →</div>
             </Link>
           ))}
         </div>
