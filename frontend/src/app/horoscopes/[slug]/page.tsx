@@ -79,7 +79,7 @@ export default function SignHoroscopePage() {
           if (d) {
             setSubStatus({
               has_email: !!d.has_email_subscription,
-              has_plan: !!d.has_active_subscription,
+              has_plan: !!(d.has_active_subscription || d.free_personal_enabled),
               loaded: true,
             });
             if (d.email && !email) setEmail(d.email);
@@ -214,7 +214,9 @@ export default function SignHoroscopePage() {
 
             <ShareButtons title={`${currentSign.emoji} Гороскоп для ${currentSign.name} — AI Астролог`} />
 
-            {/* 📬 БЛОК: ЕЖЕДНЕВНАЯ РАССЫЛКА — главная точка входа */}
+            {!subStatus.has_email && (
+<>
+{/* 📬 БЛОК: ЕЖЕДНЕВНАЯ РАССЫЛКА — главная точка входа */}
             <div className="bg-gradient-to-br from-sky-900/30 to-indigo-900/30 border border-sky-500/30 rounded-3xl p-8 mb-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="text-4xl">📬</div>
@@ -271,10 +273,15 @@ export default function SignHoroscopePage() {
               )}
             </div>
 
-            {/* ⚙️ БЛОК: УПРАВЛЕНИЕ РАССЫЛКОЙ — только для подписанных */}
-            {subStatus.has_email && <ManageSubscription />}
+            </>
+)}
 
-            {/* ✨ БЛОК: ПЕРСОНАЛЬНЫЙ ГОРОСКОП — апсейл */}
+            {/* ⚙️ БЛОК: УПРАВЛЕНИЕ РАССЫЛКОЙ — только для подписанных */}
+            {!isLoggedIn && <ManageSubscription />}
+
+            {!subStatus.has_plan && (
+<>
+{/* ✨ БЛОК: ПЕРСОНАЛЬНЫЙ ГОРОСКОП — апсейл */}
             <div className="bg-gradient-to-br from-violet-900/30 to-indigo-900/30 border border-violet-500/30 rounded-3xl p-8 text-center">
               <div className="text-5xl mb-4">✨</div>
               <h2 className="text-2xl sm:text-3xl font-bold mb-3">
@@ -298,6 +305,9 @@ export default function SignHoroscopePage() {
                 Построить мой гороскоп →
               </Link>
             </div>
+
+            </>
+)}
 
             {/* Другие знаки */}
             <div className="mt-12">
