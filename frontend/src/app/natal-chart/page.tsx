@@ -1,5 +1,7 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -174,8 +176,9 @@ export default function NatalChartPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex flex-col">
+      <main className="min-h-screen flex flex-col relative overflow-hidden isolate">
         <SiteHeader />
+      <CometField count={8} />
         <div className="flex-1 flex items-center justify-center text-slate-400">Загрузка...</div>
         <SiteFooter />
       </main>

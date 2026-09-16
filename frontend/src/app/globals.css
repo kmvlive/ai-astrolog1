@@ -475,3 +475,7 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 @media (prefers-reduced-motion: reduce) {
   .star-layer { animation: none; }
 }
+
+/* --- Космос-подложка: контент поверх на всех страницах --- */
+main.isolate > * { position: relative; z-index: 10; }
+main.isolate > .comet-field { z-index: 0; }

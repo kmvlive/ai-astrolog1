@@ -1,5 +1,7 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
@@ -88,8 +90,9 @@ export default function SubscriptionPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white">
+      <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
         <SiteHeader />
+      <CometField count={8} />
         <div className="text-center py-20 text-slate-400">
           <div className="inline-block animate-spin rounded-full h-10 w-10 border-2 border-violet-500 border-t-transparent mb-4" />
           <div>Загрузка...</div>

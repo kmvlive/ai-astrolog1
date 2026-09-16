@@ -1,3 +1,4 @@
+import CometField from "@/components/CometField";
 import DivinationPage from "../_components/DivinationPage";
 
 export const metadata = {

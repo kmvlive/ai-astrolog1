@@ -1,5 +1,7 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
@@ -49,8 +51,9 @@ export default function PaymentSuccess() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
+      <CometField count={8} />
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         {status === "checking" && (
           <>

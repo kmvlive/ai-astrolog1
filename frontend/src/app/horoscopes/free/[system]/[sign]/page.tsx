@@ -1,5 +1,7 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -32,7 +34,7 @@ export default function SignPage() {
 
   if (!data) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center relative overflow-hidden isolate">
         <div className="animate-spin rounded-full h-10 w-10 border-2 border-violet-500 border-t-transparent" />
       </main>
     );
@@ -43,6 +45,7 @@ export default function SignPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <SiteHeader />
+      <CometField count={8} />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <Link href={`/horoscopes/free/${system}`} className="text-violet-400 hover:text-violet-300 text-sm">
           ← {data.system.emoji} {data.system.name}

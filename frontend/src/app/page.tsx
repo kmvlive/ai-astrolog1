@@ -1,5 +1,7 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import DreamsCount from "@/components/DreamsCount";
 import RetrogradeWidget from "@/components/RetrogradeWidget";
 import { CALENDARS } from "@/lib/calendars";
@@ -197,8 +199,9 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
+      <CometField count={8} />
 
 
       {/* HERO */}

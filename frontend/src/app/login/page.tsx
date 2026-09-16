@@ -1,5 +1,7 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -58,7 +60,8 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white py-12 px-4">
+    <main className="min-h-screen bg-slate-950 text-white py-12 px-4 relative overflow-hidden isolate">
+      <CometField count={8} />
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
           <div className="text-4xl mb-2">🔮</div>

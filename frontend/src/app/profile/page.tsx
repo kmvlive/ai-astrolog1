@@ -1,5 +1,7 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -102,8 +104,9 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white">
+      <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
         <SiteHeader />
+      <CometField count={8} />
       <div className="max-w-2xl mx-auto px-4 pt-6 w-full">
         <Link href="/profile/referrals" className="block bg-gradient-to-r from-violet-900/40 to-purple-900/30 border border-violet-500/30 rounded-2xl p-4 hover:border-violet-500/60 transition">
           <div className="flex items-center justify-between">

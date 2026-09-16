@@ -1,5 +1,7 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
@@ -40,8 +42,9 @@ export default function MoonPage() {
 
   if (!now) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white">
+      <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
         <SiteHeader />
+      <CometField count={8} />
         <div className="text-center py-20 text-slate-400">Смотрим на Луну...</div>
       </main>
     );

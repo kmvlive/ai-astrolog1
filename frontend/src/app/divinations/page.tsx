@@ -1,5 +1,7 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import AdBlock from "@/components/AdBlock";
@@ -66,8 +68,9 @@ const DIVINATIONS = [
 
 export default function DivinationsPage() {
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
+      <CometField count={8} />
 
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Заголовок */}

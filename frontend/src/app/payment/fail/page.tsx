@@ -1,12 +1,15 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 
 export default function PaymentFail() {
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
+      <CometField count={8} />
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <div className="text-7xl mb-6">😔</div>
         <h1 className="text-4xl font-bold mb-4">Оплата не прошла</h1>

@@ -1,5 +1,7 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
@@ -83,8 +85,9 @@ export default function RetrogradePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white">
+      <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
         <SiteHeader />
+      <CometField count={8} />
         <div className="max-w-4xl mx-auto px-4 py-12">
           <div className="animate-pulse space-y-4">
             <div className="h-12 bg-slate-800 rounded w-3/4"></div>

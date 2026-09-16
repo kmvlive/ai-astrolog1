@@ -1,3 +1,4 @@
+import CometField from "@/components/CometField";
 import Link from "next/link";
 import fs from "fs";
 import path from "path";
@@ -72,8 +73,9 @@ export default async function Page(props: any) {
   const d = await getData(params.uuid);
   const t = TYPES[d?.type] ?? TYPES.default;
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
+      <CometField count={8} />
       <div className="max-w-3xl mx-auto px-4 py-12">
         {d ? (<>
           <div className="text-center mb-8">

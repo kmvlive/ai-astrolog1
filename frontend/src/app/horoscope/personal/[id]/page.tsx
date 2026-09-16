@@ -1,5 +1,7 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -32,7 +34,7 @@ export default function PersonalHoroscopePage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center relative overflow-hidden isolate">
         <div className="text-center">
           <div className="text-5xl mb-4">🔮</div>
           <h1 className="text-2xl font-bold mb-2">Гороскоп не найден</h1>
@@ -53,6 +55,7 @@ export default function PersonalHoroscopePage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <SiteHeader />
+      <CometField count={8} />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <Link href="/dashboard" className="text-violet-400 hover:text-violet-300 text-sm">← Кабинет</Link>
 

@@ -1,5 +1,7 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -95,8 +97,9 @@ export default function AffirmationsPage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col">
+    <main className="min-h-screen flex flex-col relative overflow-hidden isolate">
       <SiteHeader />
+      <CometField count={8} />
       <div className="flex-1 max-w-4xl mx-auto px-4 py-8 w-full">
         <h1 className="text-4xl font-bold mb-2">💫 Здоровье и настрой</h1>
         <p className="text-slate-400 mb-8">Ежедневные аффирмации для гармонии и вдохновения</p>

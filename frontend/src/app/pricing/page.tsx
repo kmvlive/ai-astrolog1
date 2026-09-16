@@ -1,5 +1,7 @@
 "use client";
 
+import CometField from "@/components/CometField";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
@@ -91,8 +93,9 @@ export default function PricingPage() {
   const daysLeft = currentSub ? Math.max(0, Math.ceil((new Date(currentSub.expires_at).getTime() - Date.now()) / 86400000)) : 0;
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
+      <CometField count={8} />
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Заголовок */}
         <div className="text-center mb-12">
