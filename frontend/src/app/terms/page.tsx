@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white py-12 relative overflow-hidden isolate">
-      <CometField count={8} />
       <div className="max-w-4xl mx-auto px-4">
         <Link href="/" className="text-sm text-slate-400 hover:text-violet-400 mb-6 inline-block">
           ← Главная

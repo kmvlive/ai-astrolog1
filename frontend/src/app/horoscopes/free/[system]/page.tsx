@@ -53,7 +53,7 @@ export default function SystemPage() {
   const byYear = system.by === "year" || system.by === "year9";
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
       <CometField count={8} />
       <div className="max-w-6xl mx-auto px-4 py-12">

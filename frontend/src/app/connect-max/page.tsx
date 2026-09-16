@@ -75,7 +75,6 @@ export default function ConnectMaxPage() {
   if (hasUid) {
     return (
       <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 relative overflow-hidden isolate">
-      <CometField count={8} />
         <div className="text-center max-w-md">
           <div className="text-6xl mb-6">{icon}</div>
           <div className="text-xl font-semibold mb-2">{status}</div>
@@ -86,7 +85,7 @@ export default function ConnectMaxPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4">
+    <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 relative overflow-hidden isolate">
       <div className="text-center max-w-md w-full">
         <div className="text-6xl mb-6">💬</div>
         <h1 className="text-2xl font-bold mb-4">Подключить MAX</h1>

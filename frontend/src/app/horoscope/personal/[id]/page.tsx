@@ -46,14 +46,14 @@ export default function PersonalHoroscopePage() {
 
   if (!data) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center relative overflow-hidden isolate">
         <div className="animate-spin rounded-full h-10 w-10 border-2 border-violet-500 border-t-transparent" />
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
       <CometField count={8} />
       <div className="max-w-3xl mx-auto px-4 py-12">

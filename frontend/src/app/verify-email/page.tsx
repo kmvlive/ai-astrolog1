@@ -44,7 +44,6 @@ export default function VerifyEmailPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 relative overflow-hidden isolate">
-      <CometField count={8} />
       <div className="text-center max-w-md">
         {state === "loading" && (
           <>

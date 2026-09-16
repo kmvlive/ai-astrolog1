@@ -43,7 +43,7 @@ export default function SignPage() {
   const content = tab === "today" ? data.today : data.tomorrow;
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
       <CometField count={8} />
       <div className="max-w-3xl mx-auto px-4 py-12">
