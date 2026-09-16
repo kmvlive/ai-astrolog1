@@ -34,6 +34,7 @@ export default function CometField({ count = 10 }: { count?: number }) {
 
   return (
     <div className="comet-field" aria-hidden="true">
+      <div className="star-layer" />
       {comets.map((c) => (
         <span
           key={c.id}

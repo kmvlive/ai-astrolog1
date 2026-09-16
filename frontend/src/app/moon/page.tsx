@@ -85,6 +85,7 @@ export default function MoonPage() {
         <div className="relative rounded-3xl overflow-hidden border border-violet-500/30 shadow-2xl shadow-violet-900/40 mb-8">
           {/* Кометы */}
           <div className="moon-comets">
+        <div className="star-layer" />
             <div className="comet comet-1" />
             <div className="comet comet-2" />
             <div className="comet comet-3" />

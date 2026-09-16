@@ -103,6 +103,7 @@ const MoonWidget = () => {
     <section className="max-w-6xl mx-auto px-4 pb-12 relative">
       {/* Кометы */}
       <div className="moon-comets">
+        <div className="star-layer" />
         <div className="comet comet-1" />
         <div className="comet comet-2" />
         <div className="comet comet-3" />
