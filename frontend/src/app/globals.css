@@ -1447,3 +1447,203 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 .cal-card:hover .cal-card-arrow {
   color: var(--accent);
 }
+
+/* --- Premium Calendar v2 --- */
+
+/* Hero-секция */
+.cal-hero {
+  background: linear-gradient(135deg,
+    rgba(15, 23, 42, 0.9) 0%,
+    rgba(30, 41, 59, 0.7) 50%,
+    rgba(15, 23, 42, 0.9) 100%);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  box-shadow:
+    0 0 40px -10px color-mix(in srgb, var(--accent) 30%, transparent),
+    inset 0 0 30px color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.cal-hero-watermark {
+  position: absolute;
+  right: -20px;
+  bottom: -30px;
+  font-size: 10rem;
+  line-height: 1;
+  opacity: 0.05;
+  transform: rotate(-12deg);
+  pointer-events: none;
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.cal-hero:hover .cal-hero-watermark {
+  opacity: 0.08;
+  transform: rotate(-5deg) scale(1.05);
+}
+
+.cal-hero-medal {
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 70%),
+    rgba(15, 23, 42, 0.7);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow:
+    0 0 25px -6px color-mix(in srgb, var(--accent) 55%, transparent),
+    inset 0 0 16px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* Навигация по месяцам */
+.cal-nav-btn {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cal-nav-btn:hover {
+  background: color-mix(in srgb, var(--accent) 12%, rgba(15, 23, 42, 0.8));
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  box-shadow: 0 0 20px -5px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.cal-nav-icon {
+  font-size: 1.1rem;
+  color: var(--accent);
+  transition: transform 0.3s;
+}
+
+.cal-nav-btn:hover .cal-nav-icon {
+  transform: translateX(2px);
+}
+
+.cal-nav-label {
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: capitalize;
+}
+
+/* Дни календаря */
+.cal-day {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cal-day:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 20px -5px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.cal-day-num {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.cal-day-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+}
+
+.cal-day-today {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent) 15%, rgba(15, 23, 42, 0.9)),
+    color-mix(in srgb, var(--accent) 8%, rgba(15, 23, 42, 0.95))) !important;
+  border: 2px solid var(--accent) !important;
+  box-shadow:
+    0 0 20px -3px color-mix(in srgb, var(--accent) 50%, transparent),
+    inset 0 0 12px color-mix(in srgb, var(--accent) 15%, transparent) !important;
+}
+
+.cal-day-badge {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #020617;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+/* Особые даты */
+.cal-notable {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cal-notable:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px -8px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.cal-notable-shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  transform: translateX(-180%) skewX(-15deg);
+  pointer-events: none;
+}
+
+.cal-notable:hover .cal-notable-shine {
+  animation: cal-shine-sweep 0.8s ease;
+}
+
+.cal-notable-arrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  color: var(--accent);
+  font-size: 1rem;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cal-notable:hover .cal-notable-arrow {
+  background: var(--accent);
+  color: #020617;
+  transform: translateX(3px);
+  box-shadow: 0 0 15px -2px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.cal-notable-date {
+  box-shadow: 0 4px 12px -3px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Мини-карточки других календарей */
+.cal-mini {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cal-mini:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 15px 35px -10px color-mix(in srgb, var(--accent) 35%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.cal-mini-shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.10), transparent);
+  transform: translateX(-180%) skewX(-15deg);
+  pointer-events: none;
+}
+
+.cal-mini:hover .cal-mini-shine {
+  animation: cal-shine-sweep 0.9s ease;
+}
