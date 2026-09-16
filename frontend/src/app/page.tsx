@@ -9,6 +9,13 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+const ACCENTS_HOME = {
+  free: { chinese: "#dc2626", japanese: "#f59e0b", zoroastrian: "#f97316", druids: "#16a34a", flowers: "#ec4899", compatibility: "#a855f7" },
+  periods: { today: "#fbbf24", tomorrow: "#3b82f6", week: "#10b981", month: "#a855f7", year: "#ef4444" },
+  tools: { "crystal-ball": "#8b5cf6", tarot: "#d946ef", biorhythms: "#06b6d4", dreams: "#6366f1", names: "#a855f7", compatibility: "#ec4899" },
+};
+
+
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
@@ -151,11 +158,15 @@ const FreeHoroscopesWidget = () => (
         <Link
           key={s.slug}
           href={s.href || `/horoscopes/free/${s.slug}`}
-          className="group rounded-2xl p-5 bg-slate-900 border border-white/10 hover:border-amber-400/50 hover:-translate-y-1 transition transform text-center"
+          style={{ ["--accent" as any]: ACCENTS_HOME.free[s.slug] || "#fbbf24" }}
+          className="cal-card group relative rounded-2xl p-5 bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 overflow-hidden flex flex-col items-center justify-center"
         >
-          <div className="text-4xl mb-2 group-hover:scale-110 transition">{s.emoji}</div>
-          <div className="font-semibold text-sm">{s.name}</div>
-          <div className="text-xs text-slate-500 mt-1">Читать →</div>
+          <span className="cal-shine" aria-hidden="true" />
+          <div className="cal-medal mb-2" style={{ width: "60px", height: "60px", borderRadius: "18px" }}>
+            <span className="text-3xl">{s.emoji}</span>
+          </div>
+          <div className="relative z-10 font-semibold text-sm">{s.name}</div>
+          <div className="relative z-10 cal-go mt-2" style={{ width: "28px", height: "28px", fontSize: "0.85rem" }}>→</div>
         </Link>
       ))}
     </div>
@@ -284,11 +295,15 @@ export default function HomePage() {
             <Link
               key={p.slug}
               href={`/horoscopes?period=${p.slug}`}
-              className={`bg-gradient-to-br ${p.color} border border-white/10 hover:border-violet-500/50 rounded-2xl p-5 text-center transition hover:scale-105`}
+              style={{ ["--accent" as any]: ACCENTS_HOME.periods[p.slug] || "#a78bfa" }}
+              className="cal-card group relative rounded-2xl p-5 bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 overflow-hidden text-center"
             >
-              <div className="text-3xl mb-2">{p.icon}</div>
-              <div className="font-semibold text-sm">Гороскоп</div>
-              <div className="text-xs text-slate-400">{p.name}</div>
+              <span className="cal-shine" aria-hidden="true" />
+              <div className="cal-medal mb-2 mx-auto" style={{ width: "56px", height: "56px", borderRadius: "16px" }}>
+                <span className="text-2xl">{p.icon}</span>
+              </div>
+              <div className="relative z-10 font-semibold text-sm">Гороскоп</div>
+              <div className="relative z-10 text-xs text-slate-400">{p.name}</div>
             </Link>
           ))}
         </div>
@@ -325,34 +340,28 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-            <Link href="/divinations/tarot-yes-no" className="group p-4 rounded-2xl bg-gradient-to-br from-purple-900/40 to-indigo-950 border border-purple-500/20 hover:border-purple-400/50 text-center transition hover:-translate-y-1">
-              <div className="text-3xl mb-2 group-hover:scale-110 transition">🃏</div>
-              <div className="text-sm font-semibold">Таро Да/Нет</div>
-            </Link>
-            <Link href="/divinations/celtic-cross" className="group p-4 rounded-2xl bg-gradient-to-br from-emerald-900/40 to-teal-950 border border-emerald-500/20 hover:border-emerald-400/50 text-center transition hover:-translate-y-1">
-              <div className="text-3xl mb-2 group-hover:scale-110 transition">✝️</div>
-              <div className="text-sm font-semibold">Кельтский крест</div>
-            </Link>
-            <Link href="/divinations/tarot-love" className="group p-4 rounded-2xl bg-gradient-to-br from-rose-900/40 to-pink-950 border border-rose-500/20 hover:border-rose-400/50 text-center transition hover:-translate-y-1">
-              <div className="text-3xl mb-2 group-hover:scale-110 transition">💕</div>
-              <div className="text-sm font-semibold">На любовь</div>
-            </Link>
-            <Link href="/divinations/tarot-future" className="group p-4 rounded-2xl bg-gradient-to-br from-violet-900/40 to-purple-950 border border-violet-500/20 hover:border-violet-400/50 text-center transition hover:-translate-y-1">
-              <div className="text-3xl mb-2 group-hover:scale-110 transition">🔮</div>
-              <div className="text-sm font-semibold">На будущее</div>
-            </Link>
-            <Link href="/divinations/tarot-birthdate" className="group p-4 rounded-2xl bg-gradient-to-br from-amber-900/40 to-orange-950 border border-amber-500/20 hover:border-amber-400/50 text-center transition hover:-translate-y-1">
-              <div className="text-3xl mb-2 group-hover:scale-110 transition">⭐</div>
-              <div className="text-sm font-semibold">По дате рождения</div>
-            </Link>
-            <Link href="/divinations/coffee-grounds" className="group p-4 rounded-2xl bg-gradient-to-br from-stone-900/60 to-amber-950 border border-stone-500/20 hover:border-stone-400/50 text-center transition hover:-translate-y-1">
-              <div className="text-3xl mb-2 group-hover:scale-110 transition">☕</div>
-              <div className="text-sm font-semibold">Кофейная гуща</div>
-            </Link>
-            <Link href="/divinations/runes" className="group p-4 rounded-2xl bg-gradient-to-br from-sky-900/40 to-blue-950 border border-sky-500/20 hover:border-sky-400/50 text-center transition hover:-translate-y-1">
-              <div className="text-3xl mb-2 group-hover:scale-110 transition">ᚱ</div>
-              <div className="text-sm font-semibold">На рунах</div>
-            </Link>
+            {[
+              { slug: "tarot-yes-no", emoji: "🃏", name: "Таро Да/Нет", accent: "#a855f7" },
+              { slug: "celtic-cross", emoji: "✝️", name: "Кельтский крест", accent: "#34d399" },
+              { slug: "tarot-love", emoji: "💕", name: "На любовь", accent: "#fb7185" },
+              { slug: "tarot-future", emoji: "🔮", name: "На будущее", accent: "#8b5cf6" },
+              { slug: "tarot-birthdate", emoji: "⭐", name: "По дате рождения", accent: "#fbbf24" },
+              { slug: "coffee-grounds", emoji: "☕", name: "Кофейная гуща", accent: "#d97706" },
+              { slug: "runes", emoji: "ᚱ", name: "На рунах", accent: "#38bdf8" },
+            ].map((d) => (
+              <Link
+                key={d.slug}
+                href={`/divinations/${d.slug}`}
+                style={{ ["--accent" as any]: d.accent }}
+                className="cal-card group relative rounded-2xl p-4 bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 overflow-hidden text-center"
+              >
+                <span className="cal-shine" aria-hidden="true" />
+                <div className="cal-medal mb-2 mx-auto" style={{ width: "52px", height: "52px", borderRadius: "16px" }}>
+                  <span className="text-2xl">{d.emoji}</span>
+                </div>
+                <div className="relative z-10 text-sm font-semibold">{d.name}</div>
+              </Link>
+            ))}
           </div>
         </div>
         <div className="grid md:grid-cols-4 gap-6">
@@ -423,12 +432,27 @@ export default function HomePage() {
             <Link href="/calendars" className="shrink-0 bg-violet-600 hover:bg-violet-500 rounded-xl px-6 py-3 font-semibold transition shadow-lg shadow-violet-600/30">Все календари →</Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-            {CALENDARS.map((c) => (
-              <Link key={c.slug} href={`/calendars/${c.slug}`} className="group p-4 rounded-2xl bg-slate-900/60 border border-white/5 hover:border-violet-500/40 hover:bg-slate-900 transition text-center">
-                <div className="text-3xl mb-2 group-hover:scale-110 transition-transform">{c.emoji}</div>
-                <div className="text-xs text-slate-300 leading-tight">{{ holidays: "Праздники", orthodox: "Православный", muslim: "Мусульманский", lunar: "Лунный", gardener: "Садовода", haircut: "Стрижки", names: "Именины", conception: "Зачатие" }[c.slug] ?? c.name}</div>
-              </Link>
-            ))}
+            {CALENDARS.map((c) => {
+              const accents: Record<string, string> = {
+                holidays: "#f472b6", orthodox: "#fbbf24", muslim: "#34d399",
+                lunar: "#a78bfa", gardener: "#4ade80", haircut: "#e879f9",
+                names: "#38bdf8", conception: "#fb7185"
+              };
+              return (
+                <Link
+                  key={c.slug}
+                  href={`/calendars/${c.slug}`}
+                  style={{ ["--accent" as any]: accents[c.slug] || "#a78bfa" }}
+                  className="cal-card group relative rounded-2xl p-4 bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 overflow-hidden text-center"
+                >
+                  <span className="cal-shine" aria-hidden="true" />
+                  <div className="cal-medal mb-2 mx-auto" style={{ width: "52px", height: "52px", borderRadius: "16px" }}>
+                    <span className="text-2xl">{c.emoji}</span>
+                  </div>
+                  <div className="relative z-10 text-xs text-slate-300 leading-tight">{{ holidays: "Праздники", orthodox: "Православный", muslim: "Мусульманский", lunar: "Лунный", gardener: "Садовода", haircut: "Стрижки", names: "Именины", conception: "Зачатие" }[c.slug] ?? c.name}</div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
