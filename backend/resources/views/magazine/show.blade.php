@@ -95,6 +95,8 @@
 /* === ГЛАВНАЯ СТАТЬЯ (LEAD) === */
 .journal-lead {
     margin-bottom: 50px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .journal-lead-headline {
@@ -124,7 +126,6 @@
 .journal-columns {
     column-count: 2;
     column-gap: 40px;
-    column-rule: 1px solid rgba(255, 255, 255, 0.1);
     text-align: justify;
     hyphens: auto;
 }
