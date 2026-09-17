@@ -172,8 +172,7 @@
             <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
         </div>
     </div>
-    @if(!request()->is('magazine/*'))
-<div class="mobile-menu">
+    <div class="mobile-menu">
         <nav>
             <a href="/horoscopes">Гороскопы</a>
             <a href="/divinations">Гадания</a>
@@ -188,20 +187,20 @@
             <button class="m-logout only-user" data-logout>Выйти</button>
         </nav>
     </div>
-@endif
 
 </div>
 
+@if(!request()->is('magazine/*'))
 <header class="hero">
-    @if(!request()->is('magazine/*'))
 <div class="container">
         <span class="hero-eyebrow">✨ БЛОГ AI-АСТРОЛОГА</span>
         <h1>Прогнозы, энергии и мудрость звёзд</h1>
         <p>Ежедневные прогнозы, разборы энергий дня и профессиональные советы от вашего астролога-ассистента</p>
     </div>
-@endif
 
 </header>
+@endif
+
 <main class="container">@yield('content')</main>
 @include('partials.site-footer')
 
