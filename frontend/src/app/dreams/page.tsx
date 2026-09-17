@@ -79,7 +79,7 @@ export default function DreamsPage() {
       <CometField count={8} />
       <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
-          <div className="pricing-eyebrow mb-4">🌙 СОННИК</div>
+          <div className="pricing-eyebrow mb-4">🌙 ТОЛКОВАНИЕ СНОВ</div>
           <div className="cal-medal mx-auto mb-5" style={{ width: "84px", height: "84px", borderRadius: "26px", ["--accent" as any]: "#6366f1" }}>
             <span className="text-4xl">🌙</span>
           </div>

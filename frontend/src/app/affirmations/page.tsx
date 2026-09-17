@@ -106,7 +106,7 @@ export default function AffirmationsPage() {
           <div className="cal-medal mx-auto mb-5" style={{ width: "84px", height: "84px", borderRadius: "26px", ["--accent" as any]: "#e879f9" }}>
             <span className="text-4xl">💫</span>
           </div>
-          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-fuchsia-300 via-violet-300 to-indigo-300 bg-clip-text text-transparent">Здоровье и настрой</h1>
+          <h1 className="sr-only">Здоровье и настрой — ежедневные аффирмации</h1>
           <p className="text-slate-400 max-w-2xl mx-auto">Ежедневные аффирмации для гармонии и вдохновения</p>
         </div>
 

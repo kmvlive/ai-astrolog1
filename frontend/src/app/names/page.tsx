@@ -84,7 +84,7 @@ export default function NamesPage() {
         </div>
 
         <div className="text-center mb-10">
-          <div className="pricing-eyebrow mb-4">✨ ИМЕНА</div>
+          <div className="pricing-eyebrow mb-4">✨ ПРОИСХОЖДЕНИЕ И ХАРАКТЕР</div>
           <div className="cal-medal mx-auto mb-5" style={{ width: "84px", height: "84px", borderRadius: "26px", ["--accent" as any]: "#a855f7" }}>
             <span className="text-4xl">✨</span>
           </div>
