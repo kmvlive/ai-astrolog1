@@ -2650,3 +2650,49 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   pointer-events: none;
   transition: opacity 0.4s;
 }
+
+/* --- MOBILE SAFETY: меньше композитных слоёв = гарантированная отрисовка ---
+   На слабых мобильных GPU множество анимированных слоёв (мерцание рамок,
+   пульс эмодзи, блики) переполняют лимит слоёв композитора — часть контента
+   не растеризовывается и остаётся невидимой. На мобильных отключаем
+   бесконечные анимации: контент виден всегда, стиль сохраняется. */
+@media (max-width: 767px) {
+  /* Убираем анимации появления карточек */
+  .cal-card, .div-card, .plan-card, .zodiac-card, .home-panel,
+  .cal-notable, .cal-mini, .dash-history-card, .bio-card, .page-anim {
+    animation: none !important;
+  }
+
+  /* Рамки статичные (без бесконечного мерцания) */
+  .cal-card::before, .div-card::before, .plan-card::before,
+  .home-panel::before, .cal-notable::before, .cal-mini::before,
+  .zodiac-card::before, .dash-history-card::before {
+    animation: none !important;
+    opacity: 0.5 !important;
+  }
+
+  /* Эмодзи без пульсации (filter+transform = дорогой слой) */
+  .cal-card-emoji, .zodiac-card-emoji, .div-card-emoji,
+  .crystal-idle-emoji {
+    animation: none !important;
+  }
+
+  /* Убираем блики и звёзды (лишние слои) */
+  .cal-shine, .cal-notable-shine, .cal-mini-shine,
+  .cal-date-block-shine, .zodiac-card-star,
+  .cta-btn::after, .plan-btn::after {
+    display: none !important;
+  }
+
+  /* Hover-подъёмы на тачах не нужны */
+  .cal-card:hover, .div-card:hover, .plan-card:hover,
+  .zodiac-card:hover, .home-panel:hover {
+    transform: none !important;
+  }
+
+  /* Внутренний свет статичный */
+  .cal-card::after, .div-card::after {
+    animation: none !important;
+    opacity: 0.4 !important;
+  }
+}

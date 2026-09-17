@@ -140,6 +140,7 @@
         footer{background:rgba(15,23,42,.7);backdrop-filter:blur(12px);color:#94a3b8;padding:32px 0;text-align:center;font-size:14px;margin-top:80px;border-top:1px solid rgba(255,255,255,.08);position:relative;z-index:2}
         footer a{color:#fff}
         @media(max-width:640px){.container{padding:0 16px}.posts{grid-template-columns:1fr}}
+@media(max-width:767px){.post{animation:none!important}.post::before{animation:none!important;opacity:.5!important}.post-cover img{transition:none}}
         @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     </style>
 </head>

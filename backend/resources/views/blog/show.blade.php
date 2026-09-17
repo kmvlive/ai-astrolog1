@@ -54,6 +54,7 @@
 .related h2{margin-bottom:24px;background:linear-gradient(135deg,#fff,#c4b5fd);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;font-size:28px}
 .related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
 @media(max-width:640px){.article{padding:28px 20px;border-radius:20px}.article h1{font-size:24px}}
+@media(max-width:767px){.article{animation:none!important}.article::before{animation:none!important;opacity:.5!important}}
 </style>
 
 @if(count($categories) > 0)
