@@ -59,3 +59,7 @@ Route::get('/sitemap-names.xml', function () {
     return response($xml, 200)->header('Content-Type', 'application/xml');
 });
 
+
+
+// Публичная страница персонального журнала
+Route::get('/magazine/{uuid}', [\App\Http\Controllers\MagazineWebController::class, 'show'])->name('magazine.show');

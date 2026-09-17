@@ -61,6 +61,9 @@ export default function DashboardPage() {
   const [affirmationLoading, setAffirmationLoading] = useState(false);
   const [hasNatalChart, setHasNatalChart] = useState(false);
   const [natalChartSubscribed, setNatalChartSubscribed] = useState(false);
+  const [magazineSubscribed, setMagazineSubscribed] = useState(false);
+  const [magazineIssues, setMagazineIssues] = useState<{uuid: string; date: string; sent: boolean}[]>([]);
+  const [magazineLoading, setMagazineLoading] = useState(false);
   const [extraHoroscopes, setExtraHoroscopes] = useState<string[]>([]);
   const [mood, setMood] = useState<string[]>([]);
   const [frequency, setFrequency] = useState<"daily" | "weekly">("daily");
@@ -121,6 +124,18 @@ export default function DashboardPage() {
           setFreeNatalChartEnabled(!!d.free_natal_chart_enabled);
           setCalendars(d.calendars || []);
           setSelCalendars(d.user_calendar_slugs || []);
+        }
+      })
+      .catch(() => {});
+
+    fetch(`${API_URL}/api/magazine/my-issues`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d) {
+          setMagazineSubscribed(!!d.subscribed);
+          setMagazineIssues(d.issues || []);
         }
       })
       .catch(() => {});
@@ -259,6 +274,21 @@ export default function DashboardPage() {
     } finally {
       setAutoSaving(false);
     }
+  };
+
+  const handleMagazineSubscription = async () => {
+    const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
+    if (!token) return;
+    setMagazineLoading(true);
+    try {
+      const method = magazineSubscribed ? "DELETE" : "POST";
+      const res = await fetch(`${API_URL}/api/magazine/subscribe`, {
+        method,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) setMagazineSubscribed(!magazineSubscribed);
+    } catch {}
+    finally { setMagazineLoading(false); }
   };
 
   const handleAffirmationSubscription = async () => {
@@ -572,6 +602,63 @@ export default function DashboardPage() {
             >
               {affirmationLoading ? "..." : affirmationSubscribed ? "✓ Подписан (отписаться)" : "Подписаться"}
             </button>
+          </div>
+        </div>
+
+        {/* Блок журнала */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-amber-200 to-orange-200 bg-clip-text text-transparent">📰 Ежедневный журнал</h2>
+          <div style={{ ["--accent" as any]: "#f59e0b" }} className="home-panel p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <div className="relative z-10">
+                <div className="font-semibold mb-1">Персональная газета каждое утро</div>
+                <div className="text-sm text-slate-400">
+                  {magazineSubscribed
+                    ? "Вы подписаны — журнал приходит в 8:00"
+                    : "Гороскоп, аффирмация, таро, биоритмы — всё в одном выпуске"}
+                </div>
+              </div>
+              <button
+                onClick={handleMagazineSubscription}
+                disabled={magazineLoading}
+                style={{ ["--accent" as any]: "#f59e0b" }}
+                className={`plan-btn px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition disabled:opacity-50 ${
+                  magazineSubscribed ? "dash-btn-subscribed" : ""
+                }`}
+              >
+                {magazineLoading ? "..." : magazineSubscribed ? "✓ Подписан (отписаться)" : "💌 Подписаться на журнал"}
+              </button>
+            </div>
+
+            {magazineIssues.length > 0 && (
+              <div className="relative z-10">
+                <div className="text-sm font-medium text-slate-300 mb-3">Последние выпуски:</div>
+                <div className="space-y-2">
+                  {magazineIssues.slice(0, 5).map((issue, i) => (
+                    <a
+                      key={issue.uuid}
+                      href={`/magazine/${issue.uuid}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-900/60 border border-white/5 hover:border-amber-500/40 hover:bg-slate-900/80 transition group"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="text-2xl shrink-0">📰</span>
+                        <div className="min-w-0">
+                          <div className="font-semibold text-white group-hover:text-amber-300 transition truncate">
+                            Выпуск от {new Date(issue.date).toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {issue.sent ? "✓ Отправлен на почту" : "Готов"}
+                          </div>
+                        </div>
+                      </div>
+                      <span className="text-amber-400 text-xl shrink-0 group-hover:translate-x-1 transition-transform">→</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

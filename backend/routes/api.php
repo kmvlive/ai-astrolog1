@@ -164,6 +164,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/subscription/types', [\App\Http\Controllers\Api\SubscriptionController::class, 'updateTypes']);
     Route::get('/subscription/digest-prefs', [\App\Http\Controllers\Api\SubscriptionController::class, 'getDigestPrefs']);
     Route::post('/subscription/digest-prefs', [\App\Http\Controllers\Api\SubscriptionController::class, 'updateDigestPrefs']);
+    Route::get('/magazine/my-issues', [\App\Http\Controllers\Api\MagazineController::class, 'myIssues']);
+    Route::post('/magazine/subscribe', [\App\Http\Controllers\Api\MagazineController::class, 'subscribe']);
+    Route::delete('/magazine/subscribe', [\App\Http\Controllers\Api\MagazineController::class, 'unsubscribe']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/set-password', [AuthController::class, 'setPassword']);
     Route::get('/telegram/confirm/{chatId}', function (string $chatId, \Illuminate\Http\Request $request) {

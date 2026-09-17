@@ -44,3 +44,9 @@ Schedule::command('calendar:send-daily-max')->dailyAt('07:40')->timezone('Europe
 
 // Повтор фейлов — каждые 20 минут (cron)
 Schedule::command('calendar:retry-failed')->cron('*/20 * * * *')->withoutOverlapping(5);
+
+// Ежедневная генерация персональных журналов в 7:30
+Schedule::command('magazine:generate')->dailyAt('07:30')->withoutOverlapping();
+
+// Рассылка писем о готовых журналах в 7:35 (через 5 мин после генерации)
+Schedule::command('magazine:send')->dailyAt('07:35')->withoutOverlapping();
