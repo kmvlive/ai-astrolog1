@@ -223,6 +223,11 @@ export default function DashboardPage() {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ channels: selChannels }),
       });
+      await fetch(`${API_URL}/api/subscription/digest-prefs`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ extra_horoscopes: extraHoroscopes, mood, frequency }),
+      });
       setSettingsSaved(true);
       setTimeout(() => setSettingsSaved(false), 3000);
     } catch {} finally {
