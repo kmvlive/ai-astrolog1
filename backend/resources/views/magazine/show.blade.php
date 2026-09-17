@@ -393,8 +393,6 @@
 /* === БЛОГ: "См. также" === */
 .journal-blog {
     margin-top: 50px;
-    padding-top: 40px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .journal-blog-title {
@@ -552,9 +550,7 @@
     grid-template-columns: 1fr 1fr;
     gap: 40px;
     margin: 60px 0 40px;
-    padding: 40px 0;
-    border-top: 1px solid rgba(251, 191, 36, 0.3);
-    border-bottom: 1px solid rgba(251, 191, 36, 0.3);
+    padding: 20px 0;
 }
 
 .pre-footer-col {
@@ -817,6 +813,70 @@
     gap: 10px;
 }
 
+
+/* === Блок «Поделиться» === */
+.journal-share {
+    margin: 20px auto 0;
+    max-width: 680px;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.5), rgba(30, 27, 75, 0.3));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 28px 24px;
+}
+
+.journal-share-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+.journal-share-sub {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 18px;
+}
+
+.journal-share-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.share-btn:hover {
+    transform: translateY(-2px);
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.5);
+}
+
+.share-tg { background: #229ED9; }
+.share-vk { background: #0077FF; }
+.share-wa { background: #25D366; }
+.share-ok { background: #EE8208; }
+.share-copy {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
 </style>
 
 <div class="journal-page">
@@ -872,7 +932,6 @@
         </div>
     @endif
 
-    <div class="journal-ornament">❖ ❖ ❖</div>
 
     {{-- Grid: main + sidebar --}}
     <div class="journal-grid">
@@ -1049,7 +1108,30 @@
         </div>
     </section>
 
+    {{-- Поделиться выпуском --}}
+    @php
+        $magUrl = url('/magazine/' . $issue->uuid);
+        $shareText = '💫 Мой персональный журнал AI-астролога от ' . $issue->issue_date->translatedFormat('d.m.Y');
+    @endphp
+    <section class="journal-share">
+        <div class="journal-share-title">Поделиться выпуском</div>
+        <div class="journal-share-sub">Отправьте свой персональный журнал друзьям</div>
+        <div class="journal-share-buttons">
+            <a class="share-btn share-tg" target="_blank" rel="noopener"
+               href="https://t.me/share/url?url={{ urlencode($magUrl) }}&text={{ urlencode($shareText) }}">✈️ Telegram</a>
+            <a class="share-btn share-vk" target="_blank" rel="noopener"
+               href="https://vk.com/share.php?url={{ urlencode($magUrl) }}">💙 ВКонтакте</a>
+            <a class="share-btn share-wa" target="_blank" rel="noopener"
+               href="https://wa.me/?text={{ urlencode($shareText . ' ' . $magUrl) }}">💬 WhatsApp</a>
+            <a class="share-btn share-ok" target="_blank" rel="noopener"
+               href="https://connect.ok.ru/offer?url={{ urlencode($magUrl) }}">🧡 Одноклассники</a>
+            <button class="share-btn share-copy" type="button"
+                    onclick="navigator.clipboard.writeText('{{ $magUrl }}').then(() => { this.textContent = '✓ Скопировано'; setTimeout(() => this.textContent = '🔗 Скопировать ссылку', 2000); })">🔗 Скопировать ссылку</button>
+        </div>
+    </section>
+
     {{-- Footer --}}
+
 
     <div class="journal-footer">
         <div>Ваш персональный журнал сгенерирован {{ \Carbon\Carbon::parse($issue->content['meta']['generated_at'])->translatedFormat('d F Y в H:i') }}</div>
