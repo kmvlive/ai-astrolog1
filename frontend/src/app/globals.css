@@ -159,8 +159,8 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 
 /* --- Биоритмы: анимации --- */
 @keyframes bio-card-in {
-  0% { opacity: 0; transform: translateY(20px) scale(0.9); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0% { transform: translateY(16px) scale(0.97); }
+  100% { transform: translateY(0) scale(1); }
 }
 
 .bio-card {
@@ -220,7 +220,6 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 
 @keyframes zodiac-appear {
   0% { 
-    opacity: 0; 
     transform: translateY(30px) scale(0.85);
   }
   60% {
@@ -421,7 +420,7 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 
 /* --- Анимации появления страницы --- */
 @keyframes page-fade-up {
-  from { opacity: 0; transform: translateY(24px); }
+  from { transform: translateY(24px); }
   to { opacity: 1; transform: none; }
 }
 .page-anim { animation: page-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
@@ -495,9 +494,9 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 .div-card:nth-child(6) { animation-delay: 0.30s; }
 
 @keyframes div-card-in {
-  0% { opacity: 0; transform: translateY(20px) scale(0.9); }
-  60% { opacity: 1; transform: translateY(-3px) scale(1.02); }
-  100% { opacity: 1; transform: none; }
+  0% { transform: translateY(16px) scale(0.97); }
+  60% { transform: translateY(-3px) scale(1.02); }
+  100% { transform: none; }
 }
 
 .div-card:hover {
@@ -772,8 +771,8 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 
 /* --- Биоритмы: анимации --- */
 @keyframes bio-card-in {
-  0% { opacity: 0; transform: translateY(20px) scale(0.9); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0% { transform: translateY(16px) scale(0.97); }
+  100% { transform: translateY(0) scale(1); }
 }
 
 .bio-card {
@@ -833,7 +832,6 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 
 @keyframes zodiac-appear {
   0% { 
-    opacity: 0; 
     transform: translateY(30px) scale(0.85);
   }
   60% {
@@ -1034,7 +1032,7 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 
 /* --- Анимации появления страницы --- */
 @keyframes page-fade-up {
-  from { opacity: 0; transform: translateY(24px); }
+  from { transform: translateY(24px); }
   to { opacity: 1; transform: none; }
 }
 .page-anim { animation: page-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
@@ -1108,9 +1106,9 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 .div-card:nth-child(6) { animation-delay: 0.30s; }
 
 @keyframes div-card-in {
-  0% { opacity: 0; transform: translateY(20px) scale(0.9); }
-  60% { opacity: 1; transform: translateY(-3px) scale(1.02); }
-  100% { opacity: 1; transform: none; }
+  0% { transform: translateY(16px) scale(0.97); }
+  60% { transform: translateY(-3px) scale(1.02); }
+  100% { transform: none; }
 }
 
 .div-card:hover {
@@ -1205,7 +1203,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 .cal-card:nth-child(8) { animation-delay: 0.40s; }
 
 @keyframes cal-card-in {
-  0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+  0% { transform: translateY(20px) scale(0.9); }
   60% { opacity: 1; transform: translateY(-3px) scale(1.02); }
   100% { opacity: 1; transform: none; }
 }

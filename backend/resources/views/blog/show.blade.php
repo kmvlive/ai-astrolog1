@@ -28,7 +28,7 @@
 .back-link:hover{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.4);color:#fff;text-decoration:none;transform:translateX(-3px)}
 .article{background:linear-gradient(135deg,rgba(15,23,42,.85),rgba(30,27,75,.4));border:1px solid rgba(255,255,255,.08);border-radius:28px;padding:48px;max-width:800px;margin:0 auto;position:relative;overflow:hidden;animation:article-in .6s cubic-bezier(.16,1,.3,1)}
 .article::before{content:"";position:absolute;inset:0;border-radius:28px;padding:2px;background:linear-gradient(135deg,rgba(168,85,247,.5),rgba(236,72,153,.15) 40%,rgba(14,165,233,.3) 70%,rgba(168,85,247,.5));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.45;pointer-events:none;background-size:200% 200%;animation:blog-glow 3.5s ease-in-out infinite}
-@keyframes article-in{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes article-in{from{transform:translateY(16px)}to{transform:none}}
 .article h1{font-size:clamp(26px,4vw,38px);line-height:1.25;margin-bottom:24px;background:linear-gradient(135deg,#fff,#c4b5fd);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
 .article-cover{width:100%;height:auto;border-radius:20px;margin-bottom:32px;box-shadow:0 20px 50px -15px rgba(168,85,247,.35),0 0 30px -5px rgba(236,72,153,.15);display:block}
 .article-meta{display:flex;gap:12px;color:#94a3b8;font-size:13px;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,.08);flex-wrap:wrap;align-items:center}

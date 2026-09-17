@@ -110,7 +110,7 @@
         .post:nth-child(7){animation-delay:.35s}
         .post:nth-child(8){animation-delay:.4s}
         .post:nth-child(9){animation-delay:.45s}
-        @keyframes post-in{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
+        @keyframes post-in{from{transform:translateY(16px) scale(.97)}to{transform:none}}
         .post::before{content:"";position:absolute;inset:0;border-radius:24px;padding:2px;background:linear-gradient(135deg,rgba(168,85,247,.6),rgba(236,72,153,.2) 40%,rgba(14,165,233,.4) 70%,rgba(168,85,247,.6));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.35;pointer-events:none;animation:blog-glow 3.5s ease-in-out infinite;background-size:200% 200%}
         @keyframes blog-glow{0%,100%{opacity:.25}50%{opacity:.7}}
         .post:hover{transform:translateY(-6px) scale(1.01);border-color:rgba(168,85,247,.5);box-shadow:0 20px 50px -15px rgba(168,85,247,.35),0 0 30px -5px rgba(236,72,153,.2)}
