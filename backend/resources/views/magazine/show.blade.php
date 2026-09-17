@@ -1007,6 +1007,28 @@
     @endif
 
 
+    {{-- Дополнительные гороскопы по знаку: финансы и здоровье --}}
+    @if(!empty($issue->content['sign_extras']))
+        <div class="sign-extras">
+            @if($issue->content['sign_extras']['financial'] ?? null)
+                <div class="sign-extra-card sign-extra-finance">
+                    <div class="sign-extra-kicker">💰 Финансы</div>
+                    <div class="sign-extra-title">Денежный прогноз</div>
+                    <div class="sign-extra-text">{{ \Illuminate\Support\Str::limit($issue->content['sign_extras']['financial']['content'], 300) }}</div>
+                    <a href="{{ $issue->content['sign_extras']['financial']['url'] }}" class="sign-extra-link">Полный гороскоп →</a>
+                </div>
+            @endif
+            @if($issue->content['sign_extras']['health'] ?? null)
+                <div class="sign-extra-card sign-extra-health">
+                    <div class="sign-extra-kicker">🌿 Здоровье</div>
+                    <div class="sign-extra-title">Прогноз самочувствия</div>
+                    <div class="sign-extra-text">{{ \Illuminate\Support\Str::limit($issue->content['sign_extras']['health']['content'], 300) }}</div>
+                    <a href="{{ $issue->content['sign_extras']['health']['url'] }}" class="sign-extra-link">Полный гороскоп →</a>
+                </div>
+            @endif
+        </div>
+    @endif
+
     {{-- Grid: main + sidebar --}}
     <div class="journal-grid">
         {{-- MAIN: Аффирмация --}}
