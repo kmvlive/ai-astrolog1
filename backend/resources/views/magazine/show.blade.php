@@ -905,8 +905,7 @@
     {{-- Pre-footer: Луна + Колонка редактора --}}
     <section class="journal-pre-footer">
         <div class="pre-footer-col">
-            <div class="pre-footer-kicker">🌙 Небесный календарь</div>
-            <div class="pre-footer-title">Фаза Луны</div>
+            <div class="pre-footer-kicker">🌙 ФАЗА ЛУНЫ</div>
             <div class="moon-display">
                 <div class="moon-icon">{{ $moon['emoji'] }}</div>
                 <div class="moon-info">
@@ -921,8 +920,7 @@
         </div>
 
         <div class="pre-footer-col">
-            <div class="pre-footer-kicker">✍️ Авторская колонка</div>
-            <div class="pre-footer-title">Колонка редактора</div>
+            <div class="pre-footer-kicker">✍️ КОЛОНКА РЕДАКТОРА</div>
             @if($editorPost)
                 <a href="/blog/{{ $editorPost->slug }}" class="editor-card">
                     <div class="editor-cover">
