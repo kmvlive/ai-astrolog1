@@ -38,6 +38,15 @@
     position: relative;
 }
 
+.journal-kicker {
+    font-size: 13px;
+    letter-spacing: 12px;
+    text-transform: uppercase;
+    color: #fbbf24;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
 .journal-title {
     font-family: 'Playfair Display', Georgia, serif;
     font-size: 72px;
@@ -541,11 +550,12 @@
 <div class="journal-page">
     {{-- Мелкий верхний колонтитул --}}
     <div class="journal-masthead-small">
-        Выпуск №{{ $issue->id }} · {{ $issue->issue_date->translatedFormat('d F Y') }}
+        Выпуск №{{ $issue->id }}
     </div>
 
     {{-- Masthead --}}
     <div class="journal-masthead">
+        <div class="journal-kicker">Журнал</div>
         <h1 class="journal-title">AI АСТРОЛОГ</h1>
         <div class="journal-subtitle">Персональный выпуск</div>
         <div class="journal-meta">
