@@ -315,11 +315,10 @@ export default function DashboardPage() {
       <CometField count={8} />
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="pricing-eyebrow mb-6">👤 Личный кабинет</div>
-        <h1 className="text-3xl md:text-4xl font-bold mb-8 flex items-center gap-3 flex-wrap">
+        <h1 className="text-3xl md:text-4xl font-bold mb-8">
           <span className="bg-gradient-to-r from-violet-400 to-amber-400 bg-clip-text text-transparent">
             {profile?.name ? `Привет, ${profile.name}!` : "Привет!"}
           </span>
-          <span>👋</span>
         </h1>
 
         {/* Баннер про город рождения */}
