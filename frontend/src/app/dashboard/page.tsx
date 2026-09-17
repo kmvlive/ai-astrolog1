@@ -74,7 +74,13 @@ export default function DashboardPage() {
     })
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
-        if (data?.profile) setProfile(data.profile);
+        if (data?.profile) {
+          // name/email лежат на User, не в profile — перекладываем
+          const p: any = { ...data.profile };
+          if (data.name && !p.name) p.name = data.name;
+          if (data.email && !p.email) p.email = data.email;
+          setProfile(p);
+        }
         if (data?.subscription) {
           setSubscription(data.subscription);
           setAutoRenew(!!data.subscription.auto_renew);
