@@ -719,6 +719,84 @@
     }
 }
 
+
+/* === FEATURED BLOG POST (одна большая карточка) === */
+.blog-feature {
+    display: grid;
+    grid-template-columns: 440px 1fr;
+    gap: 36px;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.5), rgba(30, 27, 75, 0.3));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 24px;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.blog-feature:hover {
+    text-decoration: none;
+    border-color: rgba(168, 85, 247, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px -12px rgba(168, 85, 247, 0.3);
+}
+
+.blog-feature-cover {
+    width: 100%;
+    aspect-ratio: 16/10;
+    border-radius: 14px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 56px;
+}
+
+.blog-feature-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s;
+}
+
+.blog-feature:hover .blog-feature-cover img {
+    transform: scale(1.05);
+}
+
+.blog-feature-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.blog-feature-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+    margin: 8px 0 12px;
+}
+
+.blog-feature-excerpt {
+    font-size: 15px;
+    color: #cbd5e1;
+    line-height: 1.75;
+    margin-bottom: 16px;
+}
+
+@media (max-width: 900px) {
+    .blog-feature {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .blog-feature-title {
+        font-size: 24px;
+    }
+}
+
 </style>
 
 <div class="journal-page">
@@ -873,31 +951,31 @@
         </div>
     </div>
 
-    {{-- Блог: "См. также" --}}
+    {{-- Блог: одна последняя статья крупной карточкой --}}
     @if(!empty($issue->content['blog']))
+        @php $latest = $issue->content['blog'][0]; @endphp
         <section class="journal-blog">
             <h2 class="journal-blog-title">
                 <span>📖</span>
                 <span>Читайте также в нашем блоге</span>
             </h2>
-            <div class="blog-grid">
-                @foreach($issue->content['blog'] as $post)
-                    <a href="{{ $post['url'] }}" class="blog-card">
-                        <div class="blog-cover">
-                            @if($post['cover'] ?? null)
-                                <img src="{{ asset('storage/' . $post['cover']) }}" alt="{{ $post['title'] }}">
-                            @else
-                                ✨
-                            @endif
-                        </div>
-                        <div class="blog-date">{{ \Carbon\Carbon::parse($post['date'])->translatedFormat('d M') }}</div>
-                        <div class="blog-title">{{ $post['title'] }}</div>
-                        @if($post['excerpt'] ?? null)
-                            <div class="blog-excerpt">{{ Str::limit($post['excerpt'], 80) }}</div>
-                        @endif
-                    </a>
-                @endforeach
-            </div>
+            <a href="{{ $latest['url'] }}" class="blog-feature">
+                <div class="blog-feature-cover">
+                    @if($latest['cover'] ?? null)
+                        <img src="{{ asset('storage/' . $latest['cover']) }}" alt="{{ $latest['title'] }}">
+                    @else
+                        ✨
+                    @endif
+                </div>
+                <div class="blog-feature-content">
+                    <div class="blog-date">{{ \Carbon\Carbon::parse($latest['date'])->translatedFormat('d F Y') }}</div>
+                    <div class="blog-feature-title">{{ $latest['title'] }}</div>
+                    @if($latest['excerpt'] ?? null)
+                        <div class="blog-feature-excerpt">{{ Str::limit($latest['excerpt'], 260) }}</div>
+                    @endif
+                    <div class="editor-link">Читать полную статью →</div>
+                </div>
+            </a>
         </section>
     @endif
 
