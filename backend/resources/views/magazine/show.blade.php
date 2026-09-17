@@ -545,6 +545,180 @@
         text-align: center;
     }
 }
+
+/* === PRE-FOOTER: Луна + Колонка редактора === */
+.journal-pre-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin: 60px 0 40px;
+    padding: 40px 0;
+    border-top: 1px solid rgba(251, 191, 36, 0.3);
+    border-bottom: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.pre-footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pre-footer-kicker {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #a78bfa;
+    font-weight: 700;
+}
+
+.pre-footer-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+/* Луна */
+.moon-display {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+.moon-icon {
+    width: 100px;
+    height: 100px;
+    font-size: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.15), transparent 70%);
+    border-radius: 50%;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.3));
+}
+
+.moon-info h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 4px;
+    color: #fbbf24;
+}
+
+.moon-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: #cbd5e1;
+    margin: 8px 0;
+}
+
+.moon-stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.moon-stat strong {
+    color: #fff;
+}
+
+.moon-text {
+    font-size: 14px;
+    color: #cbd5e1;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+/* Колонка редактора */
+.editor-card {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    text-decoration: none;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.4), rgba(30, 27, 75, 0.25));
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    transition: all 0.3s;
+}
+
+.editor-card:hover {
+    text-decoration: none;
+    border-color: rgba(168, 85, 247, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -10px rgba(168, 85, 247, 0.25);
+}
+
+.editor-cover {
+    width: 110px;
+    height: 110px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(236, 72, 153, 0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    overflow: hidden;
+}
+
+.editor-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.editor-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.editor-date {
+    font-size: 11px;
+    color: #94a3b8;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.editor-article-title {
+    font-family: 'Merriweather', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.35;
+}
+
+.editor-excerpt {
+    font-size: 13px;
+    color: #cbd5e1;
+    line-height: 1.5;
+}
+
+.editor-link {
+    font-size: 13px;
+    color: #fbbf24;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+@media (max-width: 800px) {
+    .journal-pre-footer {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+    .editor-card {
+        flex-direction: column;
+    }
+    .editor-cover {
+        width: 100%;
+        height: 140px;
+    }
+}
+
 </style>
 
 <div class="journal-page">
@@ -727,7 +901,56 @@
         </section>
     @endif
 
+
+    {{-- Pre-footer: Луна + Колонка редактора --}}
+    <section class="journal-pre-footer">
+        <div class="pre-footer-col">
+            <div class="pre-footer-kicker">🌙 Небесный календарь</div>
+            <div class="pre-footer-title">Фаза Луны</div>
+            <div class="moon-display">
+                <div class="moon-icon">{{ $moon['emoji'] }}</div>
+                <div class="moon-info">
+                    <h4>{{ $moon['name'] }}</h4>
+                    <div class="moon-stats">
+                        <div class="moon-stat">💡 <strong>{{ $moon['illumination'] }}%</strong></div>
+                        <div class="moon-stat">📅 <strong>{{ $moon['lunarDay'] }}-й день</strong></div>
+                    </div>
+                    <div class="moon-text">{{ $moon['text'] }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pre-footer-col">
+            <div class="pre-footer-kicker">✍️ Авторская колонка</div>
+            <div class="pre-footer-title">Колонка редактора</div>
+            @if($editorPost)
+                <a href="/blog/{{ $editorPost->slug }}" class="editor-card">
+                    <div class="editor-cover">
+                        @if($editorPost->cover_image)
+                            <img src="{{ asset('storage/' . $editorPost->cover_image) }}" alt="">
+                        @else
+                            ✍️
+                        @endif
+                    </div>
+                    <div class="editor-content">
+                        <div class="editor-date">{{ $editorPost->published_at?->translatedFormat('d F Y') }}</div>
+                        <div class="editor-article-title">{{ $editorPost->title }}</div>
+                        @if($editorPost->excerpt)
+                            <div class="editor-excerpt">{{ Str::limit($editorPost->excerpt, 140) }}</div>
+                        @endif
+                        <div class="editor-link">Читать полностью →</div>
+                    </div>
+                </a>
+            @else
+                <div style="color: #94a3b8; font-style: italic; padding: 20px;">
+                    Скоро здесь появится новая колонка редактора.
+                </div>
+            @endif
+        </div>
+    </section>
+
     {{-- Footer --}}
+
     <div class="journal-footer">
         <div>Ваш персональный журнал сгенерирован {{ \Carbon\Carbon::parse($issue->content['meta']['generated_at'])->translatedFormat('d F Y в H:i') }}</div>
         <div style="margin-top: 8px;">© AI Астролог · my.neiro-astro.ru</div>
