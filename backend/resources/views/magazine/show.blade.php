@@ -797,6 +797,26 @@
     }
 }
 
+
+/* === Ссылки внутри блоков журнала === */
+.mag-block-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #a78bfa;
+    text-decoration: none;
+    transition: color 0.2s, gap 0.2s;
+}
+
+.mag-block-link:hover {
+    color: #c4b5fd;
+    text-decoration: none;
+    gap: 10px;
+}
+
 </style>
 
 <div class="journal-page">
@@ -872,6 +892,7 @@
                             — {{ $issue->content['affirmation']['title'] }}
                         </div>
                     @endif
+                    <a href="/affirmations" class="mag-block-link">Все аффирмации →</a>
                 </div>
             </div>
         @endif
@@ -898,6 +919,7 @@
                             <p>{{ $issue->content['tarot']['meaning_today'] }}</p>
                         </div>
                     </div>
+                    <a href="/tarot" class="mag-block-link">Карта дня →</a>
                 </div>
             @endif
 
@@ -927,6 +949,7 @@
                         @endforeach
                     </div>
                     <div class="bio-days">День вашей жизни: <strong style="color:#fbbf24">{{ $bio['days_alive'] }}</strong></div>
+                    <a href="/biorhythms" class="mag-block-link">Мои биоритмы →</a>
                 </div>
             @endif
 
@@ -993,6 +1016,7 @@
                         <div class="moon-stat">📅 <strong>{{ $moon['lunarDay'] }}-й день</strong></div>
                     </div>
                     <div class="moon-text">{{ $moon['text'] }}</div>
+                    <a href="/moon" class="mag-block-link">Лунный календарь →</a>
                 </div>
             </div>
         </div>
