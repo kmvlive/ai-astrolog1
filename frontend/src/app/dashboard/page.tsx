@@ -613,7 +613,7 @@ export default function DashboardPage() {
             {/* Telegram */}
             <div style={{ ["--accent" as any]: "#229ed9" }} className="home-panel p-6 flex flex-col items-start justify-between gap-4">
               <div>
-                <div className="font-semibold mb-1 text-white">🤖 Гороскопы в Telegram</div>
+                <div className="font-semibold mb-1 text-white">🤖 Telegram</div>
                 <div className="text-sm text-slate-400">
                   {tgConnected
                     ? "Подключено"
@@ -638,7 +638,7 @@ export default function DashboardPage() {
             {/* MAX */}
             <div style={{ ["--accent" as any]: "#0077ff" }} className="home-panel p-6 flex flex-col items-start justify-between gap-4">
               <div>
-                <div className="font-semibold mb-1 text-white">💬 Гороскопы в MAX</div>
+                <div className="font-semibold mb-1 text-white">💬 MAX</div>
                 <div className="text-sm text-slate-400">
                   {maxConnected
                     ? "Подключено"
