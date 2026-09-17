@@ -474,7 +474,7 @@ export default function HomePage() {
 <section className="bg-slate-900/50 py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-3 bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent">📖 Блог AI-астролога</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-3 flex items-center justify-center gap-3"><span>📖</span><span className="bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent">Блог AI-астролога</span></h2>
             <p className="text-slate-400">Энергии дня, лунные циклы и астрологические прогнозы</p>
           </div>
           {blogPosts.length > 0 ? (

@@ -309,11 +309,12 @@ export default function DashboardPage() {
       <CometField count={8} />
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="pricing-eyebrow mb-6">👤 Личный кабинет</div>
-        {profile?.name && (
-          <h1 className="text-3xl md:text-4xl font-bold mb-8 bg-gradient-to-r from-violet-400 to-amber-400 bg-clip-text text-transparent">
-            Привет, {profile.name}! 👋
-          </h1>
-        )}
+        <h1 className="text-3xl md:text-4xl font-bold mb-8 flex items-center gap-3 flex-wrap">
+          <span className="bg-gradient-to-r from-violet-400 to-amber-400 bg-clip-text text-transparent">
+            {profile?.name ? `Привет, ${profile.name}!` : "Привет!"}
+          </span>
+          <span>👋</span>
+        </h1>
 
         {/* Баннер про город рождения */}
         {profile && !profile.city && (
@@ -337,7 +338,7 @@ export default function DashboardPage() {
 
         {/* Настройки рассылки */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-violet-300 to-fuchsia-300 bg-clip-text text-transparent">📧 Что получать</h2>
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><span>📧</span><span className="bg-gradient-to-r from-violet-300 to-fuchsia-300 bg-clip-text text-transparent">Что получать</span></h2>
           <div style={{ ["--accent" as any]: "#a855f7" }} className="home-panel p-6">
             <div className="text-sm font-medium text-slate-300 mb-2">Какие гороскопы получать?</div>
             <div className="flex flex-wrap gap-2 mb-6">
@@ -460,7 +461,7 @@ export default function DashboardPage() {
 
         {/* Блок подписки на аффирмации */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-fuchsia-300 to-violet-300 bg-clip-text text-transparent">💫 Подписка на аффирмации</h2>
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><span>💫</span><span className="bg-gradient-to-r from-fuchsia-300 to-violet-300 bg-clip-text text-transparent">Подписка на аффирмации</span></h2>
           <div style={{ ["--accent" as any]: "#e879f9" }} className="home-panel p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <div className="font-semibold mb-1">Ежедневные аффирмации</div>
@@ -486,7 +487,7 @@ export default function DashboardPage() {
         {/* Блок натальной карты (скрыт если бесплатная включена) */}
         {!freeNatalChartEnabled && (
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-amber-200 to-violet-200 bg-clip-text text-transparent">🌟 Натальная карта</h2>
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><span>🌟</span><span className="bg-gradient-to-r from-amber-200 to-violet-200 bg-clip-text text-transparent">Натальная карта</span></h2>
           <div style={{ ["--accent" as any]: "#a855f7" }} className="home-panel p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <div className="font-semibold mb-1">Персональный гороскоп по натальной карте</div>
@@ -516,7 +517,7 @@ export default function DashboardPage() {
 
         {/* Блок Мессенджеры */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-sky-300 to-blue-300 bg-clip-text text-transparent">📱 Мессенджеры</h2>
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><span>📱</span><span className="bg-gradient-to-r from-sky-300 to-blue-300 bg-clip-text text-transparent">Мессенджеры</span></h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Telegram */}
             <div style={{ ["--accent" as any]: "#229ed9" }} className="home-panel p-6 flex flex-col items-start justify-between gap-4">
@@ -572,7 +573,7 @@ export default function DashboardPage() {
 
         {/* Блок профиля */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">👤 Данные рождения</h2>
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><span>👤</span><span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">Данные рождения</span></h2>
           {profile ? (
             <div style={{ ["--accent" as any]: "#34d399" }} className="home-panel p-6">
               <div className="relative z-10 grid md:grid-cols-2 gap-4 mb-4">
@@ -662,7 +663,7 @@ export default function DashboardPage() {
         <div className="max-w-6xl mx-auto px-4 pt-8 pb-4">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-amber-200 to-violet-200 bg-clip-text text-transparent">📜 История гаданий</h2>
+              <h2 className="text-2xl font-bold flex items-center gap-2"><span>📜</span><span className="bg-gradient-to-r from-amber-200 to-violet-200 bg-clip-text text-transparent">История гаданий</span></h2>
               <p className="text-sm text-slate-400 mt-1">
                 {historyTotal > 0 ? `Всего предсказаний: ${historyTotal}` : "Ваши предсказания появятся здесь"}
               </p>

@@ -85,8 +85,9 @@ export default function DivinationsPage() {
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Заголовок */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-amber-400 via-purple-400 to-violet-400 bg-clip-text text-transparent">
-            🔮 Онлайн-гадания
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 flex items-center justify-center gap-3">
+            <span>🔮</span>
+            <span className="bg-gradient-to-r from-amber-400 via-purple-400 to-violet-400 bg-clip-text text-transparent">Онлайн-гадания</span>
           </h1>
           <p className="text-slate-400 text-lg max-w-2xl mx-auto">
             Семь древних способов заглянуть в будущее — от классического Таро до скандинавских рун.

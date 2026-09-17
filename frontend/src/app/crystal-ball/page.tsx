@@ -114,8 +114,9 @@ export default function CrystalBallPage() {
       <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
         {/* Заголовок */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-violet-400 via-purple-300 to-amber-400 bg-clip-text text-transparent">
-            🔮 Хрустальный Шар
+          <h1 className="text-4xl md:text-5xl font-bold mb-3 flex items-center justify-center gap-3">
+            <span>🔮</span>
+            <span className="bg-gradient-to-r from-violet-400 via-purple-300 to-amber-400 bg-clip-text text-transparent">Хрустальный Шар</span>
           </h1>
           <p className="text-slate-400 text-lg">
             Задайте вопрос — и древний оракул откроет завесу будущего
