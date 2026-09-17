@@ -10,98 +10,545 @@
 
 @section('content')
 <style>
-.mag-container{max-width:780px;margin:0 auto;position:relative;z-index:2}
+/* === JOURNAL LAYOUT === */
+.journal-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    position: relative;
+}
 
-/* Masthead журнала */
-.mag-masthead{text-align:center;margin-bottom:48px;padding:32px 0 24px;border-bottom:2px solid rgba(251,191,36,.4);position:relative}
-.mag-masthead::before{content:"❖ ❖ ❖";position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#020617;padding:0 16px;color:#fbbf24;font-size:12px;letter-spacing:8px}
-.mag-title{font-family:'Playfair Display','Merriweather',serif;font-size:56px;font-weight:900;letter-spacing:-2px;background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 50%,#fbbf24 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;margin-bottom:4px;line-height:1}
-.mag-subtitle{font-family:'Merriweather',serif;font-style:italic;font-size:15px;color:#a78bfa;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
-.mag-meta{font-size:12px;color:#94a3b8;letter-spacing:2px;text-transform:uppercase}
-.mag-meta strong{color:#fbbf24}
+/* Мелкий шрифт "номер выпуска" вверху */
+.journal-masthead-small {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
 
-/* Главная статья */
-.mag-lead{background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(168,85,247,.06));border:1px solid rgba(251,191,36,.25);border-radius:24px;padding:40px 36px;margin-bottom:40px;position:relative;overflow:hidden}
-.mag-lead::before{content:"";position:absolute;top:-50%;right:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(251,191,36,.12) 0%,transparent 60%);pointer-events:none}
-.mag-lead-label{display:inline-block;padding:6px 16px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0f172a;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
-.mag-lead h2{font-family:'Playfair Display','Merriweather',serif;font-size:32px;font-weight:700;margin-bottom:20px;color:#fff;line-height:1.25}
-.mag-lead-body{font-size:17px;line-height:1.85;color:#e2e8f0;white-space:pre-line}
-.mag-lead-body::first-letter{font-family:'Playfair Display',serif;font-size:64px;font-weight:700;float:left;line-height:0.9;margin:8px 12px 0 0;color:#fbbf24}
+/* Главный заголовок журнала */
+.journal-masthead {
+    text-align: center;
+    padding: 20px 0 30px;
+    border-top: 3px double #fbbf24;
+    border-bottom: 1px solid rgba(251, 191, 36, 0.3);
+    margin-bottom: 40px;
+    position: relative;
+}
 
-/* Блок-рубрика */
-.mag-section{margin-bottom:32px}
-.mag-section-head{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid rgba(168,85,247,.25)}
-.mag-section-icon{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(236,72,153,.15));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
-.mag-section-title{font-family:'Merriweather',serif;font-size:20px;font-weight:700;color:#fff;margin:0}
-.mag-section-kicker{font-size:11px;color:#a78bfa;text-transform:uppercase;letter-spacing:2px;font-weight:700}
+.journal-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 72px;
+    font-weight: 900;
+    letter-spacing: -3px;
+    line-height: 1;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #fbbf24 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    margin-bottom: 8px;
+}
 
-/* Аффирмация */
-.mag-quote{font-family:'Playfair Display','Merriweather',serif;font-style:italic;font-size:22px;line-height:1.5;color:#fde68a;text-align:center;padding:24px;background:linear-gradient(135deg,rgba(251,191,36,.06),transparent);border-radius:20px;border-left:4px solid #fbbf24;position:relative}
-.mag-quote::before,.mag-quote::after{content:"";position:absolute;font-size:48px;color:rgba(251,191,36,.3);font-family:Georgia,serif}
-.mag-quote::before{content:"“";top:-10px;left:16px}
-.mag-quote::after{content:"”";bottom:-30px;right:16px}
+.journal-subtitle {
+    font-family: 'Merriweather', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: #a78bfa;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+}
 
-/* Таро */
-.mag-tarot{display:flex;gap:24px;align-items:center;background:linear-gradient(135deg,rgba(168,85,247,.1),rgba(30,27,75,.4));border:1px solid rgba(168,85,247,.3);border-radius:20px;padding:24px}
-.mag-tarot-card{width:110px;height:180px;background:linear-gradient(135deg,#4c1d95,#1e1b4b);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:64px;flex-shrink:0;box-shadow:0 10px 30px -10px rgba(168,85,247,.5);position:relative;overflow:hidden}
-.mag-tarot-card::before{content:"";position:absolute;inset:4px;border:1px solid rgba(251,191,36,.4);border-radius:8px}
-.mag-tarot-info h3{font-family:'Playfair Display',serif;font-size:26px;margin-bottom:8px;color:#fff}
-.mag-tarot-info p{font-size:15px;line-height:1.7;color:#cbd5e1;font-style:italic}
+.journal-meta {
+    font-size: 12px;
+    color: #94a3b8;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 12px;
+}
 
-/* Биоритмы */
-.mag-bio{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.mag-bio-item{background:linear-gradient(135deg,rgba(15,23,42,.85),rgba(30,27,75,.4));border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:20px;text-align:center;position:relative;overflow:hidden}
-.mag-bio-item::before{content:"";position:absolute;inset:0;border-radius:20px;padding:1px;background:linear-gradient(135deg,rgba(168,85,247,.4),transparent 50%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.6;pointer-events:none}
-.mag-bio-label{font-size:12px;color:#94a3b8;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:8px}
-.mag-bio-value{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;line-height:1;margin-bottom:6px}
-.mag-bio-value.pos{background:linear-gradient(135deg,#34d399,#10b981);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
-.mag-bio-value.neg{background:linear-gradient(135deg,#f87171,#ef4444);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
-.mag-bio-bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;position:relative;margin-top:8px}
-.mag-bio-bar-fill{position:absolute;top:0;height:100%;border-radius:3px;transition:width .8s}
-.mag-bio-bar-center{position:absolute;top:0;left:50%;width:1px;height:100%;background:rgba(255,255,255,.2)}
-.mag-bio-day{margin-top:20px;text-align:center;font-size:13px;color:#94a3b8;font-style:italic}
+.journal-meta strong {
+    color: #fbbf24;
+}
 
-/* Ретроградные */
-.mag-retro{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.mag-retro-item{background:rgba(30,41,59,.6);border:1px solid rgba(236,72,153,.25);border-radius:14px;padding:14px;text-align:center}
-.mag-retro-item .planet{font-size:24px;margin-bottom:4px}
-.mag-retro-item .name{font-size:13px;font-weight:600;color:#fff}
-.mag-retro-item .status{font-size:11px;color:#f0abfc;margin-top:2px}
+/* Декоративный орнамент */
+.journal-ornament {
+    text-align: center;
+    color: #fbbf24;
+    font-size: 20px;
+    letter-spacing: 8px;
+    margin: 30px 0;
+    opacity: 0.6;
+}
 
-/* Блог */
-.mag-blog{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.mag-blog-item{background:linear-gradient(135deg,rgba(15,23,42,.85),rgba(30,27,75,.4));border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px;text-decoration:none;display:flex;flex-direction:column;gap:8px;transition:all .3s}
-.mag-blog-item:hover{transform:translateY(-3px);border-color:rgba(168,85,247,.5);text-decoration:none}
-.mag-blog-cover{width:100%;aspect-ratio:16/9;border-radius:10px;background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(236,72,153,.15));display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;margin-bottom:4px}
-.mag-blog-cover img{width:100%;height:100%;object-fit:cover}
-.mag-blog-date{font-size:11px;color:#94a3b8;letter-spacing:1px;text-transform:uppercase}
-.mag-blog-title{font-family:'Merriweather',serif;font-size:15px;font-weight:700;color:#fff;line-height:1.35}
-.mag-blog-excerpt{font-size:12px;color:#cbd5e1;line-height:1.5}
+/* === ГЛАВНАЯ СТАТЬЯ (LEAD) === */
+.journal-lead {
+    margin-bottom: 50px;
+}
 
-/* Футер журнала */
-.mag-footer{text-align:center;padding:40px 0 20px;margin-top:40px;border-top:2px solid rgba(251,191,36,.3);color:#94a3b8;font-size:13px;position:relative}
-.mag-footer::before{content:"❖";position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#020617;padding:0 12px;color:#fbbf24;font-size:14px}
-.mag-footer-cta{display:inline-block;margin-top:16px;padding:12px 28px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border-radius:999px;font-weight:600;text-decoration:none;box-shadow:0 0 20px -4px rgba(168,85,247,.5)}
-.mag-footer-cta:hover{color:#fff;text-decoration:none;box-shadow:0 0 30px -2px rgba(168,85,247,.7)}
+.journal-lead-headline {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #fff;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+}
 
-@media(max-width:640px){
-.mag-title{font-size:40px}
-.mag-lead{padding:28px 20px}
-.mag-lead h2{font-size:24px}
-.mag-quote{font-size:18px;padding:20px}
-.mag-tarot{flex-direction:column;text-align:center}
-.mag-bio{grid-template-columns:1fr}
-.mag-bio-value{font-size:36px}
-.mag-blog{grid-template-columns:1fr}
+.journal-lead-kicker {
+    display: inline-block;
+    padding: 6px 20px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #0f172a;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+/* Текст в две колонки */
+.journal-columns {
+    column-count: 2;
+    column-gap: 40px;
+    column-rule: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: justify;
+    hyphens: auto;
+}
+
+.journal-columns p {
+    margin-bottom: 16px;
+    line-height: 1.8;
+    font-size: 16px;
+    color: #e2e8f0;
+}
+
+/* Буквица (drop cap) */
+.journal-drop-cap::first-letter {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 72px;
+    font-weight: 700;
+    float: left;
+    line-height: 0.8;
+    margin: 8px 12px 0 0;
+    color: #fbbf24;
+}
+
+/* === GRID LAYOUT: main + sidebar === */
+.journal-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+.journal-main {
+    min-width: 0;
+}
+
+.journal-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* === SIDEBAR БЛОКИ === */
+.sidebar-block {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 27, 75, 0.4));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-block::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), transparent 50%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.sidebar-block-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sidebar-block-icon {
+    font-size: 24px;
+}
+
+/* Аффирмация — большая цитата */
+.affirmation-quote {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #fde68a;
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), transparent);
+    border-left: 3px solid #fbbf24;
+    border-radius: 8px;
+    position: relative;
+}
+
+.affirmation-quote::before {
+    content: """;
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    font-size: 48px;
+    color: rgba(251, 191, 36, 0.3);
+    font-family: Georgia, serif;
+}
+
+/* Таро — карточка */
+.tarot-card-display {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.tarot-card-img {
+    width: 80px;
+    height: 130px;
+    background: linear-gradient(135deg, #4c1d95, #1e1b4b);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    flex-shrink: 0;
+    box-shadow: 0 8px 20px -8px rgba(168, 85, 247, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.tarot-card-img::before {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    border-radius: 6px;
+}
+
+.tarot-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.tarot-info h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    margin-bottom: 6px;
+    color: #fff;
+}
+
+.tarot-info p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #cbd5e1;
+    font-style: italic;
+}
+
+/* Биоритмы — инфографика */
+.biorhythms-chart {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.bio-item {
+    text-align: center;
+    padding: 12px 8px;
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.bio-label {
+    font-size: 10px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.bio-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.bio-value.pos {
+    background: linear-gradient(135deg, #34d399, #10b981);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.bio-value.neg {
+    background: linear-gradient(135deg, #f87171, #ef4444);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.bio-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+}
+
+.bio-bar-center {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.bio-bar-fill {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-radius: 3px;
+}
+
+.bio-days {
+    text-align: center;
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 12px;
+    font-style: italic;
+}
+
+/* Ретроградные планеты */
+.retro-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+}
+
+.retro-item {
+    background: rgba(236, 72, 153, 0.08);
+    border: 1px solid rgba(236, 72, 153, 0.2);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+}
+
+.retro-planet {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.retro-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.retro-status {
+    font-size: 10px;
+    color: #f0abfc;
+    margin-top: 2px;
+}
+
+/* === БЛОГ: "См. также" === */
+.journal-blog {
+    margin-top: 50px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.journal-blog-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.blog-card {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 27, 75, 0.3));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    text-decoration: none;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.blog-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(168, 85, 247, 0.4);
+    box-shadow: 0 12px 30px -10px rgba(168, 85, 247, 0.3);
+}
+
+.blog-cover {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    overflow: hidden;
+}
+
+.blog-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.blog-date {
+    font-size: 10px;
+    color: #94a3b8;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.blog-title {
+    font-family: 'Merriweather', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.4;
+}
+
+.blog-excerpt {
+    font-size: 12px;
+    color: #cbd5e1;
+    line-height: 1.5;
+}
+
+/* === FOOTER === */
+.journal-footer {
+    margin-top: 60px;
+    padding: 40px 0 30px;
+    border-top: 3px double rgba(251, 191, 36, 0.3);
+    text-align: center;
+    color: #94a3b8;
+    font-size: 12px;
+    position: relative;
+}
+
+.journal-footer::before {
+    content: "❖";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #020617;
+    padding: 0 16px;
+    color: #fbbf24;
+    font-size: 16px;
+}
+
+.journal-footer-cta {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: #fff;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 0 20px -4px rgba(168, 85, 247, 0.5);
+    transition: all 0.3s;
+}
+
+.journal-footer-cta:hover {
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0 0 30px -2px rgba(168, 85, 247, 0.7);
+    transform: translateY(-2px);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+    .journal-grid {
+        grid-template-columns: 1fr;
+    }
+    .journal-columns {
+        column-count: 1;
+    }
+    .blog-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .journal-title {
+        font-size: 48px;
+    }
+    .journal-lead-headline {
+        font-size: 32px;
+    }
+    .blog-grid {
+        grid-template-columns: 1fr;
+    }
+    .biorhythms-chart {
+        grid-template-columns: 1fr;
+    }
+    .tarot-card-display {
+        flex-direction: column;
+        text-align: center;
+    }
 }
 </style>
 
-<div class="mag-container">
+<div class="journal-page">
+    {{-- Мелкий верхний колонтитул --}}
+    <div class="journal-masthead-small">
+        Выпуск №{{ $issue->id }} · {{ $issue->issue_date->translatedFormat('d F Y') }}
+    </div>
+
     {{-- Masthead --}}
-    <div class="mag-masthead">
-        <div class="mag-subtitle">Персональный выпуск</div>
-        <h1 class="mag-title">AI АСТРОЛОГ</h1>
-        <div class="mag-meta">
+    <div class="journal-masthead">
+        <h1 class="journal-title">AI АСТРОЛОГ</h1>
+        <div class="journal-subtitle">Персональный выпуск</div>
+        <div class="journal-meta">
             @if($issue->content['meta']['user_name'] ?? null)
                 Для <strong>{{ $issue->content['meta']['user_name'] }}</strong> ·
             @endif
@@ -111,8 +558,8 @@
 
     {{-- Главная статья: гороскоп --}}
     @if($issue->content['horoscope'] ?? null)
-        <article class="mag-lead">
-            <span class="mag-lead-label">
+        <article class="journal-lead">
+            <span class="journal-lead-kicker">
                 @if($issue->content['horoscope']['type'] === 'personal')
                     ⭐ Ваш персональный прогноз
                 @elseif($issue->content['horoscope']['type'] === 'free_personal')
@@ -121,142 +568,148 @@
                     ⭐ Гороскоп: {{ $issue->content['horoscope']['sign_name'] ?? 'ваш знак' }}
                 @endif
             </span>
-            <h2>
+            <h2 class="journal-lead-headline">
                 @if($issue->content['horoscope']['horoscope_name'] ?? null)
                     {{ $issue->content['horoscope']['horoscope_name'] }}
                 @else
                     Что говорят звёзды сегодня
                 @endif
             </h2>
-            <div class="mag-lead-body">{!! nl2br(e($issue->content['horoscope']['content'])) !!}</div>
+            
+            <div class="journal-columns">
+                <p class="journal-drop-cap">{!! nl2br(e($issue->content['horoscope']['content'])) !!}</p>
+            </div>
         </article>
     @else
-        <div class="mag-lead" style="text-align:center">
-            <span class="mag-lead-label">⭐ Ваш день</span>
-            <h2>Звёзды наблюдают за вами</h2>
-            <div class="mag-lead-body" style="text-align:center">Персональный гороскоп появится, когда вы заполните данные рождения и закажете натальную карту.</div>
+        <div class="journal-lead" style="text-align: center; padding: 40px;">
+            <span class="journal-lead-kicker">⭐ Ваш день</span>
+            <h2 class="journal-lead-headline" style="font-size: 32px;">Звёзды наблюдают за вами</h2>
+            <p style="color: #cbd5e1; font-size: 16px; line-height: 1.7; max-width: 600px; margin: 0 auto;">
+                Персональный гороскоп появится, когда вы заполните данные рождения и закажете натальную карту.
+            </p>
         </div>
     @endif
 
-    {{-- Аффирмация дня --}}
-    @if($issue->content['affirmation'] ?? null)
-        <section class="mag-section">
-            <div class="mag-section-head">
-                <div class="mag-section-icon">💫</div>
-                <div>
-                    <div class="mag-section-kicker">Настрой дня</div>
-                    <h3 class="mag-section-title">{{ $issue->content['affirmation']['title'] }}</h3>
-                </div>
-            </div>
-            <div class="mag-quote">{{ $issue->content['affirmation']['description'] }}</div>
-        </section>
-    @endif
+    <div class="journal-ornament">❖ ❖ ❖</div>
 
-    {{-- Таро дня --}}
-    @if($issue->content['tarot'] ?? null)
-        <section class="mag-section">
-            <div class="mag-section-head">
-                <div class="mag-section-icon">🎴</div>
-                <div>
-                    <div class="mag-section-kicker">Карта дня</div>
-                    <h3 class="mag-section-title">Послание Таро</h3>
-                </div>
-            </div>
-            <div class="mag-tarot">
-                <div class="mag-tarot-card">
-                    @if($issue->content['tarot']['image'] ?? null)
-                        <img src="{{ asset('storage/' . $issue->content['tarot']['image']) }}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:12px">
-                    @else
-                        🎴
+    {{-- Grid: main + sidebar --}}
+    <div class="journal-grid">
+        {{-- MAIN: Аффирмация --}}
+        @if($issue->content['affirmation'] ?? null)
+            <div class="journal-main">
+                <div class="sidebar-block" style="--accent: #fbbf24;">
+                    <div class="sidebar-block-title">
+                        <span class="sidebar-block-icon">💫</span>
+                        <span>Аффирмация дня</span>
+                    </div>
+                    <div class="affirmation-quote">
+                        {{ $issue->content['affirmation']['description'] }}
+                    </div>
+                    @if($issue->content['affirmation']['title'] ?? null)
+                        <div style="text-align: center; margin-top: 16px; font-size: 14px; color: #a78bfa; font-style: italic;">
+                            — {{ $issue->content['affirmation']['title'] }}
+                        </div>
                     @endif
                 </div>
-                <div class="mag-tarot-info">
-                    <h3>{{ $issue->content['tarot']['name'] }}</h3>
-                    <p>{{ $issue->content['tarot']['meaning_today'] }}</p>
-                </div>
             </div>
-        </section>
-    @endif
+        @endif
 
-    {{-- Биоритмы --}}
-    @if($issue->content['biorhythms'] ?? null)
-        @php $bio = $issue->content['biorhythms']; @endphp
-        <section class="mag-section">
-            <div class="mag-section-head">
-                <div class="mag-section-icon">📊</div>
-                <div>
-                    <div class="mag-section-kicker">Ваш внутренний календарь</div>
-                    <h3 class="mag-section-title">Биоритмы</h3>
-                </div>
-            </div>
-            <div class="mag-bio">
-                @foreach([
-                    ['k' => 'physical', 'label' => 'Физический', 'period' => '23 дня', 'color' => '#34d399'],
-                    ['k' => 'emotional', 'label' => 'Эмоциональный', 'period' => '28 дней', 'color' => '#f0abfc'],
-                    ['k' => 'intellectual', 'label' => 'Интеллектуальный', 'period' => '33 дня', 'color' => '#60a5fa'],
-                ] as $b)
-                    @php $v = $bio[$b['k']]; @endphp
-                    <div class="mag-bio-item">
-                        <div class="mag-bio-label">{{ $b['label'] }}</div>
-                        <div class="mag-bio-value {{ $v >= 0 ? 'pos' : 'neg' }}">{{ $v >= 0 ? '+' : '' }}{{ $v }}%</div>
-                        <div class="mag-bio-bar">
-                            <div class="mag-bio-bar-center"></div>
-                            <div class="mag-bio-bar-fill" style="{{ $v >= 0 ? 'left:50%' : 'left:' . (50 + $v/2) . '%' }};width:{{ abs($v)/2 }}%;background:{{ $b['color'] }}"></div>
+        {{-- SIDEBAR --}}
+        <div class="journal-sidebar">
+            {{-- Таро --}}
+            @if($issue->content['tarot'] ?? null)
+                <div class="sidebar-block">
+                    <div class="sidebar-block-title">
+                        <span class="sidebar-block-icon">🎴</span>
+                        <span>Карта дня</span>
+                    </div>
+                    <div class="tarot-card-display">
+                        <div class="tarot-card-img">
+                            @if($issue->content['tarot']['image'] ?? null)
+                                <img src="{{ asset('storage/' . $issue->content['tarot']['image']) }}" alt="{{ $issue->content['tarot']['name'] }}">
+                            @else
+                                🎴
+                            @endif
                         </div>
-                        <div class="mag-bio-day" style="font-size:10px;margin-top:6px;color:#64748b">цикл {{ $b['period'] }}</div>
+                        <div class="tarot-info">
+                            <h3>{{ $issue->content['tarot']['name'] }}</h3>
+                            <p>{{ $issue->content['tarot']['meaning_today'] }}</p>
+                        </div>
                     </div>
-                @endforeach
-            </div>
-            <div class="mag-bio-day">День вашей жизни: <strong style="color:#fbbf24">{{ $bio['days_alive'] }}</strong></div>
-        </section>
-    @endif
-
-    {{-- Ретроградные --}}
-    @if(!empty($issue->content['retrograde']))
-        <section class="mag-section">
-            <div class="mag-section-head">
-                <div class="mag-section-icon">☿</div>
-                <div>
-                    <div class="mag-section-kicker">Важный транзит</div>
-                    <h3 class="mag-section-title">Ретроградные планеты</h3>
                 </div>
-            </div>
-            <div class="mag-retro">
-                @foreach($issue->content['retrograde'] as $p)
-                    <div class="mag-retro-item">
-                        <div class="planet">{{ $p['symbol'] ?? '☿' }}</div>
-                        <div class="name">{{ $p['name'] ?? 'Планета' }}</div>
-                        <div class="status">{{ $p['status'] ?? 'Ретро' }}</div>
-                    </div>
-                @endforeach
-            </div>
-        </section>
-    @endif
+            @endif
 
-    {{-- Блог --}}
+            {{-- Биоритмы --}}
+            @if($issue->content['biorhythms'] ?? null)
+                @php $bio = $issue->content['biorhythms']; @endphp
+                <div class="sidebar-block">
+                    <div class="sidebar-block-title">
+                        <span class="sidebar-block-icon">📊</span>
+                        <span>Биоритмы</span>
+                    </div>
+                    <div class="biorhythms-chart">
+                        @foreach([
+                            ['k' => 'physical', 'label' => 'Физ', 'color' => '#34d399'],
+                            ['k' => 'emotional', 'label' => 'Эмоц', 'color' => '#f0abfc'],
+                            ['k' => 'intellectual', 'label' => 'Инт', 'color' => '#60a5fa'],
+                        ] as $b)
+                            @php $v = $bio[$b['k']]; @endphp
+                            <div class="bio-item">
+                                <div class="bio-label">{{ $b['label'] }}</div>
+                                <div class="bio-value {{ $v >= 0 ? 'pos' : 'neg' }}">{{ $v >= 0 ? '+' : '' }}{{ $v }}%</div>
+                                <div class="bio-bar">
+                                    <div class="bio-bar-center"></div>
+                                    <div class="bio-bar-fill" style="{{ $v >= 0 ? 'left:50%' : 'left:' . (50 + $v/2) . '%' }};width:{{ abs($v)/2 }}%;background:{{ $b['color'] }}"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="bio-days">День вашей жизни: <strong style="color:#fbbf24">{{ $bio['days_alive'] }}</strong></div>
+                </div>
+            @endif
+
+            {{-- Ретроградные --}}
+            @if(!empty($issue->content['retrograde']))
+                <div class="sidebar-block">
+                    <div class="sidebar-block-title">
+                        <span class="sidebar-block-icon">☿</span>
+                        <span>Ретроградные планеты</span>
+                    </div>
+                    <div class="retro-grid">
+                        @foreach($issue->content['retrograde'] as $p)
+                            <div class="retro-item">
+                                <div class="retro-planet">{{ $p['symbol'] ?? '☿' }}</div>
+                                <div class="retro-name">{{ $p['name'] ?? 'Планета' }}</div>
+                                <div class="retro-status">{{ $p['status'] ?? 'Ретро' }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    {{-- Блог: "См. также" --}}
     @if(!empty($issue->content['blog']))
-        <section class="mag-section">
-            <div class="mag-section-head">
-                <div class="mag-section-icon">📖</div>
-                <div>
-                    <div class="mag-section-kicker">Обзор прессы</div>
-                    <h3 class="mag-section-title">Свежие статьи блога</h3>
-                </div>
-            </div>
-            <div class="mag-blog">
+        <section class="journal-blog">
+            <h2 class="journal-blog-title">
+                <span>📖</span>
+                <span>Читайте также в нашем блоге</span>
+            </h2>
+            <div class="blog-grid">
                 @foreach($issue->content['blog'] as $post)
-                    <a href="{{ $post['url'] }}" class="mag-blog-item">
-                        <div class="mag-blog-cover">
+                    <a href="{{ $post['url'] }}" class="blog-card">
+                        <div class="blog-cover">
                             @if($post['cover'] ?? null)
-                                <img src="{{ asset('storage/' . $post['cover']) }}" alt="">
+                                <img src="{{ asset('storage/' . $post['cover']) }}" alt="{{ $post['title'] }}">
                             @else
                                 ✨
                             @endif
                         </div>
-                        <div class="mag-blog-date">{{ \Carbon\Carbon::parse($post['date'])->translatedFormat('d M') }}</div>
-                        <div class="mag-blog-title">{{ $post['title'] }}</div>
+                        <div class="blog-date">{{ \Carbon\Carbon::parse($post['date'])->translatedFormat('d M') }}</div>
+                        <div class="blog-title">{{ $post['title'] }}</div>
                         @if($post['excerpt'] ?? null)
-                            <div class="mag-blog-excerpt">{{ Str::limit($post['excerpt'], 100) }}</div>
+                            <div class="blog-excerpt">{{ Str::limit($post['excerpt'], 80) }}</div>
                         @endif
                     </a>
                 @endforeach
@@ -264,11 +717,11 @@
         </section>
     @endif
 
-    {{-- Футер журнала --}}
-    <div class="mag-footer">
+    {{-- Footer --}}
+    <div class="journal-footer">
         <div>Ваш персональный журнал сгенерирован {{ \Carbon\Carbon::parse($issue->content['meta']['generated_at'])->translatedFormat('d F Y в H:i') }}</div>
-        <div style="margin-top:8px;font-size:12px">© AI Астролог · my.neiro-astro.ru</div>
-        <a href="/dashboard" class="mag-footer-cta">Перейти в личный кабинет →</a>
+        <div style="margin-top: 8px;">© AI Астролог · my.neiro-astro.ru</div>
+        <a href="/dashboard" class="journal-footer-cta">Перейти в личный кабинет →</a>
     </div>
 </div>
 @endsection
