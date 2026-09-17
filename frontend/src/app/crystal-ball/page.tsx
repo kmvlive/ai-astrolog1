@@ -122,76 +122,55 @@ export default function CrystalBallPage() {
           </p>
         </div>
 
-        {/* Шар */}
+        {/* Шар 3D */}
         <div className="flex justify-center mb-8">
           <div
             ref={ballRef}
-            className={`relative w-64 h-64 md:w-80 md:h-80 rounded-full cursor-pointer transition-all duration-500 ${
-              shaking ? "animate-bounce" : ""
-            } ${glowing ? "scale-105" : "hover:scale-105"}`}
+            className={`crystal-ball-scene ${shaking ? "crystal-shaking" : ""} ${glowing ? "crystal-glowing" : ""} ${prediction ? "crystal-active" : ""}`}
             onClick={!loading ? askBall : undefined}
           >
-            {/* Свечение */}
-            <div
-              className={`absolute inset-0 rounded-full transition-all duration-1000 ${
-                glowing
-                  ? "bg-violet-500/40 blur-3xl scale-125"
-                  : prediction
-                  ? "bg-purple-500/20 blur-2xl scale-110"
-                  : "bg-violet-500/10 blur-xl"
-              }`}
-            />
-
-            {/* Шар */}
-            <div className="relative w-full h-full rounded-full bg-gradient-to-br from-violet-900/80 via-purple-800/60 to-indigo-900/80 border border-violet-400/30 shadow-2xl shadow-violet-500/20 flex items-center justify-center overflow-hidden">
-              {/* Внутренний блик */}
-              <div className="absolute top-6 left-8 w-20 h-12 bg-white/10 rounded-full blur-md rotate-[-30deg]" />
-              <div className="absolute top-10 left-12 w-8 h-6 bg-white/15 rounded-full blur-sm rotate-[-30deg]" />
-
-              {/* Контент шара */}
-              <div className="relative z-10 text-center px-6">
+            {/* Внешнее свечение */}
+            <div className="crystal-aura" />
+            
+            {/* Сфера */}
+            <div className="crystal-sphere">
+              {/* Туман внутри */}
+              <div className="crystal-mist" />
+              
+              {/* Пульсирующее ядро */}
+              <div className="crystal-core" />
+              
+              {/* Вращающиеся блики */}
+              <div className="crystal-highlight crystal-highlight-1" />
+              <div className="crystal-highlight crystal-highlight-2" />
+              <div className="crystal-highlight crystal-highlight-3" />
+              
+              {/* Верхний блик (стекло) */}
+              <div className="crystal-glass-top" />
+              <div className="crystal-glass-shine" />
+              
+              {/* Контент внутри */}
+              <div className="crystal-content">
                 {loading ? (
-                  <div className="space-y-3">
-                    <div className="text-4xl animate-spin inline-block">✨</div>
-                    <div className="text-violet-300 text-sm animate-pulse">
-                      Шар смотрит в будущее...
-                    </div>
+                  <div className="crystal-loading">
+                    <div className="crystal-loading-spinner">✨</div>
+                    <div className="crystal-loading-text">Шар смотрит в будущее...</div>
                   </div>
                 ) : prediction ? (
-                  <div className="space-y-2">
-                    <div className="text-violet-200 text-sm md:text-base leading-relaxed italic">
-                      «{prediction}»
-                    </div>
-                  </div>
+                  <div className="crystal-prediction">«{prediction}»</div>
                 ) : (
-                  <div className="space-y-3">
-                    <div className="text-5xl">🔮</div>
-                    <div className="text-violet-300/70 text-sm">
-                      Нажмите на шар
-                    </div>
+                  <div className="crystal-idle">
+                    <div className="crystal-idle-emoji">🔮</div>
+                    <div className="crystal-idle-hint">Нажмите на шар</div>
                   </div>
                 )}
               </div>
-
-              {/* Мерцающие звёзды внутри */}
-              {[...Array(6)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute w-1 h-1 bg-white rounded-full animate-ping"
-                  style={{
-                    top: `${20 + Math.random() * 60}%`,
-                    left: `${20 + Math.random() * 60}%`,
-                    animationDuration: `${2 + Math.random() * 3}s`,
-                    animationDelay: `${Math.random() * 2}s`,
-                    opacity: 0.5,
-                  }}
-                />
-              ))}
             </div>
-
+            
             {/* Подставка */}
-            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-32 h-6 bg-gradient-to-b from-amber-800/60 to-amber-950/80 rounded-full blur-sm" />
-            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-28 h-4 bg-gradient-to-b from-amber-700/40 to-transparent rounded-full" />
+            <div className="crystal-stand-base" />
+            <div className="crystal-stand-top" />
+            <div className="crystal-stand-glow" />
           </div>
         </div>
 
