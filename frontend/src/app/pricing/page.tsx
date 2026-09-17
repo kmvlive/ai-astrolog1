@@ -99,6 +99,7 @@ export default function PricingPage() {
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Заголовок */}
         <div className="text-center mb-12">
+          <div className="pricing-eyebrow">💎 Тарифы подписки</div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-400 to-amber-400 bg-clip-text text-transparent">
             Персональный гороскоп
           </h1>
@@ -118,53 +119,51 @@ export default function PricingPage() {
           </div>
         ) : (
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {plans.map((plan) => (
+            {plans.map((plan, i) => (
               <div
                 key={plan.id}
-                className={`relative rounded-2xl p-8 transition transform hover:-translate-y-1 ${
-                  plan.popular
-                    ? "bg-gradient-to-br from-violet-900/50 to-slate-900 border-2 border-amber-400 shadow-2xl shadow-amber-500/10"
-                    : "bg-slate-900 border border-white/10 hover:border-violet-500/50"
-                }`}
+                style={{ ["--accent" as any]: plan.popular ? "#fbbf24" : ["#38bdf8", "#a855f7", "#ec4899"][i % 3] }}
+                className={`plan-card relative rounded-3xl p-8 overflow-hidden flex flex-col ${plan.popular ? "plan-popular" : ""}`}
               >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-900 text-xs font-bold px-4 py-1 rounded-full">
-                    ПОПУЛЯРНЫЙ
-                  </div>
-                )}
+                <span className="plan-watermark" aria-hidden="true">
+                  {plan.duration_days <= 7 ? "🌙" : plan.duration_days <= 30 ? "💎" : "👑"}
+                </span>
+                <span className="cal-shine" aria-hidden="true" />
+                {plan.popular && <div className="plan-badge">⭐ ПОПУЛЯРНЫЙ</div>}
 
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <div className="mb-1 text-sm text-slate-400">
-                  {plan.duration_days} {plan.duration_days === 7 ? "дней" : plan.duration_days === 30 ? "дней" : "дней"}
+                <div className="cal-medal mb-4" style={{ width: "60px", height: "60px", borderRadius: "18px" }}>
+                  <span className="text-3xl">{plan.duration_days <= 7 ? "🌙" : plan.duration_days <= 30 ? "💎" : "👑"}</span>
                 </div>
+                <h3 className="relative z-10 text-2xl font-bold mb-1 text-white">{plan.name}</h3>
+                <div className="relative z-10 mb-1 text-sm text-slate-400">{plan.duration_days} дней</div>
 
-                <div className="my-6">
+                <div className="my-6 relative z-10">
                   {plan.original_price && plan.original_price > plan.price && (
                     <div className="text-lg text-slate-500 line-through mb-1">
                       {plan.formatted_original_price}
                     </div>
                   )}
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-bold">{plan.formatted_price}</span>
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <span className="plan-price">{plan.formatted_price}</span>
                     {plan.original_price && plan.original_price > plan.price && (
-                      <span className="text-sm font-semibold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full">
+                      <span className="plan-discount">
                         -{Math.round((1 - plan.price / plan.original_price) * 100)}%
                       </span>
                     )}
                   </div>
                 </div>
 
-                <ul className="space-y-3 mb-8 min-h-[180px]">
+                <ul className="space-y-3 mb-8 min-h-[180px] relative z-10 flex-1">
                   {plan.features.map((f, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
-                      <span className="text-violet-400 mt-0.5">✓</span>
+                      <span className="plan-check">✓</span>
                       <span>{f}</span>
                     </li>
                   ))}
                 </ul>
 
                 {!currentSub || currentSub.plan_type !== plan.slug ? (
-                  <label className="flex items-start gap-3 mb-4 p-3 rounded-xl bg-violet-900/20 border border-violet-500/30 cursor-pointer hover:bg-violet-900/30 transition">
+                  <label className="plan-autorenew relative z-10 flex items-start gap-3 mb-4 p-3 rounded-xl cursor-pointer transition">
                     <input
                       type="checkbox"
                       checked={autoRenew}
@@ -182,7 +181,7 @@ export default function PricingPage() {
 
                 {currentSub && currentSub.plan_type === plan.slug ? (
                   <div className="text-center">
-                    <div className="bg-green-500/20 border border-green-500/30 text-green-400 rounded-xl py-3 px-4 text-sm font-semibold">
+                    <div className="plan-active relative z-10 rounded-xl py-3 px-4 text-sm font-semibold">
                       ✓ Активен до {new Date(currentSub.expires_at).toLocaleDateString("ru-RU")}
                       <div className="text-xs font-normal mt-1 opacity-80">
                         {daysLeft > 0 ? `Осталось ${daysLeft} дн.` : "Истекает сегодня"}
@@ -193,10 +192,8 @@ export default function PricingPage() {
                   <button
                     onClick={() => pay(plan)}
                     disabled={paying === plan.id}
-                    className={`w-full py-3 rounded-xl font-semibold transition disabled:opacity-50 ${
-                      plan.popular
-                        ? "bg-amber-400 hover:bg-amber-300 text-slate-900"
-                        : "bg-violet-600 hover:bg-violet-500 text-white"
+                    className={`plan-btn relative z-10 w-full py-3.5 rounded-xl font-bold transition disabled:opacity-50 ${
+                      plan.popular ? "plan-btn-gold" : ""
                     }`}
                   >
                     {paying === plan.id ? "Переход к оплате..." : currentSub ? "Сменить тариф" : "Выбрать план"}
@@ -208,26 +205,29 @@ export default function PricingPage() {
         )}
 
         {/* Гарантии */}
-        <div className="mt-16 grid sm:grid-cols-3 gap-6 text-center max-w-4xl mx-auto">
-          <div>
-            <div className="text-3xl mb-2">🔒</div>
-            <div className="font-semibold mb-1">Безопасная оплата</div>
-            <div className="text-sm text-slate-400">Через Т-Банк</div>
-          </div>
-          <div>
-            <div className="text-3xl mb-2">💫</div>
-            <div className="font-semibold mb-1">AI-прогнозы</div>
-            <div className="text-sm text-slate-400">Составлены лично для вас</div>
-          </div>
-          <div>
-            <div className="text-3xl mb-2">📬</div>
-            <div className="font-semibold mb-1">Ваш канал</div>
-            <div className="text-sm text-slate-400">Email, Telegram или др.</div>
-          </div>
+        <div className="mt-16 grid sm:grid-cols-3 gap-5 text-center max-w-4xl mx-auto">
+          {[
+            { emoji: "🔒", accent: "#34d399", title: "Безопасная оплата", desc: "Через Т-Банк" },
+            { emoji: "💫", accent: "#a855f7", title: "AI-прогнозы", desc: "Составлены лично для вас" },
+            { emoji: "📬", accent: "#38bdf8", title: "Ваш канал", desc: "Email, Telegram или др." },
+          ].map((g) => (
+            <div
+              key={g.title}
+              style={{ ["--accent" as any]: g.accent }}
+              className="cal-card relative rounded-3xl bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 p-6 overflow-hidden"
+            >
+              <span className="cal-shine" aria-hidden="true" />
+              <div className="cal-medal mb-3 mx-auto" style={{ width: "56px", height: "56px", borderRadius: "18px" }}>
+                <span className="text-2xl">{g.emoji}</span>
+              </div>
+              <div className="relative z-10 font-semibold mb-1 text-white">{g.title}</div>
+              <div className="relative z-10 text-sm text-slate-400">{g.desc}</div>
+            </div>
+          ))}
         </div>
 
         <div className="text-center mt-12">
-          <Link href="/login" className="text-violet-400 hover:text-violet-300">
+          <Link href="/login" className="login-pill">
             Уже есть подписка? Войти в кабинет →
           </Link>
         </div>
