@@ -2513,3 +2513,140 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   0%, 100% { opacity: 0.5; }
   50% { opacity: 0.8; }
 }
+
+/* --- Dashboard Premium --- */
+
+/* Чипсы (типы гороскопов, каналы) */
+.dash-chip {
+  padding: 0.625rem 1.125rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(30, 41, 59, 0.5);
+  color: #cbd5e1;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.dash-chip:hover:not(:disabled) {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.4);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.dash-chip-active {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  border-color: #a855f7;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 0 18px -4px rgba(168, 85, 247, 0.5);
+}
+
+/* Карточки календарей */
+.dash-cal-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(30, 41, 59, 0.4);
+  transition: all 0.3s;
+}
+
+.dash-cal-card:hover {
+  background: rgba(168, 85, 247, 0.08);
+  border-color: rgba(168, 85, 247, 0.35);
+  transform: translateY(-1px);
+}
+
+.dash-cal-active {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(168, 85, 247, 0.08));
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 18px -4px rgba(56, 189, 248, 0.35);
+}
+
+/* Статус "Подключено" */
+.dash-status-connected {
+  display: inline-block;
+  padding: 0.5rem 1.125rem;
+  border-radius: 0.875rem;
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  color: #6ee7b7;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 0 14px -3px rgba(52, 211, 153, 0.4);
+}
+
+/* Кнопка "Отписаться" */
+.dash-btn-subscribed {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.4);
+  color: #6ee7b7;
+}
+
+.dash-btn-subscribed:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  color: #fca5a5 !important;
+}
+
+/* Ссылка "Редактировать профиль" */
+.dash-edit-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: #6ee7b7;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.dash-edit-link:hover {
+  background: rgba(52, 211, 153, 0.2);
+  border-color: rgba(52, 211, 153, 0.5);
+  color: #fff;
+  transform: translateX(3px);
+}
+
+/* Карточки истории */
+.dash-history-card {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dash-history-card:hover {
+  transform: translateY(-3px) scale(1.01);
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 15px 35px -10px rgba(168, 85, 247, 0.3);
+}
+
+.dash-history-card:hover::before {
+  opacity: 1;
+}
+
+.dash-history-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  padding: 1px;
+  background: linear-gradient(135deg,
+    rgba(168, 85, 247, 0.5),
+    transparent 40%,
+    rgba(168, 85, 247, 0.3));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.3;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}

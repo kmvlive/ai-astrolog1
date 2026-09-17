@@ -308,6 +308,7 @@ export default function DashboardPage() {
       <SiteHeader />
       <CometField count={8} />
       <div className="max-w-4xl mx-auto px-4 py-12">
+        <div className="pricing-eyebrow mb-4">👤 Личный кабинет</div>
         <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-violet-400 to-amber-400 bg-clip-text text-transparent">
           Личный кабинет
         </h1>
@@ -316,23 +317,26 @@ export default function DashboardPage() {
         {profile && !profile.city && (
           <Link
             href="/profile"
-            className="block mb-6 p-5 bg-gradient-to-r from-amber-900/30 to-violet-900/30 border border-amber-500/30 rounded-2xl hover:border-amber-400/50 transition"
+            style={{ ["--accent" as any]: "#fbbf24" }}
+            className="home-panel block mb-6 p-6"
           >
-            <div className="flex items-center gap-4">
-              <div className="text-4xl">📍</div>
+            <div className="relative z-10 flex items-center gap-4">
+              <div className="cal-medal" style={{ width: "56px", height: "56px", borderRadius: "18px" }}>
+                <span className="text-2xl">📍</span>
+              </div>
               <div>
                 <div className="font-semibold text-amber-200 mb-1">Укажите город рождения</div>
                 <div className="text-sm text-slate-300">Чтобы получать точные индивидуальные гороскопы — укажите, где вы родились.</div>
               </div>
-              <div className="ml-auto text-amber-400 text-2xl">→</div>
+              <span className="cal-go ml-auto shrink-0">→</span>
             </div>
           </Link>
         )}
 
         {/* Настройки рассылки */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Что получать</h2>
-          <div className="rounded-2xl p-6 bg-slate-900 border border-white/10">
+          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-violet-300 to-fuchsia-300 bg-clip-text text-transparent">📧 Что получать</h2>
+          <div style={{ ["--accent" as any]: "#a855f7" }} className="home-panel p-6">
             <div className="text-sm font-medium text-slate-300 mb-2">Какие гороскопы получать?</div>
             <div className="flex flex-wrap gap-2 mb-6">
               {availTypes.map((t) => (
@@ -341,11 +345,7 @@ export default function DashboardPage() {
                   type="button"
                   onClick={() => toggleType(t.slug)}
                   disabled={settingsSaving}
-                  className={`px-4 py-2 rounded-xl border text-sm font-medium transition ${
-                    selTypes.includes(t.slug)
-                      ? "bg-violet-600 border-violet-500 text-white"
-                      : "bg-slate-800 border-white/10 text-slate-300 hover:border-violet-500/50"
-                  }`}
+                  className={`dash-chip ${selTypes.includes(t.slug) ? "dash-chip-active" : ""}`}
                 >
                   {typeIcons[t.slug] || "✨"} {t.name}
                 </button>
@@ -360,13 +360,7 @@ export default function DashboardPage() {
                   type="button"
                   onClick={() => c.slug !== 'email' && toggleChannel(c.slug)}
                   disabled={settingsSaving || c.slug === 'email'}
-                  className={`px-4 py-2 rounded-xl border text-sm font-medium transition ${
-                    c.slug === 'email'
-                      ? "bg-violet-600 border-violet-500 text-white opacity-80 cursor-not-allowed"
-                      : selChannels.includes(c.slug)
-                        ? "bg-violet-600 border-violet-500 text-white"
-                        : "bg-slate-800 border-white/10 text-slate-300 hover:border-violet-500/50"
-                  }`}
+                  className={`dash-chip ${selChannels.includes(c.slug) ? "dash-chip-active" : ""} ${c.slug === 'email' ? "cursor-not-allowed opacity-70" : ""}`}
                 >
                   {channelIcons[c.slug] || "📬"} {c.name}{c.slug === 'email' ? ' ✓' : ''}
                 </button>
@@ -376,16 +370,20 @@ export default function DashboardPage() {
             <button
               onClick={saveSettings}
               disabled={settingsSaving}
-              className="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 font-semibold transition disabled:opacity-50"
+              style={{ ["--accent" as any]: "#a855f7" }}
+              className="plan-btn px-6 py-3 rounded-xl font-bold transition disabled:opacity-50"
             >
               {settingsSaving ? "Сохранение..." : "Сохранить настройки"}
             </button>
 
             {/* Бесплатный персональный гороскоп */}
             {freePersonalEnabled && (
-              <div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-amber-900/20 to-yellow-900/20 border border-amber-500/20">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">🎁</span>
+              <div style={{ ["--accent" as any]: "#fbbf24" }} className="mt-4 p-5 rounded-2xl bg-gradient-to-br from-amber-900/30 to-yellow-900/20 border border-amber-400/40 relative overflow-hidden">
+                <span className="cal-shine" aria-hidden="true" />
+                <div className="relative z-10 flex items-center gap-3">
+                  <div className="cal-medal" style={{ width: "48px", height: "48px", borderRadius: "14px" }}>
+                    <span className="text-xl">🎁</span>
+                  </div>
                   <div>
                     <div className="font-semibold text-amber-200">
                       Бесплатный персональный ежедневный гороскоп ✅
@@ -399,9 +397,12 @@ export default function DashboardPage() {
             )}
             {/* Бесплатная натальная карта */}
             {freeNatalChartEnabled && (
-              <div className="mt-3 p-4 rounded-xl bg-gradient-to-r from-violet-900/20 to-purple-900/20 border border-violet-500/20">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">🌟</span>
+              <div style={{ ["--accent" as any]: "#a855f7" }} className="mt-3 p-5 rounded-2xl bg-gradient-to-br from-violet-900/30 to-purple-900/20 border border-violet-400/40 relative overflow-hidden">
+                <span className="cal-shine" aria-hidden="true" />
+                <div className="relative z-10 flex items-center gap-3">
+                  <div className="cal-medal" style={{ width: "48px", height: "48px", borderRadius: "14px" }}>
+                    <span className="text-xl">🌟</span>
+                  </div>
                   <div>
                     <div className="font-semibold text-violet-200">
                       Бесплатная натальная карта ✅
@@ -418,12 +419,12 @@ export default function DashboardPage() {
 
           {/* Какие календари получать */}
           {calendars.length > 0 && (
-            <section className="mt-8 p-6 rounded-2xl bg-slate-900/60 border border-white/10">
-              <h3 className="text-xl font-bold mb-1">📅 Какие календари получать?</h3>
+            <section style={{ ["--accent" as any]: "#38bdf8" }} className="mt-8 home-panel p-6">
+              <h3 className="text-xl font-bold mb-1 text-white">📅 Какие календари получать?</h3>
               <p className="text-sm text-slate-400 mb-5">Выберите календари, которые будут приходить вам утром на выбранных каналах.</p>
               <div className="grid sm:grid-cols-2 gap-3">
                 {calendars.map((c) => (
-                  <label key={c.id} className={`flex items-start gap-3 p-4 rounded-xl cursor-pointer border transition ${selCalendars.includes(c.slug) ? "bg-violet-600/20 border-violet-500/40" : "bg-slate-800/50 border-white/5 hover:border-white/20"}`}>
+                  <label key={c.id} className={`dash-cal-card ${selCalendars.includes(c.slug) ? "dash-cal-active" : ""}`}>
                     <input
                       type="checkbox"
                       checked={selCalendars.includes(c.slug)}
@@ -444,7 +445,8 @@ export default function DashboardPage() {
                 <button
                   onClick={saveCalendars}
                   disabled={calendarsSaving}
-                  className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 rounded-xl px-6 py-2.5 font-semibold transition"
+                  style={{ ["--accent" as any]: "#38bdf8" }}
+                  className="plan-btn disabled:opacity-50 rounded-xl px-6 py-2.5 font-bold transition"
                 >
                   {calendarsSaving ? "Сохраняем..." : "Сохранить"}
                 </button>
@@ -456,8 +458,8 @@ export default function DashboardPage() {
 
         {/* Блок подписки на аффирмации */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">💫 Подписка на аффирмации</h2>
-          <div className="rounded-2xl p-6 bg-slate-900 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-fuchsia-300 to-violet-300 bg-clip-text text-transparent">💫 Подписка на аффирмации</h2>
+          <div style={{ ["--accent" as any]: "#e879f9" }} className="home-panel p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <div className="font-semibold mb-1">Ежедневные аффирмации</div>
               <div className="text-sm text-slate-400">
@@ -469,10 +471,9 @@ export default function DashboardPage() {
             <button
               onClick={handleAffirmationSubscription}
               disabled={affirmationLoading}
-              className={`px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition disabled:opacity-50 ${
-                affirmationSubscribed
-                  ? "bg-green-500/20 text-green-400 hover:bg-red-500/20 hover:text-red-400"
-                  : "bg-violet-600 hover:bg-violet-500"
+              style={{ ["--accent" as any]: "#e879f9" }}
+              className={`plan-btn px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition disabled:opacity-50 ${
+                affirmationSubscribed ? "dash-btn-subscribed" : ""
               }`}
             >
               {affirmationLoading ? "..." : affirmationSubscribed ? "✓ Подписан (отписаться)" : "Подписаться"}
@@ -483,8 +484,8 @@ export default function DashboardPage() {
         {/* Блок натальной карты (скрыт если бесплатная включена) */}
         {!freeNatalChartEnabled && (
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">🌟 Натальная карта</h2>
-          <div className="rounded-2xl p-6 bg-slate-900 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-amber-200 to-violet-200 bg-clip-text text-transparent">🌟 Натальная карта</h2>
+          <div style={{ ["--accent" as any]: "#a855f7" }} className="home-panel p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <div className="font-semibold mb-1">Персональный гороскоп по натальной карте</div>
               <div className="text-sm text-slate-400">
@@ -497,7 +498,8 @@ export default function DashboardPage() {
             </div>
             <Link
               href="/natal-chart"
-              className={`px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition ${
+              style={{ ["--accent" as any]: "#a855f7" }}
+              className={`plan-btn px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition ${
                 hasNatalChart && natalChartSubscribed
                   ? "bg-green-500/20 text-green-400 hover:bg-violet-600 hover:text-white"
                   : "bg-violet-600 hover:bg-violet-500"
@@ -512,12 +514,12 @@ export default function DashboardPage() {
 
         {/* Блок Мессенджеры */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Мессенджеры</h2>
+          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-sky-300 to-blue-300 bg-clip-text text-transparent">📱 Мессенджеры</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Telegram */}
-            <div className="rounded-2xl p-6 bg-slate-900 border border-white/10 flex flex-col items-start justify-between gap-4">
+            <div style={{ ["--accent" as any]: "#229ed9" }} className="home-panel p-6 flex flex-col items-start justify-between gap-4">
               <div>
-                <div className="font-semibold mb-1">🤖 Гороскопы в Telegram</div>
+                <div className="font-semibold mb-1 text-white">🤖 Гороскопы в Telegram</div>
                 <div className="text-sm text-slate-400">
                   {tgConnected
                     ? "Подключено"
@@ -525,15 +527,14 @@ export default function DashboardPage() {
                 </div>
               </div>
               {tgConnected ? (
-                <span className="px-4 py-2 rounded-xl bg-green-500/20 text-green-400 text-sm font-semibold whitespace-nowrap">
-                  ✓ Подключено
-                </span>
+                <span className="dash-status-connected">✓ Подключено</span>
               ) : (
                 <a
                   href={tgLink ? tgLink.replace(/\?start=.*/, '') : `https://t.me/${'neiro_horoskop_bot'}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-sm font-semibold whitespace-nowrap transition"
+                  style={{ ["--accent" as any]: "#229ed9" }}
+                  className="plan-btn px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap"
                 >
                   Подключить Telegram
                 </a>
@@ -541,9 +542,9 @@ export default function DashboardPage() {
             </div>
 
             {/* MAX */}
-            <div className="rounded-2xl p-6 bg-slate-900 border border-white/10 flex flex-col items-start justify-between gap-4">
+            <div style={{ ["--accent" as any]: "#0077ff" }} className="home-panel p-6 flex flex-col items-start justify-between gap-4">
               <div>
-                <div className="font-semibold mb-1">💬 Гороскопы в MAX</div>
+                <div className="font-semibold mb-1 text-white">💬 Гороскопы в MAX</div>
                 <div className="text-sm text-slate-400">
                   {maxConnected
                     ? "Подключено"
@@ -551,15 +552,14 @@ export default function DashboardPage() {
                 </div>
               </div>
               {maxConnected ? (
-                <span className="px-4 py-2 rounded-xl bg-green-500/20 text-green-400 text-sm font-semibold whitespace-nowrap">
-                  ✓ Подключено
-                </span>
+                <span className="dash-status-connected">✓ Подключено</span>
               ) : (
                 <a
                   href={maxLink || "https://max.ru/id263211995820_bot"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-sm font-semibold whitespace-nowrap transition"
+                  style={{ ["--accent" as any]: "#0077ff" }}
+                  className="plan-btn px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap"
                 >
                   Подключить MAX
                 </a>
@@ -570,10 +570,10 @@ export default function DashboardPage() {
 
         {/* Блок профиля */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Данные рождения</h2>
+          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">👤 Данные рождения</h2>
           {profile ? (
-            <div className="rounded-2xl p-6 bg-slate-900 border border-white/10">
-              <div className="grid md:grid-cols-2 gap-4 mb-4">
+            <div style={{ ["--accent" as any]: "#34d399" }} className="home-panel p-6">
+              <div className="relative z-10 grid md:grid-cols-2 gap-4 mb-4">
                 {profile.name && (
                   <div>
                     <div className="text-sm text-slate-400 mb-1">Имя</div>
@@ -607,21 +607,19 @@ export default function DashboardPage() {
                   </div>
                 )}
               </div>
-              <Link
-                href="/profile"
-                className="text-violet-400 hover:text-violet-300 text-sm"
-              >
+              <Link href="/profile" className="dash-edit-link">
                 Редактировать профиль →
               </Link>
             </div>
           ) : (
-            <div className="rounded-2xl p-6 bg-slate-900 border border-white/10 text-center">
-              <div className="text-lg text-slate-400 mb-4">
+            <div style={{ ["--accent" as any]: "#34d399" }} className="home-panel p-6 text-center">
+              <div className="relative z-10 text-lg text-slate-400 mb-4">
                 Заполните данные рождения для получения персональных гороскопов
               </div>
               <Link
                 href="/profile"
-                className="inline-block bg-violet-600 hover:bg-violet-500 px-6 py-3 rounded-xl font-semibold"
+                style={{ ["--accent" as any]: "#34d399" }}
+                className="inline-block plan-btn px-6 py-3 rounded-xl font-bold"
               >
                 Заполнить профиль
               </Link>
@@ -633,19 +631,27 @@ export default function DashboardPage() {
         <div className="grid md:grid-cols-2 gap-4">
           <Link
             href="/my-horoscopes"
-            className="rounded-2xl p-6 bg-slate-900 border border-white/10 hover:border-violet-500/50 transition"
+            style={{ ["--accent" as any]: "#a855f7" }}
+            className="cal-card relative rounded-3xl p-6 bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 overflow-hidden block"
           >
-            <div className="text-2xl mb-2">🔮</div>
-            <div className="font-bold mb-1">Мои гороскопы</div>
-            <div className="text-sm text-slate-400">История персональных прогнозов</div>
+            <span className="cal-shine" aria-hidden="true" />
+            <div className="cal-medal mb-3" style={{ width: "56px", height: "56px", borderRadius: "18px" }}>
+              <span className="text-2xl">🔮</span>
+            </div>
+            <div className="relative z-10 font-bold mb-1 text-white">Мои гороскопы</div>
+            <div className="relative z-10 text-sm text-slate-400">История персональных прогнозов</div>
           </Link>
           <Link
             href="/pricing"
-            className="rounded-2xl p-6 bg-slate-900 border border-white/10 hover:border-amber-400/50 transition"
+            style={{ ["--accent" as any]: "#fbbf24" }}
+            className="cal-card relative rounded-3xl p-6 bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 overflow-hidden block"
           >
-            <div className="text-2xl mb-2">💎</div>
-            <div className="font-bold mb-1">Тарифы</div>
-            <div className="text-sm text-slate-400">Просмотр и смена подписки</div>
+            <span className="cal-shine" aria-hidden="true" />
+            <div className="cal-medal mb-3" style={{ width: "56px", height: "56px", borderRadius: "18px" }}>
+              <span className="text-2xl">💎</span>
+            </div>
+            <div className="relative z-10 font-bold mb-1 text-white">Тарифы</div>
+            <div className="relative z-10 text-sm text-slate-400">Просмотр и смена подписки</div>
           </Link>
         </div>
       
@@ -654,7 +660,7 @@ export default function DashboardPage() {
         <div className="max-w-6xl mx-auto px-4 pt-8 pb-4">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold">📜 История гаданий</h2>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-amber-200 to-violet-200 bg-clip-text text-transparent">📜 История гаданий</h2>
               <p className="text-sm text-slate-400 mt-1">
                 {historyTotal > 0 ? `Всего предсказаний: ${historyTotal}` : "Ваши предсказания появятся здесь"}
               </p>
@@ -667,12 +673,13 @@ export default function DashboardPage() {
           </div>
 
           {history.length === 0 ? (
-            <div className="p-8 rounded-2xl bg-slate-900/40 border border-white/5 text-center">
-              <div className="text-5xl mb-3">🔮</div>
+            <div style={{ ["--accent" as any]: "#a855f7" }} className="home-panel p-8 text-center">
+              <div className="relative z-10 text-5xl mb-3">🔮</div>
               <p className="text-slate-400 mb-4">Вы ещё не гадали</p>
               <Link
                 href="/divinations"
-                className="inline-block bg-violet-600 hover:bg-violet-500 rounded-xl px-6 py-3 font-semibold transition"
+                style={{ ["--accent" as any]: "#a855f7" }}
+                className="inline-block plan-btn rounded-xl px-6 py-3 font-bold"
               >
                 Погадать сейчас
               </Link>
@@ -683,10 +690,13 @@ export default function DashboardPage() {
                 <Link
                   key={h.uuid}
                   href={`/share/${h.uuid}`}
-                  className="group p-4 rounded-2xl bg-slate-900/60 border border-white/5 hover:border-violet-500/30 hover:bg-slate-900/80 transition"
+                  className="dash-history-card group relative p-4 rounded-2xl bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 overflow-hidden block"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="text-3xl">{h.emoji}</div>
+                  <span className="cal-shine" aria-hidden="true" />
+                    <div className="relative z-10 flex items-start gap-3">
+                      <div className="cal-medal shrink-0" style={{ width: "48px", height: "48px", borderRadius: "14px" }}>
+                        <span className="text-xl">{h.emoji}</span>
+                      </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <h3 className="font-semibold text-white group-hover:text-violet-300 transition truncate">
@@ -703,8 +713,8 @@ export default function DashboardPage() {
                         {h.preview.slice(0, 140)}{h.preview.length > 140 ? "..." : ""}
                       </p>
                     </div>
-                  </div>
-                </Link>
+                    </div>
+                  </Link>
               ))}
             </div>
           )}
@@ -723,13 +733,13 @@ export default function DashboardPage() {
         {/* Приведи друзей */}
         <div className="max-w-6xl mx-auto px-4">
           <section className="mt-8">
-            <Link href="/profile/referrals" className="block bg-gradient-to-r from-violet-900/40 to-purple-900/30 border border-violet-500/30 rounded-2xl p-6 hover:border-violet-500/60 transition group">
+            <Link href="/profile/referrals" style={{ ["--accent" as any]: "#ec4899" }} className="home-panel block p-6 group">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold mb-1">🎁 Приведи друзей</h2>
                   <p className="text-slate-400">5 друзей = 3 месяца бесплатных персональных гороскопов</p>
                 </div>
-                <span className="text-4xl text-violet-400 group-hover:translate-x-1 transition-transform">→</span>
+                <span className="relative z-10 cal-go shrink-0 group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </Link>
           </section>
