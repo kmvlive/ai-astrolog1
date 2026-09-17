@@ -79,22 +79,25 @@ export default function DreamsPage() {
       <CometField count={8} />
       <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
-          <div className="text-6xl mb-4">🌙</div>
-          <h1 className="text-4xl sm:text-5xl font-bold mb-3">Сонник</h1>
+          <div className="pricing-eyebrow mb-4">🌙 СОННИК</div>
+          <div className="cal-medal mx-auto mb-5" style={{ width: "84px", height: "84px", borderRadius: "26px", ["--accent" as any]: "#6366f1" }}>
+            <span className="text-4xl">🌙</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-bold mb-3 bg-gradient-to-r from-indigo-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent">Сонник</h1>
           <p className="text-slate-400 max-w-2xl mx-auto">
             Толкование снов из базы <DreamsCount /> символов. Если слова нет — AI растолкует его специально для вас.
           </p>
         </div>
 
         {/* Поиск */}
-        <div className="bg-slate-900 border border-white/10 rounded-2xl p-4 sm:p-6 mb-8">
+        <div style={{ ["--accent" as any]: "#6366f1" }} className="home-panel p-4 sm:p-6 mb-8">
           <div className="relative">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Введите, что вам приснилось..."
-              className="w-full px-5 py-4 bg-slate-800 border border-white/10 rounded-xl focus:outline-none focus:border-violet-500 text-lg pr-12"
+              className="w-full px-5 py-4 bg-slate-900/60 border border-white/10 rounded-xl focus:outline-none focus:border-violet-500 text-lg pr-12 backdrop-blur"
             />
             {query && (
               <button
@@ -125,14 +128,12 @@ export default function DreamsPage() {
               ) : (
                 <button
                   onClick={() => interpret(query)}
-                  className="w-full text-left px-5 py-4 bg-gradient-to-r from-violet-900/30 to-fuchsia-900/30 hover:from-violet-900/50 hover:to-fuchsia-900/50 border border-violet-500/30 rounded-xl transition"
+                  className="cta-btn w-full justify-start gap-3 text-left"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">✨</span>
-                    <div>
-                      <div className="font-semibold">Спросить AI про «{query}»</div>
-                      <div className="text-sm text-slate-400">Символа нет в базе — AI растолкует специально для вас</div>
-                    </div>
+                  <span className="text-2xl">✨</span>
+                  <div>
+                    <div className="font-semibold">Спросить AI про «{query}»</div>
+                    <div className="text-sm text-slate-400">Символа нет в базе — AI растолкует специально для вас</div>
                   </div>
                 </button>
               )}
@@ -142,14 +143,14 @@ export default function DreamsPage() {
 
         {/* Облако тегов (когда поиск пустой) */}
         {query.length < 2 && !selected && (
-          <div className="bg-slate-900/50 border border-white/10 rounded-2xl p-6">
-            <h3 className="text-center text-sm uppercase tracking-wider text-slate-400 mb-4">Популярные символы</h3>
+          <div style={{ ["--accent" as any]: "#a855f7" }} className="home-panel p-6">
+            <h3 className="text-center text-sm uppercase tracking-wider text-slate-300 mb-4">Популярные символы</h3>
             <div className="flex flex-wrap gap-2 justify-center">
               {random.map((s, i) => (
                 <Link
                   key={i}
                   href={`/dreams/${transliterate(s.keyword)}`}
-                  className="px-4 py-2 bg-slate-800 hover:bg-violet-900/40 border border-white/10 hover:border-violet-500/40 rounded-full text-sm capitalize transition"
+                  className="dash-chip capitalize"
                 >
                   {s.keyword}
                 </Link>
@@ -160,26 +161,30 @@ export default function DreamsPage() {
 
         {/* Карточка толкования */}
         {selected && (
-          <div className="bg-gradient-to-br from-indigo-900/40 to-slate-900 border border-violet-500/30 rounded-3xl p-8 sm:p-10 shadow-2xl mt-8">
-            <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
-              <h2 className="text-3xl font-bold capitalize">{selected.keyword}</h2>
+          <div style={{ ["--accent" as any]: "#6366f1" }} className="cal-card relative rounded-3xl p-8 sm:p-10 mt-8 overflow-hidden">
+            <span className="cal-shine" aria-hidden="true" />
+            <span className="cal-watermark" aria-hidden="true">🌙</span>
+            <div className="relative z-10 flex items-start justify-between mb-6 flex-wrap gap-3">
+              <h2 className="text-3xl font-bold capitalize text-white">{selected.keyword}</h2>
               {selected.ai && (
-                <span className="px-3 py-1 bg-violet-600/30 border border-violet-500/40 rounded-full text-xs font-semibold">
+                <span className="relative z-10 px-3 py-1 bg-violet-600/30 border border-violet-500/40 rounded-full text-xs font-semibold">
                   ✨ AI-толкование
                 </span>
               )}
             </div>
 
             {aiLoading ? (
-              <div className="text-slate-400 animate-pulse text-lg">AI думает о вашем сне...</div>
+              <div className="relative z-10 text-slate-400 animate-pulse text-lg">AI думает о вашем сне...</div>
             ) : selected.interpretation ? (
-              <>
-                <p className="text-lg text-slate-200 leading-relaxed mb-6">{selected.interpretation}</p>
+              <div className="relative z-10">
+                <div className="quote-card mb-6" style={{ ["--accent" as any]: "#6366f1" }}>
+                  <p className="text-lg text-white leading-relaxed">{selected.interpretation}</p>
+                </div>
                 <div className="pt-6 border-t border-white/10">
                   <h4 className="text-sm text-slate-400 mb-3">Поделиться</h4>
                   <ShareButtons title={`Сонник: к чему снится ${selected.keyword}. ${selected.interpretation.slice(0, 100)}...`} />
                 </div>
-              </>
+              </div>
             ) : null}
           </div>
         )}

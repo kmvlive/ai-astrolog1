@@ -84,28 +84,31 @@ export default function NamesPage() {
         </div>
 
         <div className="text-center mb-10">
-          <div className="text-6xl mb-4">✨</div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">Значение имени</h1>
+          <div className="pricing-eyebrow mb-4">✨ ИМЕНА</div>
+          <div className="cal-medal mx-auto mb-5" style={{ width: "84px", height: "84px", borderRadius: "26px", ["--accent" as any]: "#a855f7" }}>
+            <span className="text-4xl">✨</span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-violet-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent">Значение имени</h1>
           <p className="text-slate-400 max-w-2xl mx-auto">
             Введите имя — AI расскажет про его происхождение, значение и характер носителей.
           </p>
         </div>
 
         {/* Поиск */}
-        <div className="mb-8">
-          <div className="relative">
+        <div style={{ ["--accent" as any]: "#a855f7" }} className="home-panel p-5 sm:p-6 mb-8">
+          <div className="relative z-10 flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Введите имя (например: Андрей)"
-              className="w-full px-6 py-4 bg-slate-900 border border-violet-500/30 rounded-2xl text-lg focus:outline-none focus:border-violet-400 transition"
+              className="flex-1 px-5 py-3.5 bg-slate-900/60 border border-white/10 rounded-xl text-lg focus:outline-none focus:border-violet-400 backdrop-blur"
               onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
             />
             <button
               onClick={handleGenerate}
               disabled={aiLoading || query.length < 2}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-2.5 rounded-xl font-semibold transition"
+              className="plan-btn disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3.5 rounded-xl font-bold whitespace-nowrap"
             >
               {aiLoading ? "⏳ AI пишет..." : "✨ Узнать значение"}
             </button>
@@ -114,9 +117,12 @@ export default function NamesPage() {
 
         {/* AI результат */}
         {aiResult && (
-          <div className="mb-8 bg-gradient-to-br from-violet-900/30 to-slate-900 border border-violet-500/30 rounded-3xl p-6 md:p-8">
-            <div className="flex items-start gap-3 mb-4">
-              <span className="text-3xl">✨</span>
+          <div style={{ ["--accent" as any]: "#a855f7" }} className="cal-card relative mb-8 rounded-3xl p-6 md:p-8 overflow-hidden">
+            <span className="cal-shine" aria-hidden="true" />
+            <div className="relative z-10 flex items-start gap-3 mb-4">
+              <div className="cal-medal shrink-0" style={{ width: "56px", height: "56px", borderRadius: "18px" }}>
+                <span className="text-2xl">✨</span>
+              </div>
               <div>
                 <h2 className="text-2xl font-bold mb-1">{aiResult.name}</h2>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -133,10 +139,10 @@ export default function NamesPage() {
                 </div>
               </div>
             </div>
-            <p className="text-slate-200 leading-relaxed whitespace-pre-line">{aiResult.interpretation}</p>
+            <div className="quote-card" style={{ ["--accent" as any]: "#a855f7" }}><p className="text-white leading-relaxed whitespace-pre-line">{aiResult.interpretation}</p></div>
             <Link
               href={`/names/${aiResult.translit}`}
-              className="inline-block mt-6 bg-violet-600 hover:bg-violet-500 px-6 py-2.5 rounded-xl font-semibold transition"
+              className="plan-btn inline-block mt-6 px-6 py-2.5 rounded-xl font-bold"
             >
               Подробнее →
             </Link>
@@ -180,14 +186,16 @@ export default function NamesPage() {
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4">Найдено: {results.length}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {results.map((n) => (
+              {results.map((n, i) => (
                 <Link
                   key={n.translit}
                   href={`/names/${n.translit}`}
-                  className="p-4 bg-slate-900 hover:bg-slate-800 border border-white/5 hover:border-violet-500/40 rounded-xl transition text-center"
+                  style={{ ["--accent" as any]: ["#a855f7", "#ec4899", "#38bdf8", "#fbbf24", "#34d399"][i % 5] }}
+                  className="cal-card relative rounded-2xl p-4 bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 overflow-hidden text-center block"
                 >
-                  <div className="font-semibold">{n.name}</div>
-                  {n.origin && <div className="text-xs text-slate-400 mt-1">{n.origin}</div>}
+                  <span className="cal-shine" aria-hidden="true" />
+                  <div className="relative z-10 font-semibold text-white">{n.name}</div>
+                  {n.origin && <div className="relative z-10 text-xs text-slate-400 mt-1">{n.origin}</div>}
                 </Link>
               ))}
             </div>
@@ -201,14 +209,16 @@ export default function NamesPage() {
               {selectedOrigin ? `Имена (${selectedOrigin})` : "Все имена"}
             </h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-              {random.map((n) => (
+              {random.map((n, i) => (
                 <Link
                   key={n.translit}
                   href={`/names/${n.translit}`}
-                  className="p-3 bg-slate-900/60 hover:bg-slate-800 border border-white/5 hover:border-violet-500/40 rounded-xl transition text-center text-sm"
+                  style={{ ["--accent" as any]: ["#a855f7", "#ec4899", "#38bdf8", "#fbbf24", "#34d399"][i % 5] }}
+                  className="cal-card relative rounded-2xl p-3 bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 overflow-hidden text-center text-sm block"
                 >
-                  <div className="font-medium">{n.name}</div>
-                  {n.origin && <div className="text-xs text-slate-400 mt-1">{n.origin}</div>}
+                  <span className="cal-shine" aria-hidden="true" />
+                  <div className="relative z-10 font-medium text-white">{n.name}</div>
+                  {n.origin && <div className="relative z-10 text-xs text-slate-400 mt-1">{n.origin}</div>}
                 </Link>
               ))}
             </div>

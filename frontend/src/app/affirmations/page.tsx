@@ -101,8 +101,14 @@ export default function AffirmationsPage() {
       <SiteHeader />
       <CometField count={8} />
       <div className="flex-1 max-w-4xl mx-auto px-4 py-8 w-full">
-        <h1 className="text-4xl font-bold mb-2">💫 Здоровье и настрой</h1>
-        <p className="text-slate-400 mb-8">Ежедневные аффирмации для гармонии и вдохновения</p>
+        <div className="text-center mb-10">
+          <div className="pricing-eyebrow mb-4">💫 ЗДОРОВЬЕ И НАСТРОЙ</div>
+          <div className="cal-medal mx-auto mb-5" style={{ width: "84px", height: "84px", borderRadius: "26px", ["--accent" as any]: "#e879f9" }}>
+            <span className="text-4xl">💫</span>
+          </div>
+          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-fuchsia-300 via-violet-300 to-indigo-300 bg-clip-text text-transparent">Здоровье и настрой</h1>
+          <p className="text-slate-400 max-w-2xl mx-auto">Ежедневные аффирмации для гармонии и вдохновения</p>
+        </div>
 
         {loading ? (
           <div className="text-center py-20 text-slate-400">Загрузка...</div>
@@ -110,40 +116,46 @@ export default function AffirmationsPage() {
           <>
             {/* Сегодняшняя аффирмация */}
             {today && (
-              <div className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 rounded-2xl p-8 mb-8">
-                <div className="text-sm text-violet-300 mb-2">Сегодня, {formatDate(today.date)}</div>
-                <h2 className="text-3xl font-bold mb-4">{today.title}</h2>
-                <p className="text-lg text-slate-300 leading-relaxed mb-6">{today.description}</p>
-                <button
-                  onClick={shareAffirmation}
-                  className="px-6 py-3 bg-violet-600 hover:bg-violet-500 rounded-xl font-semibold transition"
-                >
-                  {copied ? "✓ Скопировано" : "📤 Поделиться"}
-                </button>
+              <div style={{ ["--accent" as any]: "#e879f9" }} className="home-panel relative p-8 md:p-10 mb-8">
+                <span className="cal-shine" aria-hidden="true" />
+                <span className="cal-watermark" aria-hidden="true">💫</span>
+                <div className="relative z-10">
+                  <div className="text-sm text-fuchsia-300 mb-2">Сегодня, {formatDate(today.date)}</div>
+                  <h2 className="text-3xl font-bold mb-4 text-white">{today.title}</h2>
+                  <div className="quote-card mb-6">
+                    <p className="text-lg text-white leading-relaxed italic">{today.description}</p>
+                  </div>
+                  <button
+                    onClick={shareAffirmation}
+                    className="plan-btn px-6 py-3 rounded-xl font-bold"
+                  >
+                    {copied ? "✓ Скопировано" : "📤 Поделиться"}
+                  </button>
+                </div>
               </div>
             )}
 
             {/* Подписка — умная форма */}
-            <div className="bg-slate-900/50 border border-white/10 rounded-2xl p-6 mb-8">
-              <h3 className="text-xl font-bold mb-3">📬 Получать аффирмацию каждое утро в 8:00</h3>
+            <div style={{ ["--accent" as any]: "#38bdf8" }} className="home-panel p-6 mb-8">
+              <h3 className="relative z-10 text-xl font-bold mb-3 text-white">📬 Получать аффирмацию каждое утро в 8:00</h3>
               {subscribed ? (
-                <div className="flex items-center gap-3 text-green-400">
-                  <span className="text-2xl">✓</span>
-                  <span>Вы подписаны! Аффирмация будет приходить на вашу почту каждое утро.</span>
+                <div className="relative z-10 flex items-center gap-3">
+                  <span className="dash-status-connected shrink-0">✓ Подписан</span>
+                  <span className="text-slate-300 text-sm">Аффирмация приходит на почту каждое утро</span>
                 </div>
               ) : isLoggedIn ? (
                 <button
                   onClick={handleSubscribe}
                   disabled={subLoading}
-                  className="px-6 py-3 bg-violet-600 hover:bg-violet-500 rounded-xl font-semibold transition disabled:opacity-50"
+                  className="plan-btn px-6 py-3 rounded-xl font-bold disabled:opacity-50"
                 >
                   {subLoading ? "Подписка..." : "🔔 Подписаться на аффирмации"}
                 </button>
               ) : (
-                <div className="flex items-center gap-4">
+                <div className="relative z-10 flex items-center gap-4 flex-wrap">
                   <button
                     onClick={() => router.push("/login")}
-                    className="px-6 py-3 bg-violet-600 hover:bg-violet-500 rounded-xl font-semibold transition"
+                    className="plan-btn px-6 py-3 rounded-xl font-bold"
                   >
                     Войти, чтобы подписаться
                   </button>
@@ -153,22 +165,23 @@ export default function AffirmationsPage() {
             </div>
 
             {/* Календарь */}
-            <div className="bg-slate-900/50 border border-white/10 rounded-2xl p-6">
-              <h3 className="text-xl font-bold mb-4">📅 Календарь аффирмаций</h3>
+            <div style={{ ["--accent" as any]: "#e879f9" }} className="home-panel p-6">
+              <h3 className="relative z-10 text-xl font-bold mb-4 text-white">📅 Календарь аффирмаций</h3>
               {calendar.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {calendar.map((aff) => (
                     <div
                       key={aff.id}
-                      className={`p-4 rounded-xl border transition ${
-                        isToday(aff.date)
-                          ? "bg-violet-600/20 border-violet-500/50"
-                          : "bg-slate-800/30 border-white/5"
-                      }`}
+                      style={{ ["--accent" as any]: isToday(aff.date) ? "#fbbf24" : "#e879f9" }}
+                      className={`cal-card relative rounded-2xl p-4 bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 overflow-hidden ${isToday(aff.date) ? "plan-popular" : ""}`}
                     >
-                      <div className="text-sm text-slate-400 mb-1">{formatDate(aff.date)}</div>
-                      <div className="font-semibold text-white mb-1">{aff.title}</div>
-                      <div className="text-sm text-slate-400 line-clamp-2">{aff.description}</div>
+                      <span className="cal-shine" aria-hidden="true" />
+                      {isToday(aff.date) && <div className="plan-badge" style={{ top: "10px", left: "auto", right: "10px", transform: "none" }}>⭐ Сегодня</div>}
+                      <div className="relative z-10">
+                        <div className="text-sm text-fuchsia-300 mb-1">{formatDate(aff.date)}</div>
+                        <div className="font-semibold text-white mb-1">{aff.title}</div>
+                        <div className="text-sm text-slate-400 line-clamp-2">{aff.description}</div>
+                      </div>
                     </div>
                   ))}
                 </div>
