@@ -1987,11 +1987,12 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   box-shadow: 0 0 50px -12px rgba(251, 191, 36, 0.35);
 }
 .plan-popular::before { opacity: 0.85; }
+.plan-popular { padding-top: 64px; }
 
 /* Бейдж ПОПУЛЯРНЫЙ — пульсирует золотом */
 .plan-badge {
   position: absolute;
-  top: -13px;
+  top: 14px;
   left: 50%;
   transform: translateX(-50%);
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
