@@ -124,4 +124,35 @@ class SubscriptionController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Типы гороскопов обновлены']);
     }
+
+    public function getDigestPrefs(Request $request)
+    {
+        $prefs = $request->user()->digest_prefs ?? [];
+        return response()->json([
+            'extra_horoscopes' => $prefs['extra_horoscopes'] ?? [],
+            'mood' => $prefs['mood'] ?? [],
+            'frequency' => $prefs['frequency'] ?? 'daily',
+        ]);
+    }
+
+    public function updateDigestPrefs(Request $request)
+    {
+        $data = $request->validate([
+            'extra_horoscopes' => 'array',
+            'extra_horoscopes.*' => 'string|in:chinese,japanese,zoroastrian,druids,flowers',
+            'mood' => 'array',
+            'mood.*' => 'string|in:affirmations,tarot,biorhythms,retrograde',
+            'frequency' => 'string|in:daily,weekly',
+        ]);
+
+        $user = $request->user();
+        $prefs = $user->digest_prefs ?? [];
+        $prefs['extra_horoscopes'] = $data['extra_horoscopes'] ?? [];
+        $prefs['mood'] = $data['mood'] ?? [];
+        $prefs['frequency'] = $data['frequency'] ?? 'daily';
+        $user->digest_prefs = $prefs;
+        $user->save();
+
+        return response()->json(['success' => true]);
+    }
 }

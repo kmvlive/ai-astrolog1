@@ -61,6 +61,9 @@ export default function DashboardPage() {
   const [affirmationLoading, setAffirmationLoading] = useState(false);
   const [hasNatalChart, setHasNatalChart] = useState(false);
   const [natalChartSubscribed, setNatalChartSubscribed] = useState(false);
+  const [extraHoroscopes, setExtraHoroscopes] = useState<string[]>([]);
+  const [mood, setMood] = useState<string[]>([]);
+  const [frequency, setFrequency] = useState<"daily" | "weekly">("daily");
 
   useEffect(() => {
     const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
@@ -118,6 +121,19 @@ export default function DashboardPage() {
           setFreeNatalChartEnabled(!!d.free_natal_chart_enabled);
           setCalendars(d.calendars || []);
           setSelCalendars(d.user_calendar_slugs || []);
+        }
+      })
+      .catch(() => {});
+
+    fetch(`${API_URL}/api/subscription/digest-prefs`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d) {
+          setExtraHoroscopes(d.extra_horoscopes || []);
+          setMood(d.mood || []);
+          setFrequency(d.frequency === "weekly" ? "weekly" : "daily");
         }
       })
       .catch(() => {});
@@ -186,6 +202,10 @@ export default function DashboardPage() {
     setSelTypes((prev) => (prev.includes(slug) ? prev.filter((s2) => s2 !== slug) : [...prev, slug]));
   const toggleChannel = (slug: string) =>
     setSelChannels((prev) => (prev.includes(slug) ? prev.filter((s2) => s2 !== slug) : [...prev, slug]));
+  const toggleExtra = (slug: string) =>
+    setExtraHoroscopes((prev) => (prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]));
+  const toggleMoodItem = (slug: string) =>
+    setMood((prev) => (prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]));
 
   const saveSettings = async () => {
     const token = (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
@@ -360,6 +380,47 @@ export default function DashboardPage() {
               ))}
             </div>
 
+            <div className="relative z-10 text-sm font-medium text-slate-300 mb-2 mt-6">Другие гороскопы</div>
+            <div className="flex flex-wrap gap-2 mb-6">
+              {[
+                { slug: "chinese", name: "Китайский", icon: "🐉" },
+                { slug: "japanese", name: "Японский", icon: "🎌" },
+                { slug: "zoroastrian", name: "Зороастрийский", icon: "🔥" },
+                { slug: "druids", name: "Друидов", icon: "🌳" },
+                { slug: "flowers", name: "Цветочный", icon: "🌸" },
+              ].map((x) => (
+                <button
+                  key={x.slug}
+                  type="button"
+                  onClick={() => toggleExtra(x.slug)}
+                  disabled={settingsSaving}
+                  className={`dash-chip ${extraHoroscopes.includes(x.slug) ? "dash-chip-active" : ""}`}
+                >
+                  {x.icon} {x.name}
+                </button>
+              ))}
+            </div>
+
+            <div className="relative z-10 text-sm font-medium text-slate-300 mb-2">Настрой</div>
+            <div className="flex flex-wrap gap-2 mb-6">
+              {[
+                { slug: "affirmations", name: "Общие аффирмации", icon: "💫" },
+                { slug: "tarot", name: "Карта Таро дня", icon: "🎴" },
+                { slug: "biorhythms", name: "Биоритмы", icon: "📊" },
+                { slug: "retrograde", name: "Ретроградные планеты", icon: "☿" },
+              ].map((x) => (
+                <button
+                  key={x.slug}
+                  type="button"
+                  onClick={() => toggleMoodItem(x.slug)}
+                  disabled={settingsSaving}
+                  className={`dash-chip ${mood.includes(x.slug) ? "dash-chip-active" : ""}`}
+                >
+                  {x.icon} {x.name}
+                </button>
+              ))}
+            </div>
+
             <div className="text-sm font-medium text-slate-300 mb-2">Куда присылать?</div>
             <div className="flex flex-wrap gap-2 mb-6">
               {availChannels.map((c) => (
@@ -373,6 +434,26 @@ export default function DashboardPage() {
                   {channelIcons[c.slug] || "📬"} {c.name}{c.slug === 'email' ? ' ✓' : ''}
                 </button>
               ))}
+            </div>
+
+            <div className="relative z-10 text-sm font-medium text-slate-300 mb-2 mt-6">Когда хотите получать?</div>
+            <div className="flex flex-wrap gap-2 mb-6">
+              <button
+                type="button"
+                onClick={() => setFrequency("daily")}
+                disabled={settingsSaving}
+                className={`dash-chip ${frequency === "daily" ? "dash-chip-active" : ""}`}
+              >
+                🌞 Ежедневно
+              </button>
+              <button
+                type="button"
+                onClick={() => setFrequency("weekly")}
+                disabled={settingsSaving}
+                className={`dash-chip ${frequency === "weekly" ? "dash-chip-active" : ""}`}
+              >
+                📅 Еженедельно
+              </button>
             </div>
 
             <button

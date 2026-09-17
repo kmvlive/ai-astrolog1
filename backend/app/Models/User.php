@@ -37,6 +37,7 @@ class User extends Authenticatable implements FilamentUser
         'email_verification_token',
         'email_verification_sent_at',
         'email_opt_in',
+        'digest_prefs',
     ];
 
     /**
@@ -50,6 +51,7 @@ class User extends Authenticatable implements FilamentUser
         'email_verification_token',
         'email_verification_sent_at',
         'email_opt_in',
+        'digest_prefs',
         'remember_token',
     ];
 
@@ -63,6 +65,7 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'digest_prefs' => 'array',
         ];
     }
 
