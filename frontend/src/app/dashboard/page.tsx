@@ -368,8 +368,8 @@ export default function DashboardPage() {
 
         {/* Настройки рассылки */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><span>📧</span><span className="bg-gradient-to-r from-violet-300 to-fuchsia-300 bg-clip-text text-transparent">Что получать</span></h2>
           <div style={{ ["--accent" as any]: "#a855f7" }} className="home-panel p-6">
+            <h2 className="relative z-10 text-2xl font-bold mb-5 flex items-center gap-2"><span>✉️</span><span className="bg-gradient-to-r from-violet-300 to-fuchsia-300 bg-clip-text text-transparent">Что получать</span></h2>
             <div className="text-sm font-medium text-slate-300 mb-2">Какие гороскопы получать?</div>
             <div className="flex flex-wrap gap-2 mb-6">
               {availTypes.map((t) => (
