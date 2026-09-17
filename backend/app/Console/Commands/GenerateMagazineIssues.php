@@ -61,6 +61,7 @@ class GenerateMagazineIssues extends Command
     {
         return [
             'horoscope' => $this->getHoroscope($user, $date),
+            'sign_extras' => $this->getSignExtras($user, $date),
             'affirmation' => $this->getAffirmation($date),
             'tarot' => $this->getTarotToday(),
             'biorhythms' => $this->getBiorhythms($user, $date),
@@ -120,6 +121,40 @@ class GenerateMagazineIssues extends Command
         }
 
         return null;
+    }
+
+    private function getSignExtras(User $user, Carbon $date): array
+    {
+        $signCode = $user->profile?->zodiac_sign;
+        if (!$signCode) return [];
+
+        $codeToSlug = [
+            'Ari' => 'oven',     'Tau' => 'telec',   'Gem' => 'bliznecy',
+            'Can' => 'rak',      'Leo' => 'lev',     'Vir' => 'deva',
+            'Lib' => 'vesy',     'Sco' => 'skorpion','Sag' => 'strelec',
+            'Cap' => 'kozerog',  'Aqu' => 'vodoley', 'Pis' => 'ryby',
+        ];
+        $slug = $codeToSlug[$signCode] ?? null;
+        if (!$slug) return [];
+
+        $result = [];
+        foreach (['financial', 'health'] as $type) {
+            $row = \DB::table('daily_horoscopes')
+                ->where('date', $date)
+                ->where('zodiac_sign', $signCode)
+                ->where('period', 'today')
+                ->where('type', $type)
+                ->first();
+
+            if ($row) {
+                $result[$type] = [
+                    'content' => $row->content,
+                    'url' => url("/horoscopes/{$slug}?period=today&type={$type}"),
+                ];
+            }
+        }
+
+        return $result;
     }
 
     private function getAffirmation(Carbon $date): ?array

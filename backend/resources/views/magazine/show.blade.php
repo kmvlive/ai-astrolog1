@@ -877,6 +877,80 @@
     border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
+
+/* === Доп. блоки по знаку: финансы и здоровье === */
+.sign-extras {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 40px 0;
+}
+
+.sign-extra-card {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.5), rgba(30, 27, 75, 0.3));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.sign-extra-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--extra-color, #a855f7), transparent);
+}
+
+.sign-extra-finance { --extra-color: #fbbf24; }
+.sign-extra-health { --extra-color: #34d399; }
+
+.sign-extra-kicker {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--extra-color, #a855f7);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sign-extra-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.sign-extra-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #cbd5e1;
+    flex: 1;
+}
+
+.sign-extra-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--extra-color, #a855f7);
+    text-decoration: none;
+    transition: gap 0.2s;
+}
+
+.sign-extra-link:hover { gap: 10px; text-decoration: none; }
+
+@media (max-width: 800px) {
+    .sign-extras { grid-template-columns: 1fr; }
+}
+
 </style>
 
 <div class="journal-page">
