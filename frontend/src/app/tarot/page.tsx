@@ -54,9 +54,6 @@ export default function TarotPage() {
 
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
-          <div className="cal-medal mx-auto mb-5" style={{ ["--accent" as any]: "#a855f7", width: "80px", height: "80px", borderRadius: "22px" }}>
-            <span className="text-5xl">🎴</span>
-          </div>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-violet-200 to-purple-200 bg-clip-text text-transparent mb-3">
             Карта дня
           </h1>
