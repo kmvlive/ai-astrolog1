@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import AdBlock from "@/components/AdBlock";
 import SiteFooter from "@/components/SiteFooter";
 import CometField from "@/components/CometField";
 import DivinationAnimation from "@/components/DivinationAnimation";
+import TarotCard from "@/components/TarotCard";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
@@ -20,6 +21,23 @@ interface Props {
   hasBirthdate?: boolean;
   placeholder?: string;
 }
+
+
+  // Stagger-переворот карт (появляются рубашкой, по очереди открываются)
+  useEffect(() => {
+    if (cards.length === 0) return;
+    const timers: NodeJS.Timeout[] = [];
+    cards.forEach((_, i) => {
+      timers.push(setTimeout(() => {
+        setFlipped((prev) => {
+          const next = [...prev];
+          next[i] = true;
+          return next;
+        });
+      }, 600 + i * 400));
+    });
+    return () => timers.forEach(clearTimeout);
+  }, [cards]);
 
 const ALL_DIVINATIONS = [
   { slug: "tarot-yes-no", emoji: "🃏", name: "Таро Да/Нет" },
@@ -47,12 +65,16 @@ export default function DivinationPage({
   const [loading, setLoading] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
   const [shareUuid, setShareUuid] = useState<string | null>(null);
+  const [cards, setCards] = useState<any[]>([]);
+  const [flipped, setFlipped] = useState<boolean[]>([]);
 
   const ask = async () => {
     if (loading) return;
     setLoading(true);
     setPrediction(null);
     setShareUuid(null);
+    setCards([]);
+    setFlipped([]);
 
     setTimeout(async () => {
       try {
@@ -71,6 +93,9 @@ export default function DivinationPage({
         const data = await r.json();
         setPrediction(data.prediction);
         setShareUuid(data.uuid ?? null);
+        const receivedCards = Array.isArray(data.cards) ? data.cards : [];
+        setCards(receivedCards);
+        setFlipped(new Array(receivedCards.length).fill(false));
       } catch {
         setPrediction("Оракул временно недоступен... Попробуйте позже.");
       } finally {
