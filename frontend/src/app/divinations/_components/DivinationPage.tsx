@@ -23,22 +23,6 @@ interface Props {
 }
 
 
-  // Stagger-переворот карт (появляются рубашкой, по очереди открываются)
-  useEffect(() => {
-    if (cards.length === 0) return;
-    const timers: NodeJS.Timeout[] = [];
-    cards.forEach((_, i) => {
-      timers.push(setTimeout(() => {
-        setFlipped((prev) => {
-          const next = [...prev];
-          next[i] = true;
-          return next;
-        });
-      }, 600 + i * 400));
-    });
-    return () => timers.forEach(clearTimeout);
-  }, [cards]);
-
 const ALL_DIVINATIONS = [
   { slug: "tarot-yes-no", emoji: "🃏", name: "Таро Да/Нет" },
   { slug: "celtic-cross", emoji: "✝️", name: "Кельтский крест" },
@@ -67,6 +51,23 @@ export default function DivinationPage({
   const [shareUuid, setShareUuid] = useState<string | null>(null);
   const [cards, setCards] = useState<any[]>([]);
   const [flipped, setFlipped] = useState<boolean[]>([]);
+
+  // Stagger-переворот карт (появляются рубашкой, по очереди открываются)
+  useEffect(() => {
+    if (cards.length === 0) return;
+    const timers: NodeJS.Timeout[] = [];
+    cards.forEach((_, i) => {
+      timers.push(setTimeout(() => {
+        setFlipped((prev) => {
+          const next = [...prev];
+          next[i] = true;
+          return next;
+        });
+      }, 600 + i * 400));
+    });
+    return () => timers.forEach(clearTimeout);
+  }, [cards]);
+
 
   const ask = async () => {
     if (loading) return;
