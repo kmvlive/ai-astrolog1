@@ -34,7 +34,7 @@ export default function RetrogradeWidget() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-br from-slate-900 to-slate-800 p-6">
+      <div>
         <div className="animate-pulse space-y-3">
           <div className="h-4 bg-slate-700 rounded w-3/4"></div>
           <div className="h-4 bg-slate-700 rounded w-1/2"></div>
@@ -44,7 +44,7 @@ export default function RetrogradeWidget() {
   }
 
   return (
-    <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-br from-slate-900 to-slate-800 p-6">
+    <div>
       {retro.length > 0 ? (
         <>
           <div className="mb-4 p-3 rounded-lg bg-red-950/30 border border-red-500/20">

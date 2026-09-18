@@ -518,7 +518,8 @@ export default function HomePage() {
 
 
       <section className="max-w-6xl mx-auto px-4 py-12">
-        <div className="text-center mb-8">
+        <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900/60 via-slate-900/40 to-violet-900/20 p-8 md:p-10">
+          <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-[11px] font-semibold uppercase tracking-[0.2em] text-violet-300 mb-4">
               <span>☿</span> Транзиты
             </div>
@@ -529,6 +530,7 @@ export default function HomePage() {
           <Link href="/retrograde" className="inline-block mt-6 bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 text-violet-200 rounded-xl px-6 py-3 font-semibold transition">Подробнее →</Link>
         </div>
         <RetrogradeWidget />
+        </div>
       </section>
 
 <section className="bg-slate-900/50 py-16">
