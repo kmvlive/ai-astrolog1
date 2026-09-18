@@ -24,7 +24,7 @@ class DailyHoroscopeController extends Controller
         'ryby' => ['code' => 'Pis', 'name' => 'Рыбы', 'emoji' => '♓'],
     ];
 
-    private const TYPES = ['general', 'love', 'career', 'financial', 'health'];
+    private const TYPES = ['general', 'love', 'career', 'financial', 'health', 'erotic', 'cooking', 'shopping', 'beauty', 'jewelry'];
     private const PERIODS = ['today', 'tomorrow', 'week', 'month', 'year'];
 
     public function index()

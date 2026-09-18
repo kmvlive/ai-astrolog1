@@ -32,6 +32,11 @@ const TYPES = [
   { slug: "career", name: "Карьера", icon: "💼" },
   { slug: "financial", name: "Финансы", icon: "💰" },
   { slug: "health", name: "Здоровье", icon: "🌿" },
+  { slug: "erotic", name: "Эротика", icon: "🔥" },
+  { slug: "cooking", name: "Кулинария", icon: "🍽️" },
+  { slug: "shopping", name: "Покупки", icon: "🛍️" },
+  { slug: "beauty", name: "Красота", icon: "💄" },
+  { slug: "jewelry", name: "Ювелирный", icon: "💍" },
 ];
 
 const PERIODS = [

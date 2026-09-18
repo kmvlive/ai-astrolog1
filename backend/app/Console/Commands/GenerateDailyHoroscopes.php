@@ -22,7 +22,7 @@ class GenerateDailyHoroscopes extends Command
         'Cap' => 'Козерог', 'Aqu' => 'Водолей', 'Pis' => 'Рыбы',
     ];
 
-    private array $types = ['general', 'love', 'career', 'financial', 'health'];
+    private array $types = ['general', 'love', 'career', 'financial', 'health', 'erotic', 'cooking', 'shopping', 'beauty', 'jewelry'];
 
     public function handle(): int
     {
