@@ -401,13 +401,13 @@ export default function HomePage() {
       {/* БЛОГ */}
       <section className="max-w-6xl mx-auto px-4 pb-16">
         <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-900/20 via-slate-900/40 to-violet-900/20 p-8 md:p-10">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
-            <div>
-              <div className="text-4xl mb-3">📅</div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">Календари на каждый день</h2>
-              <p className="text-slate-400 max-w-xl">Праздники, именины, лунные дни, православные и мусульманские даты, посадка и стрижки — всё посчитано для вас.</p>
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-[11px] font-semibold uppercase tracking-[0.2em] text-violet-300 mb-4">
+              <span>📅</span> Календари
             </div>
-            <Link href="/calendars" className="shrink-0 bg-violet-600 hover:bg-violet-500 rounded-xl px-6 py-3 font-semibold transition shadow-lg shadow-violet-600/30">Все календари →</Link>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent mb-3">Календари на каждый день</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto mb-6">Праздники, именины, лунные дни, православные и мусульманские даты, посадка и стрижки — всё посчитано для вас.</p>
+            <Link href="/calendars" className="inline-block bg-violet-600 hover:bg-violet-500 rounded-xl px-6 py-3 font-semibold transition shadow-lg shadow-violet-600/30">Все календари →</Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
             {CALENDARS.map((c) => {
@@ -439,9 +439,11 @@ export default function HomePage() {
       <section className="max-w-6xl mx-auto px-4 py-12">
         <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-amber-900/20 via-slate-900/40 to-violet-900/20 p-8 md:p-10">
           <div className="text-center mb-8">
-            <div className="text-5xl mb-3">🔢</div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-2">Нумерология и эзотерика</h2>
-            <p className="text-slate-400 max-w-xl mx-auto">Раскройте тайны судьбы через числа и арканы Таро</p>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-[11px] font-semibold uppercase tracking-[0.2em] text-violet-300 mb-4">
+              <span>🔢</span> Нумерология
+            </div>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent mb-3">Нумерология и эзотерика</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">Раскройте тайны судьбы через числа и арканы Таро</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
@@ -500,15 +502,12 @@ export default function HomePage() {
           className="home-panel group block p-8 md:p-10"
         >
           <span className="cal-shine" aria-hidden="true" />
-          <div className="relative z-10 flex items-start justify-between mb-6 gap-4">
-            <div>
-              <div className="cal-medal mb-4" style={{ width: "64px", height: "64px", borderRadius: "20px" }}>
-                <span className="text-3xl">💫</span>
-              </div>
-              <h2 className="text-3xl font-bold mb-2 text-white">Здоровье и настрой</h2>
-              <p className="text-slate-400">Ежедневные аффирмации для гармонии и вдохновения</p>
+          <div className="relative z-10 text-center mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-[11px] font-semibold uppercase tracking-[0.2em] text-violet-300 mb-4">
+              <span>💫</span> Гармония
             </div>
-            <span className="cal-go shrink-0 mt-2">→</span>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent mb-3">Здоровье и настрой</h2>
+            <p className="text-slate-400">Ежедневные аффирмации для гармонии и вдохновения</p>
           </div>
           <div className="quote-card relative z-10">
             <div className="text-sm mb-1 text-violet-300">Аффирмация сегодня</div>
@@ -520,7 +519,10 @@ export default function HomePage() {
 
       <section className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-3 bg-gradient-to-r from-sky-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent">☿ Ретроградные планеты</h2>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-[11px] font-semibold uppercase tracking-[0.2em] text-violet-300 mb-4">
+              <span>☿</span> Транзиты
+            </div>
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent mb-3">Ретроградные планеты</h2>
           <p className="text-slate-400 max-w-2xl mx-auto">
             Узнайте какие планеты сейчас в ретроградном движении и как это влияет на вашу жизнь
           </p>
@@ -531,7 +533,10 @@ export default function HomePage() {
 <section className="bg-slate-900/50 py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-3 flex items-center justify-center gap-3"><span>📖</span><span className="bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent">Блог AI-астролога</span></h2>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-[11px] font-semibold uppercase tracking-[0.2em] text-violet-300 mb-4">
+              <span>📖</span> Блог
+            </div>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent mb-3">Блог AI-астролога</h2>
             <p className="text-slate-400">Энергии дня, лунные циклы и астрологические прогнозы</p>
           </div>
           {blogPosts.length > 0 ? (
