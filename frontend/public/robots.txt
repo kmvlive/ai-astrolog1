@@ -9,3 +9,4 @@ Disallow: /share/
 
 Sitemap: https://my.neiro-astro.ru/sitemap.xml
 Sitemap: https://my.neiro-astro.ru/sitemap-dreams.xml
+Sitemap: https://my.neiro-astro.ru/sitemap-names.xml
