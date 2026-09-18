@@ -44,16 +44,20 @@ export default function CompatibilityPage() {
   const [date2, setDate2] = useState("");
   const [result, setResult] = useState<{ a1: number; a2: number; n1: string; n2: string; harmony: string } | null>(null);
 
+
   // Авто-подстановка даты рождения для авторизованных
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
     if (!token) return;
-    const headers = { Authorization: `Bearer ${token}`, Accept: "application/json" };
-    fetch(`${API_URL}/api/profile`, { headers })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("no profile"))))
-      .catch(() => fetch(`${API_URL}/api/user`, { headers }).then((r) => (r.ok ? r.json() : Promise.reject(new Error("no user")))))
+    fetch(`${API_URL}/api/me`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("not auth"))))
       .then((d) => {
-        const bd = d?.profile?.birth_date ?? d?.birth_date ?? d?.user?.profile?.birth_date;
+        const bd =
+          d?.profile?.birth_date ??
+          d?.user?.profile?.birth_date ??
+          d?.birth_date;
         if (bd) setDate1(String(bd).slice(0, 10));
       })
       .catch(() => {});

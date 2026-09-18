@@ -43,16 +43,20 @@ export default function MatrixPage() {
   const [birthDate, setBirthDate] = useState("");
   const [result, setResult] = useState<{ arcana: number; name: string; meaning: string } | null>(null);
 
+
   // Авто-подстановка даты рождения для авторизованных
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
     if (!token) return;
-    const headers = { Authorization: `Bearer ${token}`, Accept: "application/json" };
-    fetch(`${API_URL}/api/profile`, { headers })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("no profile"))))
-      .catch(() => fetch(`${API_URL}/api/user`, { headers }).then((r) => (r.ok ? r.json() : Promise.reject(new Error("no user")))))
+    fetch(`${API_URL}/api/me`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("not auth"))))
       .then((d) => {
-        const bd = d?.profile?.birth_date ?? d?.birth_date ?? d?.user?.profile?.birth_date;
+        const bd =
+          d?.profile?.birth_date ??
+          d?.user?.profile?.birth_date ??
+          d?.birth_date;
         if (bd) setBirthDate(String(bd).slice(0, 10));
       })
       .catch(() => {});
