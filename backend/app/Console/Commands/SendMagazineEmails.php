@@ -17,14 +17,17 @@ class SendMagazineEmails extends Command
         $testEmail = $this->option('test');
         $service = app(UniSenderService::class);
 
-        $query = MagazineIssue::whereNull('sent_at')->with('user');
-        
         if ($testEmail) {
-            // Тестовая отправка: берём последний выпуск любого пользователя
-            $issues = $query->latest('id')->limit(1)->get();
+            // Тестовая отправка: последний неотправленный выпуск
+            $issues = MagazineIssue::whereNull('sent_at')->with('user')->latest('id')->limit(1)->get();
             $this->info("TEST MODE: sending to {$testEmail}");
         } else {
-            $issues = $query->get();
+            // Только выпуск за СЕГОДНЯ: журнал актуален в свой день.
+            // Старые неотправленные не шлём (защита от дублей после тестов/сбоев)
+            $issues = MagazineIssue::whereNull('sent_at')
+                ->with('user')
+                ->whereDate('issue_date', now()->toDateString())
+                ->get();
         }
 
         $this->info("Processing {$issues->count()} magazine issues");
