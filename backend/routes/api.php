@@ -706,3 +706,7 @@ Route::get('/footer-menu', function () {
     
     return response()->json(['menu' => $menu]);
 });
+Route::get('/tarot-cards', function () {
+    $cards = \DB::table('tarot_cards')->select('id', 'name', 'description', 'image')->get();
+    return response()->json(['cards' => $cards]);
+});

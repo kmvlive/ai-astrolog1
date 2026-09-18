@@ -435,6 +435,63 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Нумерология */}
+      <section className="max-w-6xl mx-auto px-4 py-12">
+        <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-amber-900/20 via-slate-900/40 to-violet-900/20 p-8 md:p-10">
+          <div className="text-center mb-8">
+            <div className="text-5xl mb-3">🔢</div>
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">Нумерология и эзотерика</h2>
+            <p className="text-slate-400 max-w-xl mx-auto">Раскройте тайны судьбы через числа и арканы Таро</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link
+              href="/numerology/matrix"
+              className="group relative rounded-2xl p-6 bg-gradient-to-br from-slate-900/80 to-amber-950/40 border border-white/5 overflow-hidden hover:border-amber-500/30 transition-all"
+            >
+              <span className="cal-shine" aria-hidden="true" />
+              <div className="relative z-10">
+                <div className="text-4xl mb-4">🔮</div>
+                <h3 className="text-xl font-bold text-white mb-2">Матрица судьбы</h3>
+                <p className="text-sm text-slate-400 mb-4">Расчёт по дате рождения: ваш жизненный путь, таланты и кармические задачи</p>
+                <span className="inline-flex items-center gap-2 text-amber-400 font-semibold text-sm group-hover:gap-3 transition-all">
+                  Рассчитать →
+                </span>
+              </div>
+            </Link>
+
+            <Link
+              href="/numerology/compatibility"
+              className="group relative rounded-2xl p-6 bg-gradient-to-br from-slate-900/80 to-pink-950/40 border border-white/5 overflow-hidden hover:border-pink-500/30 transition-all"
+            >
+              <span className="cal-shine" aria-hidden="true" />
+              <div className="relative z-10">
+                <div className="text-4xl mb-4">💕</div>
+                <h3 className="text-xl font-bold text-white mb-2">Матрица совместимости</h3>
+                <p className="text-sm text-slate-400 mb-4">Гармония в паре: точки соприкосновения и зоны роста по датам рождения</p>
+                <span className="inline-flex items-center gap-2 text-pink-400 font-semibold text-sm group-hover:gap-3 transition-all">
+                  Проверить →
+                </span>
+              </div>
+            </Link>
+
+            <Link
+              href="/numerology/arcana"
+              className="group relative rounded-2xl p-6 bg-gradient-to-br from-slate-900/80 to-violet-950/40 border border-white/5 overflow-hidden hover:border-violet-500/30 transition-all"
+            >
+              <span className="cal-shine" aria-hidden="true" />
+              <div className="relative z-10">
+                <div className="text-4xl mb-4">🃏</div>
+                <h3 className="text-xl font-bold text-white mb-2">Значения арканов</h3>
+                <p className="text-sm text-slate-400 mb-4">22 старших аркана Таро: символика, толкование и влияние на судьбу</p>
+                <span className="inline-flex items-center gap-2 text-violet-400 font-semibold text-sm group-hover:gap-3 transition-all">
+                  Узнать →
+                </span>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
             {/* Здоровье и настрой */}
       <section className="max-w-4xl mx-auto px-4 py-12">
         <Link
