@@ -208,41 +208,36 @@ class DivinationController extends Controller
      */
     private function extractCards(string $response, string $type): array
     {
-        $cards = [];
-        
-        // Определяем сколько карт должно быть по типу гадания
-        $expectedCount = [
+        $expected = [
             'tarot-yes-no' => 1,
             'tarot-love' => 3,
             'tarot-future' => 5,
             'tarot-birthdate' => 1,
             'celtic-cross' => 10,
         ][$type] ?? 0;
-        
-        if ($expectedCount === 0) return $cards;
-        
-        // Ищем строку CARDS: slug1, slug2, ...
-        if (preg_match('/CARDS:\s*([a-z\-,\s]+)\s*$/i', $response, $m)) {
-            $slugList = array_map('trim', explode(',', strtolower($m[1])));
-            
-            // Загружаем карты из БД
-            $dbCards = \App\Models\TarotCard::whereIn('slug', $slugList)->get();
-            
-            foreach ($slugList as $slug) {
-                $card = $dbCards->firstWhere('slug', $slug);
-                if ($card) {
+
+        if ($expected === 0) {
+            return ['prediction' => $response, 'cards' => []];
+        }
+
+        $cards = [];
+        if (preg_match('/CARDS\s*:\s*([^\n]+)/i', $response, $m)) {
+            $line = mb_strtolower($m[1]);
+            preg_match_all('/[a-z][a-z\-]*/', $line, $tok);
+            $valid = \App\Models\TarotCard::whereIn('slug', array_unique($tok[0]))->get()->keyBy('slug');
+            foreach ($tok[0] as $slug) {
+                if (isset($valid[$slug])) {
                     $cards[] = [
-                        'slug' => $card->slug,
-                        'name' => $card->name,
-                        'image' => $card->image,
+                        'slug' => $valid[$slug]->slug,
+                        'name' => $valid[$slug]->name,
+                        'image' => $valid[$slug]->image,
                     ];
                 }
+                if (count($cards) >= $expected) break;
             }
-            
-            // Удаляем техническую строку из предсказания
-            $response = preg_replace('/\n?CARDS:\s*[a-z\-,\s]+\s*$/i', '', $response);
+            $response = preg_replace('/\n?[^\n]*CARDS\s*:\s*[^\n]*/i', '', $response);
         }
-        
+
         return ['prediction' => trim($response), 'cards' => $cards];
     }
 

@@ -214,6 +214,33 @@ export default function DivinationPage({
               </div>
             </div>
 
+            {/* Выпавшие карты */}
+            {cards.length > 0 && (
+              <div className="relative rounded-3xl border border-violet-500/20 bg-gradient-to-br from-violet-950/40 to-indigo-950/30 p-6 sm:p-8 overflow-hidden">
+                <span className="cal-shine" aria-hidden="true" />
+                <div className="relative z-10">
+                  <div className="text-center mb-6">
+                    <div className="text-xs uppercase tracking-[0.25em] text-violet-300 mb-1">Выпавшие карты</div>
+                    <p className="text-xs text-slate-500">нажмите на карту, чтобы перевернуть</p>
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
+                    {cards.map((card: any, i: number) => (
+                      <div key={i} className="tarot-reveal" style={{ animationDelay: `${i * 0.15}s` }}>
+                        <TarotCard
+                          image={card.image}
+                          name={card.name}
+                          size={cards.length === 1 ? "md" : cards.length >= 6 ? "sm" : "md"}
+                          flipOnClick
+                          initialFlipped={flipped[i] ?? false}
+                          showLabel
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex flex-wrap gap-3 justify-center">
               <button
                 onClick={share}

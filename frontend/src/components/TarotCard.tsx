@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Props {
   image?: string | null;
@@ -21,6 +21,11 @@ export default function TarotCard({
   showLabel = true,
 }: Props) {
   const [flipped, setFlipped] = useState(initialFlipped);
+
+  // Синхронизация с пропом (для stagger-переворота извне)
+  useEffect(() => {
+    setFlipped(initialFlipped);
+  }, [initialFlipped]);
 
   const sizes = {
     sm: { w: 80, h: 120 },
