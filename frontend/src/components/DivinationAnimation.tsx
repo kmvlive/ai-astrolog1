@@ -38,20 +38,20 @@ const CSS = `
 const TarotAnimation = () => {
   const cards = Array.from({ length: 8 }, (_, i) => i);
   return (
-    <div className="relative h-52 flex items-center justify-center overflow-hidden">
-      <div className="relative w-40 h-32">
+    <div className="relative h-56 flex items-center justify-center overflow-hidden">
+      <div className="relative" style={{ width: 280, height: 140 }}>
         {cards.map((i) => (
           <div
             key={i}
-            className="absolute w-14 h-20 bg-gradient-to-br from-violet-600 to-purple-800 rounded-lg border border-violet-300/40 shadow-lg shadow-violet-900/50 flex items-center justify-center"
+            className="tarot-mini-back absolute"
             style={{
-              left: `${20 + Math.sin(i * 0.9) * 45}px`,
-              top: `${10 + Math.cos(i * 0.9) * 25}px`,
-              transform: `rotate(${(i - 4) * 12}deg)`,
+              left: `${40 + Math.sin(i * 0.9) * 95}px`,
+              top: `${20 + Math.cos(i * 0.9) * 40}px`,
+              transform: `rotate(${(i - 4) * 10}deg)`,
               animation: `dv-shuffle ${0.9 + i * 0.12}s ease-in-out ${i * 0.08}s infinite alternate`,
             }}
           >
-            <span className="text-xl text-amber-300">✦</span>
+            <div className="tarot-mini-back-inner">✦</div>
           </div>
         ))}
       </div>
