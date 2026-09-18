@@ -34,6 +34,9 @@ class GenerateSitemap extends Command
             '/names' => ['priority' => '0.6', 'changefreq' => 'monthly'],
             '/tarot' => ['priority' => '0.6', 'changefreq' => 'weekly'],
             '/crystal-ball' => ['priority' => '0.5', 'changefreq' => 'weekly'],
+            '/numerology/matrix' => ['priority' => '0.7', 'changefreq' => 'monthly'],
+            '/numerology/compatibility' => ['priority' => '0.7', 'changefreq' => 'monthly'],
+            '/numerology/arcana' => ['priority' => '0.6', 'changefreq' => 'yearly'],
             '/terms' => ['priority' => '0.3', 'changefreq' => 'yearly'],
             '/register' => ['priority' => '0.5', 'changefreq' => 'monthly'],
         ];
