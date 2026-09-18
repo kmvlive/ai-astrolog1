@@ -164,15 +164,15 @@ class DivinationController extends Controller
         }
 
         $prompts = [
-            'tarot-yes-no' => "Ты — мудрый таролог. Вытяни одну карту из Старших Арканов Таро и дай чёткий ответ ДА или НЕТ на вопрос. Опиши карту (название + аркан) и дай краткое мистическое толкование (3-4 предложения). Вопрос: «{$question}» ВАЖНО: В самом конце ответа, после толкования, добавь ТОЛЬКО одну строку в формате: CARDS: slug где slug — один из: sut, mag, verxovnaia-zrica, imperatrica, imperator, ierofant, vliublennye, kolesnica, sila, otselnik, koleso-fortuny, spravedlivost, povesennyi, smert, umerennost, diavol, basnia, zvezda, luna, solnce, sud, mir",
+            'tarot-yes-no' => "ОБЯЗАТЕЛЬНЫЙ ФОРМАТ ОТВЕТА: последней строкой, отдельно от всего текста, выведи служебную строку CARDS: <slug карт через запятую>. Используй только slug из списка ниже. Ты — мудрый таролог. Вытяни одну карту из Старших Арканов Таро и дай чёткий ответ ДА или НЕТ на вопрос. Опиши карту (название + аркан) и дай краткое мистическое толкование (3-4 предложения). Вопрос: «{$question}» ВАЖНО: В самом конце ответа, после толкования, добавь ТОЛЬКО одну строку в формате: CARDS: slug где slug — один из: sut, mag, verxovnaia-zrica, imperatrica, imperator, ierofant, vliublennye, kolesnica, sila, otselnik, koleso-fortuny, spravedlivost, povesennyi, smert, umerennost, diavol, basnia, zvezda, luna, solnce, sud, mir",
 
-            'celtic-cross' => "Ты — опытный таролог. Сделай полный расклад Кельтский крест на 10 карт: 1) Суть ситуации, 2) Что помогает/мешает, 3) Основа/корень, 4) Прошлое, 5) Возможное будущее, 6) Ближайшее будущее, 7) Ваше отношение, 8) Окружение, 9) Надежды/страхи, 10) Итог. Для каждой карты — название аркана и толкование в контексте вопроса (1-2 предложения). В конце — общий вывод. Вопрос: «{$question}» ВАЖНО: В самом конце ответа, после общего вывода, добавь ТОЛЬКО одну строку в формате: CARDS: slug1, slug2, slug3, slug4, slug5, slug6, slug7, slug8, slug9, slug10 где каждый slug — один из: sut, mag, verxovnaia-zrica, imperatrica, imperator, ierofant, vliublennye, kolesnica, sila, otselnik, koleso-fortuny, spravedlivost, povesennyi, smert, umerennost, diavol, basnia, zvezda, luna, solnce, sud, mir (по порядку позиций расклада 1-10)",
+            'celtic-cross' => "ОБЯЗАТЕЛЬНЫЙ ФОРМАТ ОТВЕТА: последней строкой, отдельно от всего текста, выведи служебную строку CARDS: <slug карт через запятую>. Используй только slug из списка ниже. Ты — опытный таролог. Сделай полный расклад Кельтский крест на 10 карт: 1) Суть ситуации, 2) Что помогает/мешает, 3) Основа/корень, 4) Прошлое, 5) Возможное будущее, 6) Ближайшее будущее, 7) Ваше отношение, 8) Окружение, 9) Надежды/страхи, 10) Итог. Для каждой карты — название аркана и толкование в контексте вопроса (1-2 предложения). В конце — общий вывод. Вопрос: «{$question}» ВАЖНО: В самом конце ответа, после общего вывода, добавь ТОЛЬКО одну строку в формате: CARDS: slug1, slug2, slug3, slug4, slug5, slug6, slug7, slug8, slug9, slug10 где каждый slug — один из: sut, mag, verxovnaia-zrica, imperatrica, imperator, ierofant, vliublennye, kolesnica, sila, otselnik, koleso-fortuny, spravedlivost, povesennyi, smert, umerennost, diavol, basnia, zvezda, luna, solnce, sud, mir (по порядку позиций расклада 1-10)",
 
-            'tarot-love' => "Ты — таролог-эксперт в вопросах любви. Сделай расклад на 3 карты: Прошлое любви, Настоящее, Будущее. Для каждой карты — название + толкование в контексте отношений (2 предложения). В конце — совет. Вопрос querent: «{$question}» ВАЖНО: В самом конце ответа, после совета, добавь ТОЛЬКО одну строку в формате: CARDS: slug1, slug2, slug3 где каждый slug — один из: sut, mag, verxovnaia-zrica, imperatrica, imperator, ierofant, vliublennye, kolesnica, sila, otselnik, koleso-fortuny, spravedlivost, povesennyi, smert, umerennost, diavol, basnia, zvezda, luna, solnce, sud, mir (по порядку: Прошлое, Настоящее, Будущее)",
+            'tarot-love' => "ОБЯЗАТЕЛЬНЫЙ ФОРМАТ ОТВЕТА: последней строкой, отдельно от всего текста, выведи служебную строку CARDS: <slug карт через запятую>. Используй только slug из списка ниже. Ты — таролог-эксперт в вопросах любви. Сделай расклад на 3 карты: Прошлое любви, Настоящее, Будущее. Для каждой карты — название + толкование в контексте отношений (2 предложения). В конце — совет. Вопрос querent: «{$question}» ВАЖНО: В самом конце ответа, после совета, добавь ТОЛЬКО одну строку в формате: CARDS: slug1, slug2, slug3 где каждый slug — один из: sut, mag, verxovnaia-zrica, imperatrica, imperator, ierofant, vliublennye, kolesnica, sila, otselnik, koleso-fortuny, spravedlivost, povesennyi, smert, umerennost, diavol, basnia, zvezda, luna, solnce, sud, mir (по порядку: Прошлое, Настоящее, Будущее)",
 
-            'tarot-future' => "Ты — таролог-провидец. Сделай расклад на 5 карт: Ближайшая неделя, Месяц, 3 месяца, Полгода, Год. Для каждой карты — название + прогноз (2 предложения). В конце — ключевой совет на будущее. Вопрос/ситуация: «{$question}» ВАЖНО: В самом конце ответа, после совета, добавь ТОЛЬКО одну строку в формате: CARDS: slug1, slug2, slug3, slug4, slug5 где каждый slug — один из: sut, mag, verxovnaia-zrica, imperatrica, imperator, ierofant, vliublennye, kolesnica, sila, otselnik, koleso-fortuny, spravedlivost, povesennyi, smert, umerennost, diavol, basnia, zvezda, luna, solnce, sud, mir (по порядку: неделя, месяц, 3 мес, полгода, год)",
+            'tarot-future' => "ОБЯЗАТЕЛЬНЫЙ ФОРМАТ ОТВЕТА: последней строкой, отдельно от всего текста, выведи служебную строку CARDS: <slug карт через запятую>. Используй только slug из списка ниже. Ты — таролог-провидец. Сделай расклад на 5 карт: Ближайшая неделя, Месяц, 3 месяца, Полгода, Год. Для каждой карты — название + прогноз (2 предложения). В конце — ключевой совет на будущее. Вопрос/ситуация: «{$question}» ВАЖНО: В самом конце ответа, после совета, добавь ТОЛЬКО одну строку в формате: CARDS: slug1, slug2, slug3, slug4, slug5 где каждый slug — один из: sut, mag, verxovnaia-zrica, imperatrica, imperator, ierofant, vliublennye, kolesnica, sila, otselnik, koleso-fortuny, spravedlivost, povesennyi, smert, umerennost, diavol, basnia, zvezda, luna, solnce, sud, mir (по порядку: неделя, месяц, 3 мес, полгода, год)",
 
-            'tarot-birthdate' => "Ты — таролог-нумеролог. Дата рождения клиента: {$birthHuman}. Используй ТОЛЬКО эту дату и не меняй в ней ни одну цифру. Определи число судьбы (сумма всех цифр даты, свёрнутая до однозначного числа) и выбери персональную карту Старших Арканов. Дай толкование: характер, предназначение, главный урок жизни, прогноз на ближайшее будущее (всего 4-5 предложений). ВАЖНО: В самом конце ответа добавь ТОЛЬКО одну строку в формате: CARDS: slug где slug — один из: sut, mag, verxovnaia-zrica, imperatrica, imperator, ierofant, vliublennye, kolesnica, sila, otselnik, koleso-fortuny, spravedlivost, povesennyi, smert, umerennost, diavol, basnia, zvezda, luna, solnce, sud, mir",
+            'tarot-birthdate' => "ОБЯЗАТЕЛЬНЫЙ ФОРМАТ ОТВЕТА: последней строкой, отдельно от всего текста, выведи служебную строку CARDS: <slug карт через запятую>. Используй только slug из списка ниже. Ты — таролог-нумеролог. Дата рождения клиента: {$birthHuman}. Используй ТОЛЬКО эту дату и не меняй в ней ни одну цифру. Определи число судьбы (сумма всех цифр даты, свёрнутая до однозначного числа) и выбери персональную карту Старших Арканов. Дай толкование: характер, предназначение, главный урок жизни, прогноз на ближайшее будущее (всего 4-5 предложений). ВАЖНО: В самом конце ответа добавь ТОЛЬКО одну строку в формате: CARDS: slug где slug — один из: sut, mag, verxovnaia-zrica, imperatrica, imperator, ierofant, vliublennye, kolesnica, sila, otselnik, koleso-fortuny, spravedlivost, povesennyi, smert, umerennost, diavol, basnia, zvezda, luna, solnce, sud, mir",
             
             'coffee-grounds' => "Ты — мастер чтения по кофейной гуще. Опиши символические узоры, которые видишь на дне чашки (геометрические фигуры, образы животных, предметов), и интерпретируй их как предсказание. Укажи 3-4 ключевых символа и что они означают для querent. Вопрос: «{$question}»",
             
@@ -221,7 +221,8 @@ class DivinationController extends Controller
         }
 
         $cards = [];
-        if (preg_match('/CARDS\s*:\s*([^\n]+)/i', $response, $m)) {
+        $lineMatch = preg_match('/CARDS\s*:\s*([^\n]+)/i', $response, $m);
+        if ($lineMatch) {
             $line = mb_strtolower($m[1]);
             preg_match_all('/[a-z][a-z\-]*/', $line, $tok);
             $valid = \App\Models\TarotCard::whereIn('slug', array_unique($tok[0]))->get()->keyBy('slug');
@@ -236,6 +237,26 @@ class DivinationController extends Controller
                 if (count($cards) >= $expected) break;
             }
             $response = preg_replace('/\n?[^\n]*CARDS\s*:\s*[^\n]*/i', '', $response);
+        }
+
+        // Fallback: LLM не вывел строку CARDS — ищем названия карт в тексте
+        if (count($cards) === 0) {
+            $all = \App\Models\TarotCard::orderBy('id')->get();
+            $found = [];
+            foreach ($all as $card) {
+                if (preg_match('/\b' . preg_quote($card->name, '/') . '\b/ui', $response, $mm, PREG_OFFSET_CAPTURE)) {
+                    $found[] = ['pos' => $mm[0][1], 'card' => $card];
+                }
+            }
+            usort($found, fn($a, $b) => $a['pos'] <=> $b['pos']);
+            foreach ($found as $f) {
+                $cards[] = [
+                    'slug' => $f['card']->slug,
+                    'name' => $f['card']->name,
+                    'image' => $f['card']->image,
+                ];
+                if (count($cards) >= $expected) break;
+            }
         }
 
         return ['prediction' => trim($response), 'cards' => $cards];
