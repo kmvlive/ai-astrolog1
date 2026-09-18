@@ -2696,3 +2696,16 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
     opacity: 0.4 !important;
   }
 }
+
+/* Аура-зарево над шапкой страницы (не участвует в потоке) */
+.aura-top::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 420px;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(700px 320px at 50% 0%, color-mix(in srgb, var(--accent, #a78bfa) 16%, transparent), transparent 70%);
+}

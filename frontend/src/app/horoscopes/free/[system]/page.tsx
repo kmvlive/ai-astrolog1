@@ -69,7 +69,7 @@ export default function SystemPage() {
   const byYear = system.by === "year" || system.by === "year9";
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate aura-top" style={{ ["--accent" as any]: ACCENTS[slug] || "#a78bfa" }}>
       <SiteHeader />
       <CometField count={8} />
       <div className="max-w-6xl mx-auto px-4 py-12">
