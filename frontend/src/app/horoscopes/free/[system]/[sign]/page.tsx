@@ -9,6 +9,17 @@ import { useParams } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
+const ACCENTS: Record<string, string> = {
+  chinese: "#f87171",
+  japanese: "#fb7185",
+  druids: "#4ade80",
+  numerology: "#a78bfa",
+  eastern: "#fbbf24",
+  vedic: "#38bdf8",
+  maya: "#f472b6",
+  celtic: "#34d399",
+};
+
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
 type Data = {
@@ -53,7 +64,7 @@ export default function SignPage() {
         </Link>
 
         <div className="text-center my-10">
-          <div className="cal-medal mx-auto mb-5" style={{ width: "96px", height: "96px", borderRadius: "28px" }}>
+          <div className="cal-medal mx-auto mb-5" style={{ ["--accent" as any]: ACCENTS[data.system.slug] || "#a78bfa", width: "96px", height: "96px", borderRadius: "28px" }}>
             <span className="text-6xl">{data.sign.emoji}</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent mb-3">
