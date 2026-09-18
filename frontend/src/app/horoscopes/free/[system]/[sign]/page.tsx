@@ -1,6 +1,7 @@
 "use client";
 
 import CometField from "@/components/CometField";
+import PersonalUpsell from "@/components/PersonalUpsell";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -47,47 +48,46 @@ export default function SignPage() {
       <SiteHeader />
       <CometField count={8} />
       <div className="max-w-3xl mx-auto px-4 py-12">
-        <Link href={`/horoscopes/free/${system}`} className="text-violet-400 hover:text-violet-300 text-sm">
+        <Link href={`/horoscopes/free/${system}`} className="text-violet-400 hover:text-violet-300 text-sm transition">
           ← {data.system.emoji} {data.system.name}
         </Link>
 
-        <div className="text-center my-8">
-          <div className="text-7xl mb-4">{data.sign.emoji}</div>
-          <h1 className="text-4xl font-bold mb-2">{data.sign.name}</h1>
-          <div className="text-slate-400">{data.system.name} · {data.date}</div>
+        <div className="text-center my-10">
+          <div className="cal-medal mx-auto mb-5" style={{ width: "96px", height: "96px", borderRadius: "28px" }}>
+            <span className="text-6xl">{data.sign.emoji}</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent mb-3">
+            {data.sign.name}
+          </h1>
+          <div className="text-slate-500 text-sm uppercase tracking-widest">{data.system.name} · {data.date}</div>
         </div>
 
-        <div className="flex justify-center gap-2 mb-8">
-          {(["today", "tomorrow"] as const).map((t) => (
-            <button key={t} onClick={() => setTab(t)}
-              className={`px-6 py-2.5 rounded-xl font-semibold transition ${tab === t ? "bg-amber-400 text-slate-900" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}>
-              {t === "today" ? "Сегодня" : "Завтра"}
-            </button>
-          ))}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex rounded-xl border border-white/10 bg-slate-900/70 p-1">
+            {(["today", "tomorrow"] as const).map((t) => (
+              <button key={t} onClick={() => setTab(t)}
+                className={`px-6 py-2.5 rounded-lg font-semibold text-sm transition ${tab === t ? "bg-gradient-to-r from-amber-400 to-amber-300 text-slate-900 shadow" : "text-slate-400 hover:text-white"}`}>
+                {t === "today" ? "Сегодня" : "Завтра"}
+              </button>
+            ))}
+          </div>
         </div>
 
         {content ? (
-          <div className="rounded-2xl p-8 bg-slate-900 border border-white/10">
-            <p className="text-lg leading-relaxed text-slate-200 whitespace-pre-line">{content}</p>
+          <div className="relative rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900/70 to-indigo-950/30 p-8 md:p-10 overflow-hidden">
+            <span className="cal-shine" aria-hidden="true" />
+            <p className="relative z-10 text-lg leading-relaxed text-slate-200 whitespace-pre-line">{content}</p>
           </div>
         ) : (
-          <div className="rounded-2xl p-8 bg-slate-900 border border-white/10 text-center text-slate-400">
+          <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-10 text-center text-slate-400">
             Прогноз на этот день готовится — загляните чуть позже ✨
           </div>
         )}
 
-        <div className="mt-10 rounded-2xl p-8 bg-gradient-to-r from-violet-900/40 to-amber-900/20 border border-violet-500/30 text-center">
-          <h2 className="text-xl font-bold mb-2">✨ Хотите точнее?</h2>
-          <p className="text-slate-300 mb-5 text-sm max-w-md mx-auto">
-            Персональный гороскоп по вашей натальной карте — в разы точнее общего прогноза
-          </p>
-          <Link href="/pricing" className="inline-block bg-amber-400 hover:bg-amber-300 text-slate-900 font-semibold px-6 py-3 rounded-xl transition">
-            Получить персональный
-          </Link>
-        </div>
+        <PersonalUpsell />
 
         <div className="text-center mt-8">
-          <Link href="/horoscopes/compatibility" className="text-rose-400 hover:text-rose-300">
+          <Link href="/horoscopes/compatibility" className="text-rose-400 hover:text-rose-300 transition">
             💞 Проверить совместимость с другим знаком →
           </Link>
         </div>
