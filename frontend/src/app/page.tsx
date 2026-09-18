@@ -526,6 +526,7 @@ export default function HomePage() {
           <p className="text-slate-400 max-w-2xl mx-auto">
             Узнайте какие планеты сейчас в ретроградном движении и как это влияет на вашу жизнь
           </p>
+          <Link href="/retrograde" className="inline-block mt-6 bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 text-violet-200 rounded-xl px-6 py-3 font-semibold transition">Подробнее →</Link>
         </div>
         <RetrogradeWidget />
       </section>

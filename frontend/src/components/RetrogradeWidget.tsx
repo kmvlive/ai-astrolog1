@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
 interface Planet {
@@ -36,10 +35,6 @@ export default function RetrogradeWidget() {
   if (loading) {
     return (
       <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-2xl">☿</span>
-          <h3 className="text-xl font-semibold text-white">Ретроградные планеты</h3>
-        </div>
         <div className="animate-pulse space-y-3">
           <div className="h-4 bg-slate-700 rounded w-3/4"></div>
           <div className="h-4 bg-slate-700 rounded w-1/2"></div>
@@ -50,16 +45,6 @@ export default function RetrogradeWidget() {
 
   return (
     <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">☿</span>
-          <h3 className="text-xl font-semibold text-white">Ретроградные планеты</h3>
-        </div>
-        <Link href="/retrograde" className="text-sm text-violet-400 hover:text-violet-300 transition">
-          Подробнее →
-        </Link>
-      </div>
-
       {retro.length > 0 ? (
         <>
           <div className="mb-4 p-3 rounded-lg bg-red-950/30 border border-red-500/20">
