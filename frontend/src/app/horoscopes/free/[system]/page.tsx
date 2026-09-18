@@ -72,7 +72,6 @@ export default function SystemPage() {
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
       <CometField count={8} />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px]" style={{ background: `radial-gradient(700px 320px at 50% 0%, ${ACCENTS[slug] || "#a78bfa"}26, transparent 70%)` }} />
       <div className="max-w-6xl mx-auto px-4 py-12">
         <Link href="/horoscopes/free" className="text-violet-400 hover:text-violet-300 text-sm transition">← Все бесплатные гороскопы</Link>
 
