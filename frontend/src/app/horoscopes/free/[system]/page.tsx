@@ -12,7 +12,9 @@ import SiteFooter from "@/components/SiteFooter";
 const ACCENTS: Record<string, string> = {
   chinese: "#f87171",
   japanese: "#fb7185",
+  zoroastrian: "#fbbf24",
   druids: "#4ade80",
+  flowers: "#f472b6",
   numerology: "#a78bfa",
   eastern: "#fbbf24",
   vedic: "#38bdf8",
