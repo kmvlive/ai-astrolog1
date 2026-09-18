@@ -44,8 +44,11 @@ export default function ArcanaPage() {
               <div key={card.id}
                 className="rounded-2xl border border-white/10 bg-gradient-to-br from-violet-950/40 to-slate-900/80 p-6 hover:border-violet-500/30 transition">
                 {card.image ? (
-                  <img src={`/storage/${card.image}`} alt={card.name}
-                    className="w-full h-48 object-cover rounded-xl mb-4 border border-white/10" />
+                  <div className="relative w-full h-48 rounded-xl mb-4 overflow-hidden border border-white/10">
+                    <img src={`/storage/${card.image}`} alt={card.name}
+                      className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_70px_35px_rgba(5,8,20,0.95)]" />
+                  </div>
                 ) : (
                   <div className="relative w-full h-48 rounded-xl mb-4 border border-white/10 bg-gradient-to-br from-indigo-950/70 via-slate-900/80 to-violet-950/50 overflow-hidden flex items-center justify-center">
                     <span className="cal-shine" aria-hidden="true" />
