@@ -1,5 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
@@ -41,6 +43,22 @@ export default function CompatibilityPage() {
   const [date1, setDate1] = useState("");
   const [date2, setDate2] = useState("");
   const [result, setResult] = useState<{ a1: number; a2: number; n1: string; n2: string; harmony: string } | null>(null);
+
+  // Авто-подстановка даты рождения для авторизованных
+  useEffect(() => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+    if (!token) return;
+    const headers = { Authorization: `Bearer ${token}`, Accept: "application/json" };
+    fetch(`${API_URL}/api/profile`, { headers })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("no profile"))))
+      .catch(() => fetch(`${API_URL}/api/user`, { headers }).then((r) => (r.ok ? r.json() : Promise.reject(new Error("no user")))))
+      .then((d) => {
+        const bd = d?.profile?.birth_date ?? d?.birth_date ?? d?.user?.profile?.birth_date;
+        if (bd) setDate1(String(bd).slice(0, 10));
+      })
+      .catch(() => {});
+  }, []);
+
 
   const handleCalc = () => {
     if (!date1 || !date2) return;
