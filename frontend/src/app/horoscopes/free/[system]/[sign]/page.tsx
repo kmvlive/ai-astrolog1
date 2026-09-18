@@ -60,6 +60,7 @@ export default function SignPage() {
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
       <CometField count={8} />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px]" style={{ background: `radial-gradient(700px 320px at 50% 0%, ${ACCENTS[data.system.slug] || "#a78bfa"}26, transparent 70%)` }} />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <Link href={`/horoscopes/free/${system}`} className="text-violet-400 hover:text-violet-300 text-sm transition">
           ← {data.system.emoji} {data.system.name}

@@ -22,6 +22,8 @@ const ACCENTS: Record<string, string> = {
   celtic: "#34d399",
 };
 
+const SIGN_ACCENTS = ["#f87171", "#fbbf24", "#4ade80", "#a78bfa", "#38bdf8", "#f472b6", "#fb7185", "#34d399", "#f59e0b", "#818cf8", "#22d3ee", "#e879f9"];
+
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
 type System = {
@@ -70,6 +72,7 @@ export default function SystemPage() {
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
       <CometField count={8} />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px]" style={{ background: `radial-gradient(700px 320px at 50% 0%, ${ACCENTS[slug] || "#a78bfa"}26, transparent 70%)` }} />
       <div className="max-w-6xl mx-auto px-4 py-12">
         <Link href="/horoscopes/free" className="text-violet-400 hover:text-violet-300 text-sm transition">← Все бесплатные гороскопы</Link>
 
@@ -107,12 +110,15 @@ export default function SystemPage() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {system.signs.map((s) => (
+          {system.signs.map((s, i) => (
             <Link key={s.slug} href={`/horoscopes/free/${slug}/${s.slug}`}
-              className="group relative rounded-2xl p-5 bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 overflow-hidden hover:border-amber-400/40 hover:-translate-y-0.5 transition text-center">
+              style={{ ["--accent" as any]: SIGN_ACCENTS[i % SIGN_ACCENTS.length] }}
+              className="group relative rounded-2xl p-6 bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 overflow-hidden hover:border-white/20 hover:-translate-y-1 transition text-center">
               <span className="cal-shine" aria-hidden="true" />
               <div className="relative z-10">
-                <div className="text-4xl mb-2 group-hover:scale-110 transition-transform inline-block">{s.emoji}</div>
+                <div className="cal-medal mx-auto mb-3" style={{ width: "64px", height: "64px", borderRadius: "18px" }}>
+                  <span className="text-3xl group-hover:scale-110 transition-transform inline-block">{s.emoji}</span>
+                </div>
                 <div className="font-semibold text-white group-hover:text-amber-200 transition">{s.name}</div>
               </div>
             </Link>
