@@ -16,6 +16,22 @@ class DestinyMatrixController
             return response()->json(['error' => 'Укажите дату в формате YYYY-MM-DD'], 422);
         }
 
+        $userId = $this->resolveUserId($request);
+
+        // Повторный расчёт той же даты — возвращаем из БД (без AI-запроса)
+        $q = \App\Models\DestinyMatrix::where('birth_date', date('Y-m-d', strtotime($date)));
+        $userId ? $q->where('user_id', $userId) : $q->whereNull('user_id');
+        $existing = $q->first();
+        if ($existing) {
+            return response()->json([
+                'date' => date('d.m.Y', strtotime($date)),
+                'positions' => $existing->positions,
+                'interpretation' => $existing->interpretation,
+                'uuid' => $existing->uuid,
+                'from_db' => true,
+            ]);
+        }
+
         $ts = strtotime($date);
         $day = (int) date('j', $ts);
         $month = (int) date('n', $ts);
@@ -42,10 +58,19 @@ class DestinyMatrixController
             return $ai->chat($prompt, ['temperature' => 0.8, 'max_tokens' => 1500]) ?? 'Толкование временно недоступно.';
         });
 
+        $row = \App\Models\DestinyMatrix::create([
+            'user_id' => $userId,
+            'birth_date' => date('Y-m-d', $ts),
+            'positions' => $positions,
+            'interpretation' => $aiText,
+            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+        ]);
+
         return response()->json([
             'date' => date('d.m.Y', $ts),
             'positions' => $positions,
             'interpretation' => $aiText,
+            'uuid' => $row->uuid,
         ]);
     }
 
@@ -81,5 +106,28 @@ class DestinyMatrixController
 
 Стиль: тёплый, вдохновляющий, практичный. Используй **жирный** для ключевых слов. 400-600 слов.
 PROMPT;
+    }
+
+    public function history(Request $request)
+    {
+        $rows = \App\Models\DestinyMatrix::where('user_id', $request->user('sanctum')->id)
+            ->orderByDesc('created_at')
+            ->limit(20)
+            ->get();
+
+        return response()->json([
+            'items' => $rows->map(fn ($r) => [
+                'uuid' => $r->uuid,
+                'birth_date' => $r->birth_date->format('d.m.Y'),
+                'positions' => $r->positions,
+                'created_at' => $r->created_at->format('d.m.Y H:i'),
+            ]),
+            'total' => $rows->count(),
+        ]);
+    }
+
+    private function resolveUserId(Request $request): ?int
+    {
+        return $request->user('sanctum')?->id;
     }
 }

@@ -380,6 +380,7 @@ Route::get('/runes', function () {
 
 // ===== Матрица судьбы =====
 Route::post('/destiny-matrix', [\App\Http\Controllers\Api\DestinyMatrixController::class, 'calculate']);
+Route::get('/destiny-matrix/history', [\App\Http\Controllers\Api\DestinyMatrixController::class, 'history'])->middleware('auth:sanctum');
 
 
 // ===== Биоритмы =====
