@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
@@ -65,7 +66,13 @@ export default function RuneOfDay() {
             </span>
           </div>
           <p className="text-white/90 leading-relaxed mb-2">{data.rune.meaning}</p>
-          <p className="text-violet-200 italic text-sm">💡 {data.rune.advice}</p>
+          <p className="text-violet-200 italic text-sm mb-4">💡 {data.rune.advice}</p>
+          <Link
+            href="/runes"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 text-violet-300 text-sm font-medium transition"
+          >
+            ᚱ Все 24 руны и руна дня →
+          </Link>
         </div>
       </div>
     </div>
