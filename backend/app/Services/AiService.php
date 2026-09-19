@@ -411,7 +411,14 @@ PROMPT;
             ]);
 
             $cover = $this->generateCover($post);
-            if ($cover) { $post->update(['cover_image' => $cover]); }
+            if ($cover) { 
+                $post->update(['cover_image' => $cover]); 
+                // Сохраняем мотив для предотвращения повторов
+                $subject = $this->extractSubjectFromCover($post);
+                if ($subject) {
+                    $post->update(['cover_subject' => $subject]);
+                }
+            }
 
             return $post;
         } catch (\Exception $e) {
@@ -480,56 +487,114 @@ PROMPT;
         'https://images.unsplash.com/photo-1532693322450-2cb5c511067d',
     ];
 
-    private const COVER_PROMPTS = [
-        // 1. Красивые женщины
-        [
-            'beautiful mystical sorceress with long flowing silver hair, standing in a moonlit garden, glowing runes floating around her hands, soft lavender and pearl palette, ethereal cinematic lighting, highly detailed face, {keyword}',
-            'elegant fortune teller woman with dark eyes and golden jewelry, sitting at a table with candles and tarot cards, warm amber glow, mysterious smile, rich purple shadows, professional fantasy portrait, {keyword}',
-            'celestial goddess of stars with flowing dress made of night sky and constellations, standing on clouds at dawn, soft pink and gold light, serene expression, epic fantasy digital painting, {keyword}',
-            'young witch with freckles and warm smile holding a glowing crystal lantern, autumn forest at golden hour, fireflies around, cozy magical atmosphere, highly detailed fantasy illustration, {keyword}',
-        ],
-        // 2. Мистические животные
-        [
-            'majestic phoenix with fiery golden plumage rising above misty mountains at sunrise, sparks and embers swirling, epic cinematic fantasy art, highly detailed feathers, {keyword}',
-            'ethereal white unicorn with pearlescent mane walking through a glowing lavender field at twilight, stars appearing in violet sky, magical sparkles, dreamy fantasy painting, {keyword}',
-            'wise ancient dragon with silver scales coiled around a floating crystal island, aurora borealis in background, epic scale, cinematic lighting, masterpiece fantasy art, {keyword}',
-            'glowing celestial whale swimming through starry nebula clouds, tiny stars like plankton around it, surreal dreamlike cosmic scene, soft blue and violet palette, {keyword}',
-        ],
-        // 3. Галактики и космос
-        [
-            'spiral galaxy with swirling purple and gold arms seen from above, countless stars and glowing core, deep space vista, ultra detailed astronomical art, {keyword}',
-            'colorful nebula clouds in pink violet and teal with newborn stars shining through, cosmic dust pillars, hubble style epic space scenery, highly detailed, {keyword}',
-            'double sunset over ringed planet seen from moon surface, alien sky in orange and magenta, dramatic clouds, sci-fi fantasy landscape, cinematic, {keyword}',
-            'star cluster inside translucent cosmic bubble floating in dark space, delicate light rays, surreal mystical astronomy art, ultra detailed, {keyword}',
-        ],
-        // 4. Фантастические пейзажи
-        [
-            'towering waterfall falling from floating island into clouds below, rainbow mist, lush greenery and glowing flowers on cliff edges, golden morning light, epic fantasy landscape, {keyword}',
-            'ancient marble temple on cliff overlooking turquoise sea at sunset, columns wrapped in flowering vines, warm golden light, serene majestic atmosphere, fantasy concept art, {keyword}',
-            'crystal mountains glowing from inside under aurora borealis, mirror lake reflecting violet sky, snow sparkles, magical winter landscape, masterpiece, {keyword}',
-            'alien valley with giant glowing mushrooms and bioluminescent river at night, two moons in starry sky, fantastical distant world, highly detailed sci-fi fantasy art, {keyword}',
-        ],
-        // 5. Разное время суток
-        [
-            'misty dawn over lavender hills with ancient stone circle, first sun rays breaking through fog, soft pink and gold palette, peaceful magical morning, cinematic landscape, {keyword}',
-            'golden hour in enchanted forest with sunbeams through tall trees, floating pollen sparkles, moss covered stones, warm amber tones, dreamy fantasy scenery, {keyword}',
-            'violet twilight over calm sea with lighthouse beam and first stars, soft gradient sky from magenta to deep blue, serene mystical evening, highly detailed, {keyword}',
-            'midnight sky full of stars and milky way over quiet mountain lake, perfect reflection, silver moonlight, peaceful nocturnal landscape, masterpiece, {keyword}',
-        ],
-        // 6. Мистические объекты
-        [
-            'ornate golden astrolabe floating above open ancient book, glowing star map projecting upward, candlelit library background, warm magical atmosphere, ultra detailed fantasy still life, {keyword}',
-            'crystal ball on carved wooden stand showing swirling galaxy inside, soft violet glow illuminating dark mystical room, incense smoke, highly detailed, {keyword}',
-            'spread of glowing tarot cards floating in circle above moonlit table, silver light edges, mystical atmosphere, deep purple and gold palette, fantasy illustration, {keyword}',
-            'antique compass with mother of pearl inlay pointing to a shining star, lying on old star chart, soft candlelight, cozy magical mood, macro fantasy still life, {keyword}',
-        ],
-        // 7. Магия и порталы
-        [
-            'swirling portal of violet and gold light opening between two ancient trees, leaves lifted by magic wind, sparkles streaming through, epic fantasy moment, cinematic, {keyword}',
-            'aurora borealis dancing above snowy peaks in shapes of celestial runes, green and purple ribbons in starry sky, breathtaking night landscape, masterpiece, {keyword}',
-            'streams of glowing starlight flowing like rivers through dark cosmic valley, tiny lights like fireflies in space, surreal dreamscape, ultra detailed, {keyword}',
-            'magic circle of floating candles and flower petals around meditating figure silhouette at night, soft warm glow, peaceful mystical ritual, fantasy art, {keyword}',
-        ],
+        private const COVER_PROMPTS = [
+        // Природа и стихии
+        'mystical lighthouse on a cliff with stormy waves',
+        'ancient compass with glowing runes on parchment map',
+        'ethereal moon path reflecting on still lake at night',
+        'enchanted forest with bioluminescent mushrooms and fireflies',
+        'majestic mountain peak with aurora borealis above',
+        'serene waterfall cascading into crystal clear pool',
+        'vast desert with lone dune and setting sun',
+        'frozen glacier with blue ice caves and northern lights',
+        'rainbow arching over misty valley after rain',
+        'meteor shower streaking across starry sky',
+        
+        // Космос и время
+        'lunar eclipse with blood moon and ancient temple silhouette',
+        'solar eclipse corona with cosmic energy rays',
+        'hourglass with golden sand flowing between dimensions',
+        'vintage pocket watch with exposed gears showing time portals',
+        'celestial clock tower with moon phases on its face',
+        'cosmic spiral galaxy with nebula colors',
+        'constellation map with zodiac symbols glowing',
+        'black hole event horizon with accretion disk',
+        'supernova explosion with colorful stellar debris',
+        'parallel universe portal with swirling vortex',
+        
+        // Артефакты и символы
+        'ancient key with ornate bow and glowing teeth',
+        'crystal ball showing future visions inside',
+        'tarot card spread on velvet cloth with candles',
+        'runic stone circle with carved symbols',
+        'alchemical flask with bubbling potion and steam',
+        'golden chalice with overflowing wine and grapes',
+        'sacred geometry mandala with intricate patterns',
+        'dreamcatcher with feathers and beads against moonlight',
+        'magic wand with sparkles and starlight trail',
+        'ancient scroll with mysterious text and wax seal',
+        
+        // Архитектура и места
+        'gothic cathedral with stained glass windows and candlelight',
+        'abandoned castle ruins with ivy and moonbeams',
+        'winding staircase leading to floating island in clouds',
+        'bridge over misty chasm with lanterns on both sides',
+        'hidden door in ancient library with glowing book',
+        'secret garden with fountain and marble statues',
+        'underground cave with crystal formations and underground river',
+        'treehouse village in giant ancient tree with rope bridges',
+        'floating islands with waterfalls and airships',
+        'underwater city with bioluminescent buildings and fish',
+        
+        // Существа и духи
+        'majestic phoenix rising from flames with golden feathers',
+        'ethereal unicorn with flowing mane in enchanted forest',
+        'wise owl with glowing eyes perched on ancient branch',
+        'mystical raven with iridescent feathers and prophecy scroll',
+        'graceful deer with antlers made of branches and stars',
+        'powerful wolf howling at full moon on mountain peak',
+        'majestic dragon with scales like gemstones breathing fire',
+        'serene mermaid with flowing hair sitting on rock',
+        'angelic figure with luminous wings and halo',
+        'shadow creature with glowing eyes in dark alley',
+        
+        // Предметы и инструменты
+        'ornate mirror with gilded frame showing alternate reality',
+        'vintage telescope pointed at starry sky on rooftop',
+        'ancient book with glowing pages and floating letters',
+        'quill pen writing on parchment with magical ink',
+        'candle flame with dancing shadows on wall',
+        'lantern with warm glow illuminating cobblestone path',
+        'compass rose with cardinal directions and mystical symbols',
+        'sundial with shadow pointing to golden hour',
+        'abacus with beads made of precious stones',
+        'balance scale with feather on one side and heart on other',
+        
+        // Абстрактные концепции
+        'yin yang symbol with flowing energy between black and white',
+        'infinity symbol made of intertwined ribbons of light',
+        'spiral staircase ascending into clouds and stars',
+        'labyrinth with glowing path leading to center',
+        'kaleidoscope pattern with shifting geometric shapes',
+        'fractal tree with branches splitting infinitely',
+        'golden ratio spiral with fibonacci sequence numbers',
+        'mandala with intricate patterns radiating from center',
+        'mobius strip with ants walking on infinite loop',
+        'penrose triangle impossible shape in 3D space',
+        
+        // Сезоны и времена суток
+        'spring cherry blossom tree with petals falling like snow',
+        'summer beach with turquoise water and palm trees at sunset',
+        'autumn forest with golden leaves and misty morning',
+        'winter wonderland with snow covered trees and aurora',
+        'dawn breaking over horizon with pastel colors',
+        'golden hour sunlight streaming through forest canopy',
+        'twilight with purple sky and first stars appearing',
+        'midnight with full moon and fireflies in meadow',
+        'eclipse moment with corona visible and stars out',
+        'solstice celebration with bonfire and dancing shadows',
+        
+        // Эмоции и состояния
+        'person meditating in lotus position with aura glowing',
+        'dancer in flowing dress spinning with fabric trails',
+        'artist painting on canvas with colors coming to life',
+        'musician playing violin with sound waves visible',
+        'writer at desk with words floating from pages',
+        'warrior in armor with sword raised in victory',
+        'healer with hands glowing while treating wounded',
+        'explorer with map and compass in unknown land',
+        'dreamer sleeping with visions floating above head',
+        'lover embracing under starry sky with hearts floating',
     ];
 
     private function extractKeywords(string $text): string
@@ -545,22 +610,49 @@ PROMPT;
 
     private function getRandomPrompt(string $postTitle): string
     {
-        $category = random_int(0, count(self::COVER_PROMPTS) - 1);
-        $prompts = self::COVER_PROMPTS[$category];
-        $prompt = $prompts[random_int(0, count($prompts) - 1)];
+        // Получаем мотивы последних 45 постов для исключения повторов
+        $recentSubjects = \App\Models\BlogPost::whereNotNull('cover_subject')
+            ->orderByDesc('published_at')
+            ->limit(45)
+            ->pluck('cover_subject')
+            ->toArray();
+        
+        // Собираем все доступные мотивы (flatten массив массивов)
+        $allPrompts = [];
+        foreach (self::COVER_PROMPTS as $category => $prompts) {
+            foreach ($prompts as $prompt) {
+                $allPrompts[] = $prompt;
+            }
+        }
+        
+        // Фильтруем: только те, которых нет в последних 45
+        $availablePrompts = array_filter($allPrompts, function($p) use ($recentSubjects) {
+            return !in_array($p, $recentSubjects);
+        });
+        
+        // Если все использованы недавно — берём любой (цикл начнётся заново)
+        if (empty($availablePrompts)) {
+            $availablePrompts = $allPrompts;
+        }
+        
+        // Выбираем случайный мотив из доступных
+        $prompt = $availablePrompts[array_rand($availablePrompts)];
 
         $keyword = $this->extractKeywords($postTitle);
 
-        // Уникальный seed для каждой генерации — гарантирует разные картинки
+        // Уникальный seed для каждой генерации
         $seed = random_int(100000, 999999);
+        
+        // Стили и муды с ротацией (чтобы даже при повторе мотива композиция была другой)
         $styles = [
             'oil painting style', 'watercolor illustration', 'digital art',
             'art nouveau style', 'ethereal photography', 'concept art',
             'impressionist painting', 'surrealist art', 'fantasy illustration',
             'cinematic matte painting',
         ];
-        $style = $styles[array_rand($styles)];
         $moods = ['serene', 'mystical', 'ethereal', 'majestic', 'tranquil', 'enchanting', 'celestial', 'luminous'];
+        
+        $style = $styles[array_rand($styles)];
         $mood = $moods[array_rand($moods)];
 
         return str_replace('{keyword}', $keyword, $prompt)
@@ -1138,6 +1230,37 @@ PROMPT;
             'Lib' => 'Весы', 'Sco' => 'Скорпион', 'Sag' => 'Стрелец',
             'Cap' => 'Козерог', 'Aqu' => 'Водолей', 'Pis' => 'Рыбы',
         ];
+    }
+
+
+    /**
+     * Извлекает мотив обложки для сохранения в cover_subject
+     */
+    private function extractSubjectFromCover(\App\Models\BlogPost $post): ?string
+    {
+        // Берём случайный мотив из доступных (тот же что использовался в getRandomPrompt)
+        $recentSubjects = \App\Models\BlogPost::whereNotNull('cover_subject')
+            ->orderByDesc('published_at')
+            ->limit(45)
+            ->pluck('cover_subject')
+            ->toArray();
+        
+        $allPrompts = [];
+        foreach (self::COVER_PROMPTS as $prompts) {
+            foreach ($prompts as $prompt) {
+                $allPrompts[] = $prompt;
+            }
+        }
+        
+        $availablePrompts = array_filter($allPrompts, function($p) use ($recentSubjects) {
+            return !in_array($p, $recentSubjects);
+        });
+        
+        if (empty($availablePrompts)) {
+            $availablePrompts = $allPrompts;
+        }
+        
+        return $availablePrompts[array_rand($availablePrompts)] ?? null;
     }
 
 }
