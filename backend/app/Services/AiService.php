@@ -487,7 +487,7 @@ PROMPT;
         'https://images.unsplash.com/photo-1532693322450-2cb5c511067d',
     ];
 
-        private const COVER_PROMPTS = [
+        public const COVER_PROMPTS = [
         // Природа и стихии
         'mystical lighthouse on a cliff with stormy waves',
         'ancient compass with glowing runes on parchment map',
