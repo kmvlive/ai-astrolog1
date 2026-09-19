@@ -89,7 +89,7 @@ export default async function NameMeaningPage({ params }: { params: Promise<{ na
                     <div className="rounded-[3px] p-[1.5px] bg-gradient-to-br from-amber-300/80 via-amber-500/60 to-amber-800/80">
 
                       {/* Контейнер картинки: квадрат + object-cover обрезает белые поля на фронте */}
-                      <div className="relative aspect-square w-44 sm:w-56 overflow-hidden rounded-[2px] bg-[#0a0715]">
+                      <div className="relative aspect-[7/10] w-44 sm:w-56 overflow-hidden rounded-[2px] bg-[#0a0715]">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={`/storage/${nm.image}`}
@@ -104,14 +104,6 @@ export default async function NameMeaningPage({ params }: { params: Promise<{ na
                       </div>
                     </div>
 
-                    {/* Латунная табличка с именем (как в музее) */}
-                    <div className="mt-3 flex items-center justify-center">
-                      <div className="px-4 py-1.5 rounded-[3px] bg-gradient-to-br from-amber-700/90 via-amber-800/95 to-amber-950 shadow-[inset_0_1px_0_rgba(253,230,138,0.3),inset_0_-1px_0_rgba(0,0,0,0.4)]">
-                        <span className="font-serif tracking-[0.2em] text-[11px] sm:text-xs uppercase text-amber-100/95">
-                          {nm.name}
-                        </span>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
