@@ -324,7 +324,7 @@ class DivinationController extends Controller
             $cards[] = [
                 'name' => $ruName,
                 'slug' => $slug,
-                'image' => '/storage/' . $imgPath,
+                'image' => $imgPath,
                 'glyph' => $this->runeGlyph($slug),
             ];
         }
