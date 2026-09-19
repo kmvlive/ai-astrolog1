@@ -98,7 +98,7 @@ export default function NamesPage() {
         </div>
 
         {/* Поиск */}
-        <div style={{ ["--accent" as any]: "#a855f7" }} className="home-panel p-5 sm:p-6 mb-8">
+        <div style={{ ["--accent" as any]: "#a855f7", overflow: "visible" }} className="home-panel p-5 sm:p-6 mb-8">
           <div className="relative z-40">
             <div className="flex flex-col sm:flex-row gap-3">
               <input
