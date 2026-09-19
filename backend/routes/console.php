@@ -50,3 +50,6 @@ Schedule::command('magazine:generate')->dailyAt('07:30')->withoutOverlapping();
 
 // Рассылка писем о готовых журналах в 7:35 (через 5 мин после генерации)
 Schedule::command('magazine:send')->dailyAt('07:35')->withoutOverlapping();
+
+use Illuminate\Support\Facades\Schedule;
+Schedule::command('names:generate-images --limit=3')->everyTenMinutes()->withoutOverlapping();
