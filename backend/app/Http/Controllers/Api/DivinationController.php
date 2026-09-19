@@ -13,6 +13,34 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class DivinationController extends Controller
 {
+
+    private const RUNES_MAP = [
+            'феху' => 'fehu', 'fehu' => 'fehu',
+            'уруз' => 'uruz', 'uruz' => 'uruz',
+            'турисаз' => 'thurisaz', 'thurisaz' => 'thurisaz', 'турисаз' => 'thurisaz',
+            'ансуз' => 'ansuz', 'ansuz' => 'ansuz',
+            'райдо' => 'raidho', 'raidho' => 'raidho', 'райто' => 'raidho',
+            'кеназ' => 'kenaz', 'kenaz' => 'kenaz', 'кеназ' => 'kenaz',
+            'гебо' => 'gebo', 'gebo' => 'gebo',
+            'вуньо' => 'wunjo', 'wunjo' => 'wunjo', 'вуньо' => 'wunjo',
+            'хагалаз' => 'hagalaz', 'hagalaz' => 'hagalaz',
+            'наудиз' => 'naudiz', 'naudiz' => 'naudiz',
+            'иса' => 'isa', 'isa' => 'isa',
+            'йера' => 'jera', 'jera' => 'jera', 'джер' => 'jera',
+            'эйваз' => 'eihwaz', 'eihwaz' => 'eihwaz', 'иваз' => 'eihwaz',
+            'перт' => 'perthro', 'perthro' => 'perthro', 'пертро' => 'perthro',
+            'альгиз' => 'algiz', 'algiz' => 'algiz',
+            'совило' => 'sowilo', 'sowilo' => 'sowilo', 'соулу' => 'sowilo', 'совелу' => 'sowilo',
+            'тейваз' => 'tiwaz', 'tiwaz' => 'tiwaz', 'тиваз' => 'tiwaz',
+            'беркана' => 'berkano', 'berkano' => 'berkano', 'беркана' => 'berkano',
+            'эваз' => 'ehwaz', 'ehwaz' => 'ehwaz',
+            'манназ' => 'mannaz', 'mannaz' => 'mannaz',
+            'лагуз' => 'laguz', 'laguz' => 'laguz',
+            'ингуз' => 'ingwaz', 'ingwaz' => 'ingwaz', 'ингваз' => 'ingwaz',
+            'дагаз' => 'dagaz', 'dagaz' => 'dagaz',
+            'отала' => 'othala', 'othala' => 'othala', 'отала' => 'othala',
+        ];
+
     public function predict(Request $request, string $type)
     {
         $question = (string) $request->input('question', '');
@@ -106,32 +134,7 @@ class DivinationController extends Controller
             'runes' => ['name' => 'На рунах', 'emoji' => 'ᚱ'],
         ];
 
-    private const RUNES_MAP = [
-        'феху' => 'fehu', 'fehu' => 'fehu',
-        'уруз' => 'uruz', 'uruz' => 'uruz',
-        'турисаз' => 'thurisaz', 'thurisaz' => 'thurisaz', 'турисаз' => 'thurisaz',
-        'ансуз' => 'ansuz', 'ansuz' => 'ansuz',
-        'райдо' => 'raidho', 'raidho' => 'raidho', 'райто' => 'raidho',
-        'кеназ' => 'kenaz', 'kenaz' => 'kenaz', 'кеназ' => 'kenaz',
-        'гебо' => 'gebo', 'gebo' => 'gebo',
-        'вуньо' => 'wunjo', 'wunjo' => 'wunjo', 'вуньо' => 'wunjo',
-        'хагалаз' => 'hagalaz', 'hagalaz' => 'hagalaz',
-        'наудиз' => 'naudiz', 'naudiz' => 'naudiz',
-        'иса' => 'isa', 'isa' => 'isa',
-        'йера' => 'jera', 'jera' => 'jera', 'джер' => 'jera',
-        'эйваз' => 'eihwaz', 'eihwaz' => 'eihwaz', 'иваз' => 'eihwaz',
-        'перт' => 'perthro', 'perthro' => 'perthro', 'пертро' => 'perthro',
-        'альгиз' => 'algiz', 'algiz' => 'algiz',
-        'совило' => 'sowilo', 'sowilo' => 'sowilo', 'соулу' => 'sowilo', 'совелу' => 'sowilo',
-        'тейваз' => 'tiwaz', 'tiwaz' => 'tiwaz', 'тиваз' => 'tiwaz',
-        'беркана' => 'berkano', 'berkano' => 'berkano', 'беркана' => 'berkano',
-        'эваз' => 'ehwaz', 'ehwaz' => 'ehwaz',
-        'манназ' => 'mannaz', 'mannaz' => 'mannaz',
-        'лагуз' => 'laguz', 'laguz' => 'laguz',
-        'ингуз' => 'ingwaz', 'ingwaz' => 'ingwaz', 'ингваз' => 'ingwaz',
-        'дагаз' => 'dagaz', 'dagaz' => 'dagaz',
-        'отала' => 'othala', 'othala' => 'othala', 'отала' => 'othala',
-    ];
+    
 
         $result = $rows->map(function ($r) use ($types) {
             $t = $types[$r->type] ?? ['name' => $r->type, 'emoji' => '🔮'];
