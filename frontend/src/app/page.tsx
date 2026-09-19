@@ -202,6 +202,18 @@ export default function HomePage() {
         if (data) setAffirmationTitle(data.title);
       })
       .catch(() => {});
+
+    // Руна дня
+    fetch(`${API}/api/runes/today`)
+      .then(r => {
+        console.log('[RuneOfDay] Status:', r.status);
+        return r.ok ? r.json() : null;
+      })
+      .then(data => {
+        console.log('[RuneOfDay] Data:', data);
+        if (data) setRuneOfTheDay(data);
+      })
+      .catch(e => console.error('[RuneOfDay] Error:', e));
   }, []);
 
   const checkSign = () => {
