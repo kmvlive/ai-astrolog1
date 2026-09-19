@@ -2,6 +2,7 @@ import CometField from "@/components/CometField";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import ShareBlock from "@/components/ShareBlock";
@@ -14,6 +15,7 @@ type NameData = {
   translit: string;
   interpretation: string;
   origin: string | null;
+  image?: string | null;
   views: number;
   ai_generated: boolean;
   approved: boolean;
@@ -71,8 +73,37 @@ export default async function NameMeaningPage({ params }: { params: Promise<{ na
         </div>
 
         <div className="bg-gradient-to-br from-violet-900/40 to-slate-900 border border-violet-500/30 rounded-3xl p-8 sm:p-12 shadow-2xl mb-8">
-          <div className="text-6xl mb-4">✨</div>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-4">Значение имени {nm.name}</h1>
+          <div className="flex flex-col sm:flex-row items-center gap-6 mb-6">
+            {/* Картинка-персонаж в стиле колоды Таро */}
+            {nm.image ? (
+              <div className="relative group shrink-0">
+                <div className="absolute -inset-1 bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-600 rounded-2xl blur-sm opacity-75 group-hover:opacity-100 transition"></div>
+                <div className="relative rounded-2xl overflow-hidden border-4 border-amber-400/80 shadow-2xl shadow-amber-900/30">
+                  <Image
+                    src={`/storage/${nm.image}`}
+                    alt={`Иллюстрация имени ${nm.name}`}
+                    width={220}
+                    height={220}
+                    className="w-40 h-40 sm:w-56 sm:h-56 object-cover"
+                    priority
+                  />
+                </div>
+                {/* Декоративные элементы рамки */}
+                <div className="absolute -top-2 -left-2 w-6 h-6 bg-amber-400 rounded-full shadow-lg"></div>
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-amber-400 rounded-full shadow-lg"></div>
+                <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-amber-400 rounded-full shadow-lg"></div>
+                <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-amber-400 rounded-full shadow-lg"></div>
+              </div>
+            ) : (
+              <div className="text-6xl mb-4">✨</div>
+            )}
+            <div className="text-center sm:text-left">
+              <h1 className="text-3xl sm:text-4xl font-bold mb-2">Значение имени {nm.name}</h1>
+              {nm.origin && (
+                <p className="text-violet-300 text-sm">Происхождение: <span className="font-semibold capitalize">{nm.origin}</span></p>
+              )}
+            </div>
+          </div>
 
           {/* Бейджи */}
           <div className="flex flex-wrap gap-2 mb-6">
