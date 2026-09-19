@@ -18,6 +18,8 @@ export default function NamesPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [aiResult, setAiResult] = useState<any>(null);
+  const [dropOpen, setDropOpen] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
 
   useEffect(() => {
     fetch(`${API}/api/names/origins`)
@@ -47,6 +49,7 @@ export default function NamesPage() {
         const r = await fetch(`${API}/api/names?q=${encodeURIComponent(query)}`);
         const d = await r.json();
         setResults(d.names || []);
+        setDropOpen(true);
       } catch {}
       setLoading(false);
     }, 300);
@@ -96,22 +99,63 @@ export default function NamesPage() {
 
         {/* Поиск */}
         <div style={{ ["--accent" as any]: "#a855f7" }} className="home-panel p-5 sm:p-6 mb-8">
-          <div className="relative z-10 flex flex-col sm:flex-row gap-3">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Введите имя (например: Андрей)"
-              className="flex-1 px-5 py-3.5 bg-slate-900/60 border border-white/10 rounded-xl text-lg focus:outline-none focus:border-violet-400 backdrop-blur"
-              onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
-            />
-            <button
-              onClick={handleGenerate}
-              disabled={aiLoading || query.length < 2}
-              className="plan-btn disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3.5 rounded-xl font-bold whitespace-nowrap"
-            >
-              {aiLoading ? "⏳ AI пишет..." : "✨ Узнать значение"}
-            </button>
+          <div className="relative z-40">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => { setQuery(e.target.value); setDropOpen(true); setActiveIdx(-1); }}
+                onFocus={() => setDropOpen(true)}
+                onBlur={() => setTimeout(() => setDropOpen(false), 180)}
+                placeholder="Введите имя (например: Андрей)"
+                className="flex-1 px-5 py-3.5 bg-slate-900/60 border border-white/10 rounded-xl text-lg focus:outline-none focus:border-violet-400 backdrop-blur"
+                onKeyDown={(e) => {
+                  const open = dropOpen && results.length > 0;
+                  if (e.key === "ArrowDown" && open) { e.preventDefault(); setActiveIdx((i) => Math.min(i + 1, Math.min(results.length, 8) - 1)); }
+                  else if (e.key === "ArrowUp" && open) { e.preventDefault(); setActiveIdx((i) => Math.max(i - 1, 0)); }
+                  else if (e.key === "Escape") { setDropOpen(false); }
+                  else if (e.key === "Enter") {
+                    if (open && activeIdx >= 0) { window.location.href = `/names/${results[activeIdx].translit}`; }
+                    else if (open && results.length === 1) { window.location.href = `/names/${results[0].translit}`; }
+                    else { handleGenerate(); }
+                  }
+                }}
+              />
+              <button
+                onClick={handleGenerate}
+                disabled={aiLoading || query.length < 2}
+                className="plan-btn disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3.5 rounded-xl font-bold whitespace-nowrap"
+              >
+                {aiLoading ? "⏳ AI пишет..." : "✨ Узнать значение"}
+              </button>
+            </div>
+
+            {/* Дропдаун: совпадения из каталога */}
+            {dropOpen && query.length >= 2 && results.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-2 rounded-2xl border border-violet-500/30 bg-slate-900/95 backdrop-blur-xl shadow-2xl shadow-violet-950/60 overflow-hidden z-50">
+                {results.slice(0, 8).map((n: any, i: number) => (
+                  <Link
+                    key={n.translit}
+                    href={`/names/${n.translit}`}
+                    onMouseEnter={() => setActiveIdx(i)}
+                    className={`flex items-center justify-between gap-3 px-5 py-3 transition ${i === activeIdx ? "bg-violet-600/30 text-white" : "hover:bg-violet-600/15 text-slate-200"}`}
+                  >
+                    <span className="font-semibold">{n.name}</span>
+                    <span className="text-xs text-slate-400">{n.origin || ""}</span>
+                  </Link>
+                ))}
+                <div className="px-5 py-2 text-[11px] text-slate-500 border-t border-white/5">
+                  Enter — открыть · ↑↓ — навигация
+                </div>
+              </div>
+            )}
+
+            {/* Нет в каталоге — предлагаем AI */}
+            {dropOpen && query.length >= 2 && !loading && results.length === 0 && (
+              <div className="absolute left-0 right-0 top-full mt-2 rounded-2xl border border-white/10 bg-slate-900/95 backdrop-blur-xl px-5 py-3 text-sm text-slate-400 z-50">
+                В каталоге такого имени нет — нажмите «✨ Узнать значение», и AI напишет толкование
+              </div>
+            )}
           </div>
         </div>
 
@@ -182,27 +226,7 @@ export default function NamesPage() {
         )}
 
         {/* Результаты поиска */}
-        {results.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">Найдено: {results.length}</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {results.map((n, i) => (
-                <Link
-                  key={n.translit}
-                  href={`/names/${n.translit}`}
-                  style={{ ["--accent" as any]: ["#a855f7", "#ec4899", "#38bdf8", "#fbbf24", "#34d399"][i % 5] }}
-                  className="cal-card relative rounded-2xl p-4 bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 overflow-hidden text-center block"
-                >
-                  <span className="cal-shine" aria-hidden="true" />
-                  <div className="relative z-10 font-semibold text-white">{n.name}</div>
-                  {n.origin && <div className="relative z-10 text-xs text-slate-400 mt-1">{n.origin}</div>}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Случайные имена */}
+{/* Случайные имена */}
         {!query && random.length > 0 && (
           <div>
             <h2 className="text-xl font-semibold mb-4">
