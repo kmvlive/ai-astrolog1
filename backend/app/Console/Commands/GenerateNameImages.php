@@ -15,6 +15,10 @@ class GenerateNameImages extends Command
 
     public function handle()
     {
+        // Больше памяти для обработки картинок
+        ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', 0);
+        
         $limit = (int) $this->option('limit');
         $batchSize = (int) $this->option('batch-size');
 
@@ -82,6 +86,11 @@ class GenerateNameImages extends Command
                 $name->save();
                 
                 $generated++;
+                // Освобождаем память сразу после сохранения
+                unset($imageData);
+                if (function_exists('gc_collect_cycles')) {
+                    gc_collect_cycles();
+                }
             } else {
                 $failed++;
                 Log::error("Не удалось сгенерировать картинку для: {$name->name}");
@@ -133,7 +142,7 @@ PROMPT;
 
             $download = Http::timeout(30)->get($img['url']);
             if ($download->successful() && strlen($download->body()) > 30000) {
-                return $this->convertToPng($download->body());
+                return $download->body();
             }
 
             return null;
@@ -143,26 +152,4 @@ PROMPT;
         }
     }
 
-    private function convertToPng(string $imageData): string
-    {
-        $img = @imagecreatefromstring($imageData);
-        if (!$img) {
-            return $imageData;
-        }
-
-        // Ресайз до 800x800 для оптимизации
-        $width = 800;
-        $height = 800;
-        $resized = imagecreatetruecolor($width, $height);
-        imagecopyresampled($resized, $img, 0, 0, 0, 0, $width, $height, imagesx($img), imagesy($img));
-
-        ob_start();
-        imagepng($resized, null, 9);
-        $result = ob_get_clean();
-
-        imagedestroy($img);
-        imagedestroy($resized);
-
-        return $result ?: $imageData;
-    }
 }
