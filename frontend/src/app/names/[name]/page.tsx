@@ -76,29 +76,44 @@ export default async function NameMeaningPage({ params }: { params: Promise<{ na
             {/* Картинка-персонаж в стиле колоды Таро */}
             {nm.image ? (
               <div className="relative group shrink-0">
-                {/* Мягкое фиолетовое сияние-аура вокруг карты */}
-                <div className="absolute -inset-10 rounded-[48px] bg-violet-600/25 blur-3xl opacity-60 group-hover:opacity-90 transition-opacity duration-700"></div>
-                {/* Тонкая золотая окантовка-градиент (2px) */}
-                <div className="relative rounded-[24px] p-[2px] bg-gradient-to-br from-amber-200/90 via-amber-500/40 to-amber-700/80 shadow-[0_25px_70px_-20px_rgba(0,0,0,0.85),0_0_45px_-12px_rgba(251,191,36,0.35)]">
-                  <div className="relative rounded-[22px] overflow-hidden bg-[#141024]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={`/storage/${nm.image}`}
-                      alt={`Иллюстрация имени ${nm.name}`}
-                      className="w-44 sm:w-60 h-auto block transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                      loading="eager"
-                    />
-                    {/* Блик, пробегающий по карте при наведении */}
-                    <span className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms]"></span>
-                    {/* Внутренняя виньетка для глубины */}
-                    <span className="pointer-events-none absolute inset-0 shadow-[inset_0_0_45px_rgba(8,5,26,0.55)]"></span>
+                {/* Сдержанная мягкая тень-аура */}
+                <div className="absolute -inset-4 rounded-[8px] bg-violet-700/15 blur-2xl opacity-80 group-hover:opacity-100 transition-opacity duration-700"></div>
+
+                {/* Музейная рамка: внешний золотой контур */}
+                <div className="relative rounded-[6px] p-[3px] bg-gradient-to-br from-amber-200 via-amber-600 to-amber-900 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.9)]">
+
+                  {/* Паспарту: тёмный фон между рамами */}
+                  <div className="rounded-[4px] bg-[#1a1430] p-[6px] sm:p-[8px]">
+
+                    {/* Внутренний золотой контур */}
+                    <div className="rounded-[3px] p-[1.5px] bg-gradient-to-br from-amber-300/80 via-amber-500/60 to-amber-800/80">
+
+                      {/* Контейнер картинки: квадрат + object-cover обрезает белые поля на фронте */}
+                      <div className="relative aspect-square w-44 sm:w-56 overflow-hidden rounded-[2px] bg-[#0a0715]">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={`/storage/${nm.image}`}
+                          alt={`Иллюстрация имени ${nm.name}`}
+                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.06]"
+                          loading="eager"
+                        />
+                        {/* Блик */}
+                        <span className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-[1400ms]"></span>
+                        {/* Виньетка */}
+                        <span className="pointer-events-none absolute inset-0 shadow-[inset_0_0_55px_rgba(8,5,26,0.65)]"></span>
+                      </div>
+                    </div>
+
+                    {/* Латунная табличка с именем (как в музее) */}
+                    <div className="mt-3 flex items-center justify-center">
+                      <div className="px-4 py-1.5 rounded-[3px] bg-gradient-to-br from-amber-700/90 via-amber-800/95 to-amber-950 shadow-[inset_0_1px_0_rgba(253,230,138,0.3),inset_0_-1px_0_rgba(0,0,0,0.4)]">
+                        <span className="font-serif tracking-[0.2em] text-[11px] sm:text-xs uppercase text-amber-100/95">
+                          {nm.name}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                {/* Тонкие золотые уголки-акценты */}
-                <span className="absolute -top-1.5 -left-1.5 w-5 h-5 border-t-2 border-l-2 border-amber-300/90 rounded-tl-[10px]"></span>
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 border-t-2 border-r-2 border-amber-300/90 rounded-tr-[10px]"></span>
-                <span className="absolute -bottom-1.5 -left-1.5 w-5 h-5 border-b-2 border-l-2 border-amber-300/90 rounded-bl-[10px]"></span>
-                <span className="absolute -bottom-1.5 -right-1.5 w-5 h-5 border-b-2 border-r-2 border-amber-300/90 rounded-br-[10px]"></span>
               </div>
             ) : (
               <div className="text-6xl mb-4">✨</div>
