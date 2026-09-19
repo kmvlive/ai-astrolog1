@@ -106,6 +106,33 @@ class DivinationController extends Controller
             'runes' => ['name' => 'На рунах', 'emoji' => 'ᚱ'],
         ];
 
+    private const RUNES_MAP = [
+        'феху' => 'fehu', 'fehu' => 'fehu',
+        'уруз' => 'uruz', 'uruz' => 'uruz',
+        'турисаз' => 'thurisaz', 'thurisaz' => 'thurisaz', 'турисаз' => 'thurisaz',
+        'ансуз' => 'ansuz', 'ansuz' => 'ansuz',
+        'райдо' => 'raidho', 'raidho' => 'raidho', 'райто' => 'raidho',
+        'кеназ' => 'kenaz', 'kenaz' => 'kenaz', 'кеназ' => 'kenaz',
+        'гебо' => 'gebo', 'gebo' => 'gebo',
+        'вуньо' => 'wunjo', 'wunjo' => 'wunjo', 'вуньо' => 'wunjo',
+        'хагалаз' => 'hagalaz', 'hagalaz' => 'hagalaz',
+        'наудиз' => 'naudiz', 'naudiz' => 'naudiz',
+        'иса' => 'isa', 'isa' => 'isa',
+        'йера' => 'jera', 'jera' => 'jera', 'джер' => 'jera',
+        'эйваз' => 'eihwaz', 'eihwaz' => 'eihwaz', 'иваз' => 'eihwaz',
+        'перт' => 'perthro', 'perthro' => 'perthro', 'пертро' => 'perthro',
+        'альгиз' => 'algiz', 'algiz' => 'algiz',
+        'совило' => 'sowilo', 'sowilo' => 'sowilo', 'соулу' => 'sowilo', 'совелу' => 'sowilo',
+        'тейваз' => 'tiwaz', 'tiwaz' => 'tiwaz', 'тиваз' => 'tiwaz',
+        'беркана' => 'berkano', 'berkano' => 'berkano', 'беркана' => 'berkano',
+        'эваз' => 'ehwaz', 'ehwaz' => 'ehwaz',
+        'манназ' => 'mannaz', 'mannaz' => 'mannaz',
+        'лагуз' => 'laguz', 'laguz' => 'laguz',
+        'ингуз' => 'ingwaz', 'ingwaz' => 'ingwaz', 'ингваз' => 'ingwaz',
+        'дагаз' => 'dagaz', 'dagaz' => 'dagaz',
+        'отала' => 'othala', 'othala' => 'othala', 'отала' => 'othala',
+    ];
+
         $result = $rows->map(function ($r) use ($types) {
             $t = $types[$r->type] ?? ['name' => $r->type, 'emoji' => '🔮'];
             return [
@@ -216,6 +243,11 @@ class DivinationController extends Controller
             'celtic-cross' => 10,
         ][$type] ?? 0;
 
+        if ($type === 'runes') {
+            $cards = $this->extractRuneCards($response);
+            return ['prediction' => trim($response), 'cards' => $cards];
+        }
+
         if ($expected === 0) {
             return ['prediction' => $response, 'cards' => []];
         }
@@ -262,4 +294,67 @@ class DivinationController extends Controller
         return ['prediction' => trim($response), 'cards' => $cards];
     }
 
+
+    /**
+     * Извлекает руны из ответа AI и добавляет картинки
+     */
+    private function extractRuneCards(string $response): array
+    {
+        $cards = [];
+        $lower = mb_strtolower($response);
+
+        foreach (self::RUNES_MAP as $name => $slug) {
+            if (mb_strpos($lower, mb_strtolower($name)) === false) continue;
+            // Проверяем что эта руна ещё не добавлена (могли быть дубли в маппинге)
+            $alreadyExists = false;
+            foreach ($cards as $c) {
+                if ($c['slug'] === $slug) { $alreadyExists = true; break; }
+            }
+            if ($alreadyExists) continue;
+
+            $imgPath = "runes/{$slug}.png";
+            if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($imgPath)) continue;
+
+            // Определяем русское имя руны
+            $ruName = $this->runeRuName($slug);
+
+            $cards[] = [
+                'name' => $ruName,
+                'slug' => $slug,
+                'image' => '/storage/' . $imgPath,
+                'glyph' => $this->runeGlyph($slug),
+            ];
+        }
+
+        // Ограничиваем 3 рунами (стандартный расклад), сохраняя порядок упоминания в тексте
+        return array_slice($cards, 0, 3);
+    }
+
+    private function runeRuName(string $slug): string
+    {
+        return [
+            'fehu' => 'Феху', 'uruz' => 'Уруз', 'thurisaz' => 'Турисаз',
+            'ansuz' => 'Ансуз', 'raidho' => 'Райдо', 'kenaz' => 'Кеназ',
+            'gebo' => 'Гебо', 'wunjo' => 'Вуньо', 'hagalaz' => 'Хагалаз',
+            'naudiz' => 'Наудиз', 'isa' => 'Иса', 'jera' => 'Йера',
+            'eihwaz' => 'Эйваз', 'perthro' => 'Перт', 'algiz' => 'Альгиз',
+            'sowilo' => 'Совило', 'tiwaz' => 'Тейваз', 'berkano' => 'Беркана',
+            'ehwaz' => 'Эваз', 'mannaz' => 'Манназ', 'laguz' => 'Лагуз',
+            'ingwaz' => 'Ингуз', 'dagaz' => 'Дагаз', 'othala' => 'Отала',
+        ][$slug] ?? $slug;
+    }
+
+    private function runeGlyph(string $slug): string
+    {
+        return [
+            'fehu' => 'ᚠ', 'uruz' => 'ᚢ', 'thurisaz' => 'ᚦ',
+            'ansuz' => 'ᚨ', 'raidho' => 'ᚱ', 'kenaz' => 'ᚲ',
+            'gebo' => 'ᚷ', 'wunjo' => 'ᚹ', 'hagalaz' => 'ᚺ',
+            'naudiz' => 'ᚾ', 'isa' => 'ᛁ', 'jera' => 'ᛃ',
+            'eihwaz' => 'ᛇ', 'perthro' => 'ᛈ', 'algiz' => 'ᛉ',
+            'sowilo' => 'ᛊ', 'tiwaz' => 'ᛏ', 'berkano' => 'ᛒ',
+            'ehwaz' => 'ᛖ', 'mannaz' => 'ᛗ', 'laguz' => 'ᛚ',
+            'ingwaz' => 'ᛜ', 'dagaz' => 'ᛞ', 'othala' => 'ᛟ',
+        ][$slug] ?? 'ᚱ';
+    }
 }
