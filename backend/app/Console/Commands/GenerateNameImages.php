@@ -61,7 +61,7 @@ class GenerateNameImages extends Command
         foreach ($names as $name) {
             $bar->advance();
 
-            $symbol = $symbols[$name->name] ?? null;
+            $symbol = $symbols[$name->translit] ?? null;
             if (!$symbol) {
                 Log::warning("Символ не найден для имени: {$name->name}");
                 $failed++;
