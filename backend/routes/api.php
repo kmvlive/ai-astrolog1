@@ -367,10 +367,7 @@ Route::get('/runes/today', function () {
 
 Route::get('/runes', function () {
     $runes = \App\Support\Runes::all();
-    
-// ===== Матрица судьбы =====
-Route::post('/destiny-matrix', [\App\Http\Controllers\Api\DestinyMatrixController::class, 'calculate']);
-$list = [];
+    $list = [];
     foreach ($runes as $slug => $r) {
         $list[] = array_merge(['slug' => $slug], \App\Support\Runes::images($slug), $r);
     }
@@ -380,6 +377,10 @@ $list = [];
         'runes' => $list,
     ]);
 });
+
+// ===== Матрица судьбы =====
+Route::post('/destiny-matrix', [\App\Http\Controllers\Api\DestinyMatrixController::class, 'calculate']);
+
 
 // ===== Биоритмы =====
 Route::get('/biorhythms', function (\Illuminate\Http\Request $request) {
