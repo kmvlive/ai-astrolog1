@@ -182,4 +182,20 @@ PROMPT;
         $cache[$n] = $card ? ['name' => $card->name, 'image' => $card->image] : null;
         return $cache[$n];
     }
+
+    public function destroy(string $uuid, Request $request)
+    {
+        $userId = $this->resolveUserId($request);
+        if (!$userId) return response()->json(['error' => 'unauthorized'], 401);
+
+        $row = \App\Models\DestinyMatrix::where('uuid', $uuid)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$row) return response()->json(['error' => 'not found'], 404);
+
+        $row->delete();
+        return response()->json(['success' => true]);
+    }
+
 }

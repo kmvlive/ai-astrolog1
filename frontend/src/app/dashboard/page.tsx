@@ -924,7 +924,25 @@ export default function DashboardPage() {
               </div>
             </Link>
           </section>
-        </div>
+  
+      {/* Мои матрицы */}
+      <section className="max-w-4xl mx-auto px-4 py-12">
+        <Link
+          href="/my-matrices"
+          className="block rounded-2xl p-6 bg-gradient-to-br from-violet-900/40 to-amber-900/30 border border-violet-500/30 hover:border-violet-500/60 transition"
+        >
+          <div className="flex items-center gap-4">
+            <div className="text-5xl">🔮</div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold mb-1">Мои матрицы судьбы</h3>
+              <p className="text-slate-400 text-sm">История расчётов и управление матрицами</p>
+            </div>
+            <div className="text-2xl text-violet-400">→</div>
+          </div>
+        </Link>
+      </section>
+
+      </div>
 
           <SiteFooter />
         </main>
