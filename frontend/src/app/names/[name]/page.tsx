@@ -76,21 +76,29 @@ export default async function NameMeaningPage({ params }: { params: Promise<{ na
             {/* Картинка-персонаж в стиле колоды Таро */}
             {nm.image ? (
               <div className="relative group shrink-0">
-                <div className="absolute -inset-1 bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-600 rounded-2xl blur-sm opacity-75 group-hover:opacity-100 transition"></div>
-                <div className="relative rounded-2xl overflow-hidden border-4 border-amber-400/80 shadow-2xl shadow-amber-900/30">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={`/storage/${nm.image}`}
-                    alt={`Иллюстрация имени ${nm.name}`}
-                    className="w-40 h-40 sm:w-56 sm:h-56 object-cover"
-                    loading="eager"
-                  />
+                {/* Мягкое фиолетовое сияние-аура вокруг карты */}
+                <div className="absolute -inset-10 rounded-[48px] bg-violet-600/25 blur-3xl opacity-60 group-hover:opacity-90 transition-opacity duration-700"></div>
+                {/* Тонкая золотая окантовка-градиент (2px) */}
+                <div className="relative rounded-[24px] p-[2px] bg-gradient-to-br from-amber-200/90 via-amber-500/40 to-amber-700/80 shadow-[0_25px_70px_-20px_rgba(0,0,0,0.85),0_0_45px_-12px_rgba(251,191,36,0.35)]">
+                  <div className="relative rounded-[22px] overflow-hidden bg-[#141024]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`/storage/${nm.image}`}
+                      alt={`Иллюстрация имени ${nm.name}`}
+                      className="w-44 sm:w-60 h-auto block transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                      loading="eager"
+                    />
+                    {/* Блик, пробегающий по карте при наведении */}
+                    <span className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms]"></span>
+                    {/* Внутренняя виньетка для глубины */}
+                    <span className="pointer-events-none absolute inset-0 shadow-[inset_0_0_45px_rgba(8,5,26,0.55)]"></span>
+                  </div>
                 </div>
-                {/* Декоративные элементы рамки */}
-                <div className="absolute -top-2 -left-2 w-6 h-6 bg-amber-400 rounded-full shadow-lg"></div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-amber-400 rounded-full shadow-lg"></div>
-                <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-amber-400 rounded-full shadow-lg"></div>
-                <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-amber-400 rounded-full shadow-lg"></div>
+                {/* Тонкие золотые уголки-акценты */}
+                <span className="absolute -top-1.5 -left-1.5 w-5 h-5 border-t-2 border-l-2 border-amber-300/90 rounded-tl-[10px]"></span>
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 border-t-2 border-r-2 border-amber-300/90 rounded-tr-[10px]"></span>
+                <span className="absolute -bottom-1.5 -left-1.5 w-5 h-5 border-b-2 border-l-2 border-amber-300/90 rounded-bl-[10px]"></span>
+                <span className="absolute -bottom-1.5 -right-1.5 w-5 h-5 border-b-2 border-r-2 border-amber-300/90 rounded-br-[10px]"></span>
               </div>
             ) : (
               <div className="text-6xl mb-4">✨</div>
