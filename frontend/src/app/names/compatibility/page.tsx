@@ -73,7 +73,7 @@ function CompatibilityContent() {
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-2">Первое имя</label>
               <input
-                type="text"
+                type="search" autoComplete="off" autoCapitalize="sentences" data-lpignore="true"
                 value={name1}
                 onChange={(e) => setName1(e.target.value)}
                 placeholder="Например: Александр"
@@ -83,7 +83,7 @@ function CompatibilityContent() {
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-2">Второе имя</label>
               <input
-                type="text"
+                type="search" autoComplete="off" autoCapitalize="sentences" data-lpignore="true"
                 value={name2}
                 onChange={(e) => setName2(e.target.value)}
                 placeholder="Например: Анна"

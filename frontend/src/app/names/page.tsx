@@ -102,7 +102,13 @@ export default function NamesPage() {
           <div className="relative z-40">
             <div className="flex flex-col sm:flex-row gap-3">
               <input
-                type="text"
+                type="search"
+                name="name-search-query"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="sentences"
+                enterKeyHint="search"
+                data-lpignore="true"
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setDropOpen(true); setActiveIdx(-1); }}
                 onFocus={() => setDropOpen(true)}

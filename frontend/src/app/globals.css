@@ -2875,3 +2875,10 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   font-size: 18px;
   text-shadow: 0 0 8px rgba(251,191,36,.8);
 }
+
+/* Убираем системный крестик у поисковых полей */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
