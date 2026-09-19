@@ -180,6 +180,7 @@ export default function HomePage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
   const [affirmationTitle, setAffirmationTitle] = useState<string>("");
+  const [runeOfTheDay, setRuneOfTheDay] = useState<any>(null);
 
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("auth_token"));
@@ -515,6 +516,46 @@ export default function HomePage() {
           </div>
         </Link>
       </section>
+
+      {/* Руна дня */}
+      {runeOfTheDay && (
+        <section className="max-w-4xl mx-auto px-4 py-12">
+          <Link
+            href="/runes"
+            style={{ ["--accent" as any]: "#fbbf24" }}
+            className="home-panel group block p-8 md:p-10"
+          >
+            <span className="cal-shine" aria-hidden="true" />
+            <div className="relative z-10 text-center mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300 mb-4">
+                <span>ᚱ</span> Руна дня
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent mb-3">
+                {runeOfTheDay.rune.name}
+              </h2>
+            </div>
+            <div className="relative z-10 flex flex-col sm:flex-row items-center gap-6">
+              <div className="shrink-0 w-32 h-44 rounded-xl overflow-hidden border-2 border-amber-400/60 shadow-lg shadow-amber-900/30">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/storage/${runeOfTheDay.rune.image}`}
+                  alt={runeOfTheDay.rune.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <div className="text-4xl mb-2 text-amber-400">{runeOfTheDay.rune.glyph}</div>
+                <p className="text-white text-lg leading-relaxed mb-2">
+                  {runeOfTheDay.rune.meaning}
+                </p>
+                <p className="text-violet-300 italic text-sm">
+                  💡 {runeOfTheDay.rune.advice}
+                </p>
+              </div>
+            </div>
+          </Link>
+        </section>
+      )}
 
 
       <section className="max-w-6xl mx-auto px-4 py-12">
