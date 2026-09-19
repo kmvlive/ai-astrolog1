@@ -349,6 +349,35 @@ Route::get('/tarot/today', function () {
 
 
 
+
+// ===== Руны =====
+Route::get('/runes/today', function () {
+    $day = now()->format('Ymd');
+    $runes = \App\Support\Runes::all();
+    $slugs = array_keys($runes);
+    $index = abs(crc32($day)) % count($slugs);
+    $slug = $slugs[$index];
+    $rune = $runes[$slug];
+
+    return response()->json([
+        'date' => now()->format('d.m.Y'),
+        'rune' => array_merge(['slug' => $slug, 'image' => "runes/{$slug}.png"], $rune),
+    ]);
+});
+
+Route::get('/runes', function () {
+    $runes = \App\Support\Runes::all();
+    $list = [];
+    foreach ($runes as $slug => $r) {
+        $list[] = array_merge(['slug' => $slug, 'image' => "runes/{$slug}.png"], $r);
+    }
+    return response()->json([
+        'date' => now()->format('d.m.Y'),
+        'today' => \App\Support\Runes::todaySlug(),
+        'runes' => $list,
+    ]);
+});
+
 // ===== Биоритмы =====
 Route::get('/biorhythms', function (\Illuminate\Http\Request $request) {
     $birth = $request->query('birth_date');
