@@ -617,13 +617,8 @@ PROMPT;
             ->pluck('cover_subject')
             ->toArray();
         
-        // Собираем все доступные мотивы (flatten массив массивов)
-        $allPrompts = [];
-        foreach (self::COVER_PROMPTS as $category => $prompts) {
-            foreach ($prompts as $prompt) {
-                $allPrompts[] = $prompt;
-            }
-        }
+        // COVER_PROMPTS — плоский массив строк
+        $allPrompts = self::COVER_PROMPTS;
         
         // Фильтруем: только те, которых нет в последних 45
         $availablePrompts = array_filter($allPrompts, function($p) use ($recentSubjects) {
@@ -1245,12 +1240,8 @@ PROMPT;
             ->pluck('cover_subject')
             ->toArray();
         
-        $allPrompts = [];
-        foreach (self::COVER_PROMPTS as $prompts) {
-            foreach ($prompts as $prompt) {
-                $allPrompts[] = $prompt;
-            }
-        }
+        // COVER_PROMPTS — плоский массив строк
+        $allPrompts = self::COVER_PROMPTS;
         
         $availablePrompts = array_filter($allPrompts, function($p) use ($recentSubjects) {
             return !in_array($p, $recentSubjects);
