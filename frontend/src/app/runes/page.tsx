@@ -11,6 +11,7 @@ const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 type Rune = {
   slug: string;
   image: string;
+  thumb?: string;
   name: string;
   glyph: string;
   element: string;
@@ -176,7 +177,7 @@ export default function RunesPage() {
               <div className="relative aspect-[7/10] bg-[#0a0715]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={`/storage/${r.image}`}
+                  src={`/storage/${r.thumb || r.image}`}
                   alt={r.name}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"

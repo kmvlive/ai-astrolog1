@@ -374,7 +374,13 @@ Route::get('/runes', function () {
     return response()->json([
         'date' => now()->format('d.m.Y'),
         'today' => \App\Support\Runes::todaySlug(),
-        'runes' => $list,
+        'runes' => array_map(function($r) {
+            $thumb = "runes/thumb-{$r['slug']}.png";
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($thumb)) {
+                $r['thumb'] = $thumb;
+            }
+            return $r;
+        }, $list),
     ]);
 });
 
