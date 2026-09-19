@@ -101,7 +101,7 @@ class GenerateNameImages extends Command
     private function buildPrompt(string $name, string $symbol): string
     {
         return <<<PROMPT
-Mystical name talisman illustration, unified deck style: the symbol is centered in the image, surrounded by deep indigo-violet night sky filled with golden stars and soft purple nebulae. The illustration has an ornate Art Nouveau golden frame with crescent moons, suns and star ornaments on a deep indigo border. Name "{$name}" in gold capital letters on an indigo banner at the bottom. Central symbol: {$symbol}. Painterly detailed illustration, rich colors, esoteric symbolism, no watermark, no text except name banner, masterpiece quality.
+Mystical tarot card illustration, unified deck style: central character — {$symbol} — an elegant stylized human figure, full body, centered composition, surrounded by deep indigo-violet night sky filled with golden stars and soft purple nebulae. Ornate Art Nouveau golden frame with crescent moons, suns and star ornaments on a deep indigo border. At the bottom a decorative empty indigo ribbon banner with golden trim, absolutely no text on it. Painterly detailed illustration, rich colors, esoteric symbolism, ABSOLUTELY NO TEXT, NO LETTERS, NO WORDS, NO INSCRIPTIONS anywhere in the image, no watermark, masterpiece quality.
 PROMPT;
     }
 
