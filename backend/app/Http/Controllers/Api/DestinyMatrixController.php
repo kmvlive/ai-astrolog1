@@ -50,6 +50,8 @@ class DestinyMatrixController
             8 => ['name' => 'Итог', 'value' => $this->reduce($day + $month + $yearDigitsSum + $this->reduce($day) + $this->reduce($month) + $this->reduce($yearDigitsSum))],
         ];
 
+        $positions = $this->enrichPositions($positions);
+
         // Кеш AI-толкования по дате (24 часа)
         $cacheKey = 'destiny_matrix_' . md5($date);
         $aiText = Cache::remember($cacheKey, 86400, function () use ($date, $positions) {
@@ -129,5 +131,55 @@ PROMPT;
     private function resolveUserId(Request $request): ?int
     {
         return $request->user('sanctum')?->id;
+    }
+
+    public function share(string $uuid)
+    {
+        $row = \App\Models\DestinyMatrix::where('uuid', $uuid)->first();
+        if (!$row) return response()->json(['error' => 'not found'], 404);
+
+        return response()->json([
+            'date' => $row->birth_date->format('d.m.Y'),
+            'positions' => $row->positions,
+            'interpretation' => $row->interpretation,
+            'uuid' => $row->uuid,
+        ]);
+    }
+
+    /**
+     * Добавляет к каждой позиции аркан Таро (имя + картинка)
+     */
+    private function enrichPositions(array $positions): array
+    {
+        foreach ($positions as $num => $pos) {
+            $positions[$num]['arcana'] = $this->arcanaFor((int) $pos['value']);
+        }
+        return $positions;
+    }
+
+    private function arcanaFor(int $n): ?array
+    {
+        static $cache = [];
+        if (array_key_exists($n, $cache)) return $cache[$n];
+
+        $names = [
+            1 => ['Маг'], 2 => ['Жрица', 'Верховная Жрица'], 3 => ['Императрица'], 4 => ['Император'],
+            5 => ['Иерофант', 'Верховный Жрец', 'Жрец'], 6 => ['Влюблённые', 'Влюбленные'], 7 => ['Колесница'],
+            8 => ['Сила'], 9 => ['Отшельник'], 10 => ['Колесо Фортуны'], 11 => ['Справедливость', 'Правосудие'],
+            12 => ['Повешенный'], 13 => ['Смерть'], 14 => ['Умеренность'], 15 => ['Дьявол'], 16 => ['Башня'],
+            17 => ['Звезда'], 18 => ['Луна'], 19 => ['Солнце'], 20 => ['Суд', 'Страшный суд'], 21 => ['Мир'],
+            22 => ['Шут', 'Дурак', 'Глупец'],
+        ][$n] ?? [];
+
+        $card = null;
+        foreach ($names as $nm) {
+            $low = mb_strtolower($nm);
+            $card = \App\Models\TarotCard::whereRaw('LOWER(name) = ?', [$low])->first()
+                 ?? \App\Models\TarotCard::whereRaw('LOWER(name) LIKE ?', ["%{$low}%"])->first();
+            if ($card) break;
+        }
+
+        $cache[$n] = $card ? ['name' => $card->name, 'image' => $card->image] : null;
+        return $cache[$n];
     }
 }
