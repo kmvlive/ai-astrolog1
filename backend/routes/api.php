@@ -361,7 +361,7 @@ Route::get('/runes/today', function () {
 
     return response()->json([
         'date' => now()->format('d.m.Y'),
-        'rune' => array_merge(['slug' => $slug, 'image' => "runes/{$slug}.png"], $rune),
+        'rune' => array_merge(['slug' => $slug], \App\Support\Runes::images($slug), $rune),
     ]);
 });
 
@@ -369,18 +369,12 @@ Route::get('/runes', function () {
     $runes = \App\Support\Runes::all();
     $list = [];
     foreach ($runes as $slug => $r) {
-        $list[] = array_merge(['slug' => $slug, 'image' => "runes/{$slug}.png"], $r);
+        $list[] = array_merge(['slug' => $slug], \App\Support\Runes::images($slug), $r);
     }
     return response()->json([
         'date' => now()->format('d.m.Y'),
         'today' => \App\Support\Runes::todaySlug(),
-        'runes' => array_map(function($r) {
-            $thumb = "runes/thumb-{$r['slug']}.png";
-            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($thumb)) {
-                $r['thumb'] = $thumb;
-            }
-            return $r;
-        }, $list),
+        'runes' => $list,
     ]);
 });
 

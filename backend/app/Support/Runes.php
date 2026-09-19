@@ -90,4 +90,20 @@ class Runes
         $slugs = array_keys(self::all());
         return $slugs[abs(crc32(now()->format('Ymd'))) % count($slugs)];
     }
+
+    /**
+     * Пути изображений руны: полное, среднее, миниатюра
+     */
+    public static function images(string $slug): array
+    {
+        $disk = \Illuminate\Support\Facades\Storage::disk('public');
+        $out = ['image' => "runes/{$slug}.png"];
+        if ($disk->exists("runes/thumb-{$slug}.jpg")) {
+            $out['thumb'] = "runes/thumb-{$slug}.jpg";
+        }
+        if ($disk->exists("runes/med-{$slug}.jpg")) {
+            $out['med'] = "runes/med-{$slug}.jpg";
+        }
+        return $out;
+    }
 }

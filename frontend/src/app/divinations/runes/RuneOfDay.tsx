@@ -10,6 +10,7 @@ type RuneOfDayData = {
   rune: {
     slug: string;
     image: string;
+    med?: string;
     name: string;
     glyph: string;
     element: string;
@@ -43,7 +44,7 @@ export default function RuneOfDay() {
                 <div className="relative aspect-[7/10] w-36 sm:w-44 overflow-hidden rounded-[2px] bg-[#0a0715]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={`/storage/${data.rune.image}`}
+                    src={`/storage/${data.rune.med || data.rune.image}`}
                     alt={`Руна дня ${data.rune.name}`}
                     className="absolute inset-0 w-full h-full object-cover"
                   />

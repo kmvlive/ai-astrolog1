@@ -12,6 +12,7 @@ type Rune = {
   slug: string;
   image: string;
   thumb?: string;
+  med?: string;
   name: string;
   glyph: string;
   element: string;
@@ -89,7 +90,7 @@ export default function RunesPage() {
                       <div className="relative aspect-[7/10] w-48 sm:w-60 overflow-hidden rounded-[2px] bg-[#0a0715]">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={`/storage/${selected.image}`}
+                          src={`/storage/${selected.med || selected.image}`}
                           alt={`Руна ${selected.name}`}
                           className="absolute inset-0 w-full h-full object-cover"
                         />

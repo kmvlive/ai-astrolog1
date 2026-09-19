@@ -315,8 +315,8 @@ class DivinationController extends Controller
             }
             if ($alreadyExists) continue;
 
-            $imgPath = "runes/{$slug}.png";
-            if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($imgPath)) continue;
+            $imgs = \App\Support\Runes::images($slug);
+            if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($imgs['image'])) continue;
 
             // Определяем русское имя руны
             $ruName = $this->runeRuName($slug);
@@ -324,7 +324,7 @@ class DivinationController extends Controller
             $cards[] = [
                 'name' => $ruName,
                 'slug' => $slug,
-                'image' => $imgPath,
+                'image' => $imgs['med'] ?? $imgs['image'],
                 'glyph' => $this->runeGlyph($slug),
             ];
         }
