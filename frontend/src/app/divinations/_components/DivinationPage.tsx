@@ -20,6 +20,7 @@ interface Props {
   hasQuestion?: boolean;
   hasBirthdate?: boolean;
   placeholder?: string;
+  topContent?: React.ReactNode;
 }
 
 
@@ -42,6 +43,7 @@ export default function DivinationPage({
   hasQuestion = true,
   hasBirthdate = false,
   placeholder = "Задайте свой вопрос...",
+  topContent,
 }: Props) {
   const [question, setQuestion] = useState("");
   const [birthdate, setBirthdate] = useState("");
