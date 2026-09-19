@@ -2,7 +2,6 @@ import CometField from "@/components/CometField";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import ShareBlock from "@/components/ShareBlock";
@@ -79,13 +78,12 @@ export default async function NameMeaningPage({ params }: { params: Promise<{ na
               <div className="relative group shrink-0">
                 <div className="absolute -inset-1 bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-600 rounded-2xl blur-sm opacity-75 group-hover:opacity-100 transition"></div>
                 <div className="relative rounded-2xl overflow-hidden border-4 border-amber-400/80 shadow-2xl shadow-amber-900/30">
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={`/storage/${nm.image}`}
                     alt={`Иллюстрация имени ${nm.name}`}
-                    width={220}
-                    height={220}
                     className="w-40 h-40 sm:w-56 sm:h-56 object-cover"
-                    priority
+                    loading="eager"
                   />
                 </div>
                 {/* Декоративные элементы рамки */}
