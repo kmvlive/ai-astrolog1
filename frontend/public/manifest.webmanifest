@@ -1,3 +1,31 @@
-
-// Тест: в консоли браузера выполните
-// localStorage.setItem('pwa_force_show', '1'); location.reload();
+{
+  "name": "AI Астролог — гороскопы и гадания",
+  "short_name": "AI Астролог",
+  "description": "Персональные гороскопы, матрица судьбы, руны, таро и календари каждый день",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f0a1e",
+  "theme_color": "#0f0a1e",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
