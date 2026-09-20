@@ -240,15 +240,27 @@ class WidgetsController
     private function getNameday(): array
     {
         $mmdd = date('m-d');
-        $orthodox = json_decode(file_get_contents(storage_path('app/data/orthodox.json')), true);
-        $today = $orthodox[$mmdd] ?? [];
+        $wiki = json_decode(file_get_contents(storage_path('app/data/wiki-days.json')), true);
+        $saints = json_decode(file_get_contents(storage_path('app/data/saint-names.json')), true);
+        $saintsSet = array_flip($saints ?? []);
 
-        // Извлекаем имена из православных праздников
+        $day = $wiki[$mmdd] ?? [];
+        $rawNames = $day['names'] ?? [];
+
         $names = [];
-        foreach ($today as $event) {
-            if (preg_match_all('/([А-Я][а-я]+(?:\s+[А-Я][а-я]+)*)/u', $event['name'] ?? '', $matches)) {
-                $names = array_merge($names, $matches[1]);
+        foreach ($rawNames as $name) {
+            if (isset($saintsSet[$name])) {
+                $names[] = $name;
             }
+        }
+
+        return [
+            'type' => 'nameday',
+            'date' => date('d.m.Y'),
+            'names' => array_values(array_unique($names)),
+            'emoji' => '🎂',
+        ];
+    }
         }
 
         return [
