@@ -6,6 +6,20 @@ import { Suspense } from "react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
+const SIGN_BASE = "horoscopes";
+
+function smartCut(text: string, limit: number): string {
+  if (text.length <= limit) return text;
+  const cut = text.slice(0, limit);
+  let idx = -1;
+  for (let i = cut.length - 1; i >= 0; i--) {
+    if (".!?".includes(cut[i])) { idx = i; break; }
+  }
+  if (idx > limit * 0.5) return cut.slice(0, idx + 1);
+  const sp = cut.lastIndexOf(" ");
+  return cut.slice(0, sp > 0 ? sp : limit) + "…";
+}
+
 const LINKS: Record<string, string> = {
   moon: "/moon", lunar: "/moon",
   horoscope: "/horoscopes",
@@ -105,7 +119,15 @@ function Widget() {
             {data && (
               <>
                 <div className="font-bold text-lg mb-1">{data.emoji} {data.sign_name}</div>
-                <div className="text-sm leading-relaxed">{String(data.text || "").slice(0, 300)}…</div>
+                <div className="text-sm leading-relaxed">{smartCut(String(data.text || ""), 700)}</div>
+                <a
+                  href={`${API}/${SIGN_BASE}/${data.sign_slug || sign}?utm_source=widget`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-2 text-xs font-semibold text-amber-300 hover:text-amber-200"
+                >
+                  {data.emoji} Полный гороскоп: {data.sign_name} →
+                </a>
               </>
             )}
           </>
@@ -116,7 +138,7 @@ function Widget() {
           <>
             <div className="text-3xl mb-2">💫</div>
             <div className="font-bold text-lg mb-2">{data.title}</div>
-            <div className="text-sm opacity-80 italic">{String(data.text || "").slice(0, 200)}…</div>
+            <div className="text-sm opacity-80 italic">{smartCut(String(data.text || ""), 300)}</div>
           </>
         )}
 
@@ -140,7 +162,7 @@ function Widget() {
             <img src={`${API}/storage/${data.image}`} alt={data.name} className="w-20 rounded-lg border border-amber-400/50" />
             <div>
               <div className="font-bold text-lg">🃏 {data.name}</div>
-              <div className="text-xs mt-1 leading-relaxed">{String(data.description || "").slice(0, 160)}…</div>
+              <div className="text-xs mt-1 leading-relaxed">{smartCut(String(data.description || ""), 300)}</div>
             </div>
           </div>
         )}
@@ -159,7 +181,7 @@ function Widget() {
         {type === "garden" && data && (
           <>
             <div className="font-bold text-lg mb-1">🌱 {data.title}</div>
-            <div className="text-xs mb-2 leading-relaxed">{String(data.text || "").slice(0, 140)}…</div>
+            <div className="text-xs mb-2 leading-relaxed">{smartCut(String(data.text || ""), 250)}</div>
             <ul className="text-xs space-y-1 list-disc pl-4">
               {(data.works || []).map((w: string, i: number) => <li key={i}>{w}</li>)}
             </ul>

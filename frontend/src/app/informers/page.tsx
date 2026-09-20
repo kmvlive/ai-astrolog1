@@ -8,15 +8,15 @@ const API = "https://my.neiro-astro.ru";
 
 const WIDGETS = [
   { type: "moon", js: "moon", title: "Фаза луны", desc: "Текущая фаза и лунный день", h: 170 },
-  { type: "horoscope", js: "horoscope", title: "Общий гороскоп", desc: "С выбором знака зодиака", h: 260 },
-  { type: "horoscope-daily", js: "horoscope", title: "Гороскоп сегодня/завтра", desc: "Знак + переключатель дня", h: 300 },
-  { type: "affirmation", js: "affirmation", title: "Ежедневная аффирмация", desc: "Вдохновение дня", h: 190 },
+  { type: "horoscope", js: "horoscope", title: "Общий гороскоп", desc: "С выбором знака зодиака", h: 460 },
+  { type: "horoscope-daily", js: "horoscope", title: "Гороскоп сегодня/завтра", desc: "Знак + переключатель дня", h: 500 },
+  { type: "affirmation", js: "affirmation", title: "Ежедневная аффирмация", desc: "Вдохновение дня", h: 230 },
   { type: "rune", js: "rune", title: "Руна дня", desc: "Карточка руны с советом", h: 230 },
-  { type: "tarot", js: "tarot", title: "Карта Таро дня", desc: "Аркан дня с описанием", h: 220 },
+  { type: "tarot", js: "tarot", title: "Карта Таро дня", desc: "Аркан дня с описанием", h: 280 },
   { type: "holidays", js: "holiday", title: "Праздники сегодня", desc: "Светские праздники дня", h: 210 },
   { type: "orthodox", js: "orthodox", title: "Православные праздники", desc: "Церковный календарь дня", h: 210 },
   { type: "lunar", js: "lunar", title: "Лунный календарь", desc: "Лунный день + рекомендация", h: 210 },
-  { type: "garden", js: "garden", title: "Календарь садовода", desc: "Работы в саду по луне", h: 260 },
+  { type: "garden", js: "garden", title: "Календарь садовода", desc: "Работы в саду по луне", h: 320 },
   { type: "nameday", js: "nameday", title: "Именины сегодня", desc: "Список имён дня", h: 190 },
   { type: "dreams", js: "dream", title: "Сонник", desc: "Поле ввода + толкование + ссылка", h: 260 },
 ];

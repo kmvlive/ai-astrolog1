@@ -94,6 +94,7 @@ class WidgetsController
             'sign' => $sign,
             'period' => $period,
             'sign_name' => $this->signName($sign),
+            'sign_slug' => $slug,
             'text' => $text,
             'emoji' => $this->signEmoji($sign),
         ];

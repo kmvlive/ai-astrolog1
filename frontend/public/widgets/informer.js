@@ -1,5 +1,19 @@
 (function () {
   var API = "https://my.neiro-astro.ru";
+  var SIGN_BASE = "horoscopes";
+
+  function smartCut(text, limit) {
+    text = String(text || "");
+    if (text.length <= limit) return text;
+    var cut = text.slice(0, limit), idx = -1;
+    for (var i = cut.length - 1; i >= 0; i--) {
+      if (".!?".indexOf(cut[i]) >= 0) { idx = i; break; }
+    }
+    if (idx > limit * 0.5) return cut.slice(0, idx + 1);
+    var sp = cut.lastIndexOf(" ");
+    return cut.slice(0, sp > 0 ? sp : limit) + "…";
+  }
+
   var LINKS = {
     moon: "/moon", lunar: "/moon", horoscope: "/horoscopes", affirmation: "/affirmations",
     rune: "/runes", tarot: "/tarot", holiday: "/calendars/holidays", orthodox: "/calendars/orthodox",
@@ -51,18 +65,18 @@
       case "lunar":
         return head(d) + '<div class="nai-title">' + d.emoji + " " + d.day + "-й лунный день</div><div class=\"nai-text\">" + esc(d.phase) + '</div><div class="nai-muted">' + esc(d.recommendation) + "</div>" + link(d);
       case "horoscope":
-        return head(d) + '<div class="nai-title">' + d.emoji + " " + esc(d.sign_name || d.sign) + '</div><div class="nai-text">' + esc((d.text || "").slice(0, 220)) + "…</div>" + link(d);
+        return head(d) + '<div class="nai-title">' + d.emoji + " " + esc(d.sign_name || d.sign) + '</div><div class="nai-text">' + esc(smartCut(d.text, 400)) + '</div><a class="nai-link" href="' + API + "/" + SIGN_BASE + "/" + (d.sign_slug || d.sign) + '?utm_source=widget" target="_blank" rel="noopener" style="font-weight:600;color:#fbbf24">' + d.emoji + " Полный гороскоп: " + esc(d.sign_name || "") + " →</a>" + link(d);
       case "affirmation":
-        return head(d) + '<div class="nai-title">💫 ' + esc(d.title) + '</div><div class="nai-muted">' + esc((d.text || "").slice(0, 160)) + "…</div>" + link(d);
+        return head(d) + '<div class="nai-title">💫 ' + esc(d.title) + '</div><div class="nai-muted">' + esc(smartCut(d.text, 300)) + "</div>" + link(d);
       case "rune":
         return head(d) + '<div class="nai-row"><img class="nai-img" src="' + API + "/storage/" + d.image + '" alt=""><div><div class="nai-title">' + esc(d.name) + ' <span class="nai-glyph">' + d.glyph + '</span></div><div class="nai-text">' + esc(d.meaning) + '</div><div class="nai-muted">💡 ' + esc(d.advice) + "</div></div></div>" + link(d);
       case "tarot":
-        return head(d) + '<div class="nai-row"><img class="nai-img" src="' + API + "/storage/" + d.image + '" alt=""><div><div class="nai-title">🃏 ' + esc(d.name) + '</div><div class="nai-text">' + esc((d.description || "").slice(0, 140)) + "…</div></div></div>" + link(d);
+        return head(d) + '<div class="nai-row"><img class="nai-img" src="' + API + "/storage/" + d.image + '" alt=""><div><div class="nai-title">🃏 ' + esc(d.name) + '</div><div class="nai-text">' + esc(smartCut(d.description, 300)) + "</div></div></div>" + link(d);
       case "holiday":
       case "orthodox":
         return head(d) + '<div class="nai-title">' + d.emoji + " " + esc(d.date) + '</div><ul class="nai-list">' + (d.holidays || []).map(function (h) { return "<li>" + esc(h.name) + "</li>"; }).join("") + "</ul>" + link(d);
       case "garden":
-        return head(d) + '<div class="nai-title">🌱 ' + esc(d.title) + '</div><div class="nai-text">' + esc((d.text || "").slice(0, 140)) + '…</div><ul class="nai-list">' + (d.works || []).map(function (w) { return "<li>" + esc(w) + "</li>"; }).join("") + "</ul>" + link(d);
+        return head(d) + '<div class="nai-title">🌱 ' + esc(d.title) + '</div><div class="nai-text">' + esc(smartCut(d.text, 250)) + '</div><ul class="nai-list">' + (d.works || []).map(function (w) { return "<li>" + esc(w) + "</li>"; }).join("") + "</ul>" + link(d);
       case "nameday":
         return head(d) + '<div class="nai-title">🎂 Именины сегодня</div><div class="nai-text">' + esc((d.names || []).join(", ")) + "</div>" + link(d);
       case "dream":
