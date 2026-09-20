@@ -10,7 +10,7 @@ const WIDGETS = [
   { type: "moon", js: "moon", title: "Фаза луны", desc: "Текущая фаза и лунный день", h: 170 },
   { type: "horoscope", js: "horoscope", title: "Общий гороскоп", desc: "С выбором знака зодиака", h: 460 },
   { type: "horoscope-daily", js: "horoscope", title: "Гороскоп сегодня/завтра", desc: "Знак + переключатель дня", h: 500 },
-  { type: "affirmation", js: "affirmation", title: "Ежедневная аффирмация", desc: "Вдохновение дня", h: 230 },
+  { type: "affirmation", js: "affirmation", title: "Ежедневная аффирмация", desc: "Вдохновение дня", h: 300 },
   { type: "rune", js: "rune", title: "Руна дня", desc: "Карточка руны с советом", h: 230 },
   { type: "tarot", js: "tarot", title: "Карта Таро дня", desc: "Аркан дня с описанием", h: 280 },
   { type: "holidays", js: "holiday", title: "Праздники сегодня", desc: "Светские праздники дня", h: 210 },
