@@ -72,25 +72,22 @@ class WidgetsController
     {
         $sign = $request->query('sign', 'aries');
         $period = $request->query('period', 'today');
+        $slug = $this->signSlug($sign);
 
-        // Используем существующий free-horoscopes API
         $cacheKey = "widget_horoscope_{$sign}_{$period}";
         $data = cache($cacheKey);
 
         if (!$data) {
-            $systems = ['western' => 'Западный', 'chinese' => 'Китайский'];
-            $system = $request->query('system', 'western');
-            
-            $url = url("/api/free-horoscopes/{$system}/{$sign}");
-            $response = @file_get_contents($url);
-            $data = json_decode($response ?? '', true) ?: [];
-            cache([$cacheKey => $data], 3600);
+            try {
+                $response = \Illuminate\Support\Facades\Http::get(url("/api/daily-horoscopes/{$slug}"));
+                $data = $response->json() ?? [];
+                cache([$cacheKey => $data], 3600);
+            } catch (\Exception $e) {
+                $data = [];
+            }
         }
 
-        $text = $data['periods'][$period] ?? $data['forecast'] ?? $data['text'] ?? 'Гороскоп временно недоступен';
-        if (is_array($text)) {
-            $text = $text['text'] ?? implode(' ', array_filter(array_map('strval', $text)));
-        }
+        $text = $data['horoscope']['content'] ?? 'Гороскоп временно недоступен';
 
         return [
             'type' => 'horoscope',
@@ -100,6 +97,15 @@ class WidgetsController
             'text' => $text,
             'emoji' => $this->signEmoji($sign),
         ];
+    }
+
+    private function signSlug(string $sign): string
+    {
+        return [
+            'aries' => 'oven', 'taurus' => 'telec', 'gemini' => 'bliznecy', 'cancer' => 'rak',
+            'leo' => 'lev', 'virgo' => 'deva', 'libra' => 'vesy', 'scorpio' => 'skorpion',
+            'sagittarius' => 'strelec', 'capricorn' => 'kozerog', 'aquarius' => 'vodolej', 'pisces' => 'ryby',
+        ][$sign] ?? $sign;
     }
 
     private function signName(string $sign): string
