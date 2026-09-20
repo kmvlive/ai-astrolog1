@@ -29,6 +29,16 @@ export default function PwaBanner() {
   const [deferred, setDeferred] = useState<any>(null);
 
   useEffect(() => {
+    // Полное отключение: ?nopwa=1
+    if (new URLSearchParams(location.search).has("nopwa")) {
+      // Unregister всех SW
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations().then((regs) =>
+          regs.forEach((r) => r.unregister())
+        );
+      }
+      return;
+    }
     console.log("[PWA] Banner component mounted");
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js").then(
