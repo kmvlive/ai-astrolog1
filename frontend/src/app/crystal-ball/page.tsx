@@ -91,7 +91,6 @@ export default function CrystalBallPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
-      <CometField count={8} />
 
       {/* Звёздный фон */}
       <div className="fixed inset-0 pointer-events-none">

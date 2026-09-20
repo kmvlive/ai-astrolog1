@@ -100,7 +100,6 @@ export default function ReferralsPage() {
   return (
     <main className="min-h-screen flex flex-col relative overflow-hidden isolate">
       <SiteHeader />
-      <CometField count={8} />
       <div className="flex-1 max-w-4xl mx-auto px-4 py-8 w-full">
         <Link href="/profile" className="text-sm text-slate-400 hover:text-violet-400 mb-4 inline-block">
           ← Назад к профилю

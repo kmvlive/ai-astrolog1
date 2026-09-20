@@ -90,7 +90,6 @@ export default function RetrogradePage() {
     return (
       <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
         <SiteHeader />
-        <CometField count={8} />
         <div className="max-w-4xl mx-auto px-4 py-12">
           <div className="animate-pulse space-y-4">
             <div className="h-12 bg-slate-800 rounded w-3/4"></div>
@@ -106,7 +105,6 @@ export default function RetrogradePage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate aura-top" style={{ ["--accent" as any]: "#a855f7" }}>
       <SiteHeader />
-      <CometField count={8} />
 
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="text-center mb-12">

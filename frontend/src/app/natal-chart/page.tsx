@@ -178,7 +178,6 @@ export default function NatalChartPage() {
     return (
       <main className="min-h-screen flex flex-col relative overflow-hidden isolate">
         <SiteHeader />
-      <CometField count={8} />
         <div className="flex-1 flex items-center justify-center text-slate-400">Загрузка...</div>
         <SiteFooter />
       </main>
@@ -190,7 +189,6 @@ export default function NatalChartPage() {
     return (
       <main className="min-h-screen flex flex-col relative overflow-hidden isolate">
         <SiteHeader />
-      <CometField count={8} />
         <div className="flex-1 max-w-3xl mx-auto px-4 py-8 w-full">
           <h1 className="text-3xl font-bold mb-2">🌟 Ваша натальная карта</h1>
           <p className="text-slate-400 mb-6">
@@ -299,7 +297,6 @@ export default function NatalChartPage() {
     return (
       <main className="min-h-screen flex flex-col relative overflow-hidden isolate">
         <SiteHeader />
-      <CometField count={8} />
         <div className="flex-1 flex flex-col items-center justify-center px-4">
           <div className="text-6xl mb-4 animate-pulse">🔮</div>
           <h2 className="text-2xl font-bold mb-2">Генерируем вашу натальную карту...</h2>
@@ -314,7 +311,6 @@ export default function NatalChartPage() {
   return (
     <main className="min-h-screen flex flex-col relative overflow-hidden isolate">
       <SiteHeader />
-      <CometField count={8} />
       <div className="flex-1 max-w-2xl mx-auto px-4 py-8 w-full">
         <h1 className="text-3xl font-bold mb-2">🌟 Персональная натальная карта</h1>
         <p className="text-slate-400 mb-8">

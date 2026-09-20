@@ -354,7 +354,6 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center relative overflow-hidden isolate">
-        <CometField count={8} />
         <div className="text-center">
           <div className="text-6xl mb-4 animate-pulse">🔮</div>
           <p className="text-slate-400">Загрузка...</p>
@@ -367,7 +366,6 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
-      <CometField count={8} />
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="pricing-eyebrow mb-6">👤 Личный кабинет</div>
         <h1 className="text-3xl md:text-4xl font-bold mb-8">

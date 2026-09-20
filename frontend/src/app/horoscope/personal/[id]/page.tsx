@@ -55,7 +55,6 @@ export default function PersonalHoroscopePage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
-      <CometField count={8} />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <Link href="/dashboard" className="text-violet-400 hover:text-violet-300 text-sm">← Кабинет</Link>
 

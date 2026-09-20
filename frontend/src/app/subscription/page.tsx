@@ -92,7 +92,6 @@ export default function SubscriptionPage() {
     return (
       <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
         <SiteHeader />
-      <CometField count={8} />
         <div className="text-center py-20 text-slate-400">
           <div className="inline-block animate-spin rounded-full h-10 w-10 border-2 border-violet-500 border-t-transparent mb-4" />
           <div>Загрузка...</div>
@@ -104,7 +103,6 @@ export default function SubscriptionPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
-      <CometField count={8} />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-violet-400 to-amber-400 bg-clip-text text-transparent">
           Подписка

@@ -50,7 +50,6 @@ function CompatibilityContent() {
   return (
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
-      <CometField count={8} />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="text-sm text-slate-400 mb-6">
           <Link href="/" className="hover:text-violet-400">Главная</Link>

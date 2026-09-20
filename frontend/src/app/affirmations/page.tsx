@@ -99,7 +99,6 @@ export default function AffirmationsPage() {
   return (
     <main className="min-h-screen flex flex-col relative overflow-hidden isolate">
       <SiteHeader />
-      <CometField count={8} />
       <div className="flex-1 max-w-4xl mx-auto px-4 py-8 w-full">
         <div className="text-center mb-10">
           <div className="pricing-eyebrow mb-4">💫 ЗДОРОВЬЕ И НАСТРОЙ</div>

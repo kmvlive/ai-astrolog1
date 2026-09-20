@@ -346,9 +346,9 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
   display: block;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 0 12px 3px var(--glow);
+  
   opacity: 0;
-  animation: comet-r-fly var(--dur) cubic-bezier(0.2, 0.6, 0.4, 1) var(--delay) infinite;
+  animation: none;
 }
 .comet-core::before {
   content: '';

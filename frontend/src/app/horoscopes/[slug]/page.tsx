@@ -154,7 +154,6 @@ export default function SignHoroscopePage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
-      <CometField count={8} />
       <div className="max-w-3xl mx-auto px-4 py-12 relative z-10">
         <Link href="/horoscopes" className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition">
           ← Все знаки зодиака

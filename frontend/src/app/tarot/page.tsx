@@ -36,7 +36,6 @@ export default function TarotPage() {
     return (
       <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
         <SiteHeader />
-        <CometField count={8} />
         <div className="flex items-center justify-center py-20">
           <div className="text-slate-400">🎴 Открываю карту дня...</div>
         </div>
@@ -50,7 +49,6 @@ export default function TarotPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate aura-top" style={{ ["--accent" as any]: "#a855f7" }}>
       <SiteHeader />
-      <CometField count={8} />
 
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="text-center mb-10">

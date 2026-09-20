@@ -47,7 +47,6 @@ export default function ShareMatrixPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <SiteHeader />
-      <CometField count={6} />
       <div className="max-w-4xl mx-auto px-4 py-12">
         {error && (
           <div className="text-center py-20">

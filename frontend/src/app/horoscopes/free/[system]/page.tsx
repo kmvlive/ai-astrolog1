@@ -71,7 +71,6 @@ export default function SystemPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate aura-top" style={{ ["--accent" as any]: ACCENTS[slug] || "#a78bfa" }}>
       <SiteHeader />
-      <CometField count={8} />
       <div className="max-w-6xl mx-auto px-4 py-12">
         <Link href="/horoscopes/free" className="text-violet-400 hover:text-violet-300 text-sm transition">← Все бесплатные гороскопы</Link>
 

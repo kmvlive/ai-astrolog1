@@ -78,7 +78,6 @@ export default function AffirmationDatePage() {
     return (
       <main className="min-h-screen flex flex-col relative overflow-hidden isolate">
         <SiteHeader />
-      <CometField count={8} />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-slate-400">Загрузка...</div>
         </div>
@@ -91,7 +90,6 @@ export default function AffirmationDatePage() {
     return (
       <main className="min-h-screen flex flex-col relative overflow-hidden isolate">
         <SiteHeader />
-      <CometField count={8} />
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="text-center">
             <div className="text-6xl mb-4">🔍</div>
@@ -110,7 +108,6 @@ export default function AffirmationDatePage() {
   return (
     <main className="min-h-screen flex flex-col relative overflow-hidden isolate">
       <SiteHeader />
-      <CometField count={8} />
       <div className="flex-1 max-w-3xl mx-auto px-4 py-8 w-full">
         <Link href="/affirmations" className="text-sm text-slate-400 hover:text-violet-400 mb-6 inline-block">
           ← Все аффирмации
