@@ -97,12 +97,12 @@ class Runes
     public static function images(string $slug): array
     {
         $disk = \Illuminate\Support\Facades\Storage::disk('public');
-        $out = ['image' => "runes/{$slug}.png"];
-        if ($disk->exists("runes/thumb-{$slug}.jpg")) {
-            $out['thumb'] = "runes/thumb-{$slug}.jpg";
+        $out = ['image' => "runes/{$slug}.webp"];
+        if ($disk->exists("runes/thumb-{$slug}.webp")) {
+            $out['thumb'] = "runes/thumb-{$slug}.webp";
         }
-        if ($disk->exists("runes/med-{$slug}.jpg")) {
-            $out['med'] = "runes/med-{$slug}.jpg";
+        if ($disk->exists("runes/med-{$slug}.webp")) {
+            $out['med'] = "runes/med-{$slug}.webp";
         }
         return $out;
     }

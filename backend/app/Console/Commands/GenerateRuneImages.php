@@ -95,10 +95,10 @@ class GenerateRuneImages extends Command
 
         foreach (self::RUNES as $slug => $rune) {
             $bar->advance();
-            $path = "runes/{$slug}.png";
+            $path = "runes/{$slug}.webp";
 
             // 1) Генерация фона (пропуск если уже есть и skip-bg)
-            $bgPath = "runes/{$slug}-bg.png";
+            $bgPath = "runes/{$slug}-bg.webp";
             $haveBg = $disk->exists($bgPath);
             if (!$haveBg && !$skipBg) {
                 $elementDesc = self::ELEMENT_PROMPTS[$rune['element']] ?? '';

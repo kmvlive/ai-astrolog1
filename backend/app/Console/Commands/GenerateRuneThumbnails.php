@@ -24,7 +24,7 @@ class GenerateRuneThumbnails extends Command
         $generated = 0;
         foreach ($runes as $slug => $rune) {
             $bar->advance();
-            $sourcePath = "runes/{$slug}.png";
+            $sourcePath = "runes/{$slug}.webp";
             if (!$disk->exists($sourcePath)) continue;
 
             $img = @imagecreatefromstring($disk->get($sourcePath));
@@ -57,14 +57,14 @@ class GenerateRuneThumbnails extends Command
                 imagedestroy($out);
 
                 if ($data && strlen($data) > 1000) {
-                    $disk->put("runes/{$prefix}-{$slug}.jpg", $data);
+                    $disk->put("runes/{$prefix}-{$slug}.webp", $data);
                     $generated++;
                 }
             }
 
             // Удаляю старые PNG-миниатюры
             foreach (['thumb', 'med'] as $prefix) {
-                $old = "runes/{$prefix}-{$slug}.png";
+                $old = "runes/{$prefix}-{$slug}.webp";
                 if ($disk->exists($old)) $disk->delete($old);
             }
 
