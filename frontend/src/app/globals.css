@@ -53,11 +53,9 @@ img[src*="/moon/moon-7"] { animation-delay: 3.5s; }
 @keyframes moon-float {
   0%, 100% { 
     transform: translateY(0) scale(1); 
-    filter: drop-shadow(0 0 20px rgba(200, 220, 255, 0.6)) brightness(1);
   }
   50% { 
     transform: translateY(-8px) scale(1.03); 
-    filter: drop-shadow(0 0 35px rgba(200, 220, 255, 0.9)) brightness(1.2);
   }
 }
 img[src*="/moon/moon-"],
@@ -449,22 +447,14 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
     240px 240px, 240px 240px, 240px 240px, 240px 240px, 240px 240px,
     320px 320px, 320px 320px, 320px 320px, 320px 320px,
     400px 400px, 400px 400px, 400px 400px;
-  animation: star-drift 70s linear infinite;
+  animation: none;
 }
 
 /* Каждый слой смещается на свой тайл → разная скорость = параллакс */
 @keyframes star-drift {
   from {
-    background-position:
-      0 0, 0 0, 0 0, 0 0, 0 0,
-      0 0, 0 0, 0 0, 0 0,
-      0 0, 0 0, 0 0;
   }
   to {
-    background-position:
-      -240px 240px, -240px 240px, -240px 240px, -240px 240px, -240px 240px,
-      -320px 320px, -320px 320px, -320px 320px, -320px 320px,
-      -400px 400px, -400px 400px, -400px 400px;
   }
 }
 
