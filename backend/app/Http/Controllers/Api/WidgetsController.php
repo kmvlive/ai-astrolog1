@@ -261,6 +261,8 @@ class WidgetsController
             'emoji' => '🎂',
         ];
     }
+
+
         }
 
         return [
