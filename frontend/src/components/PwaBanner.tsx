@@ -102,7 +102,7 @@ export default function PwaBanner() {
   // iOS-подсказка: внизу слева (рядом с кнопкой «Поделиться»)
   if (mode === "ios") {
     return (
-      <div className="fixed left-4 bottom-4 z-[60] w-[270px] rounded-xl border border-violet-500/40 bg-[#14102a]/95 backdrop-blur p-3 shadow-xl shadow-violet-900/40">
+      <div className="fixed left-4 bottom-4 z-[60] w-[270px] rounded-xl border border-violet-500/40 bg-[#14102a]/95 p-3 shadow-xl shadow-violet-900/40">
         <button
           onClick={dismiss}
           aria-label="Закрыть"
@@ -135,7 +135,7 @@ export default function PwaBanner() {
 
   // Android / десктоп: системная установка
   return (
-    <div className="fixed left-4 top-20 z-[60] w-[260px] rounded-xl border border-violet-500/40 bg-[#14102a]/95 backdrop-blur p-3 shadow-xl shadow-violet-900/40">
+    <div className="fixed left-4 top-20 z-[60] w-[260px] rounded-xl border border-violet-500/40 bg-[#14102a]/95 p-3 shadow-xl shadow-violet-900/40">
       <button
         onClick={dismiss}
         aria-label="Закрыть"
