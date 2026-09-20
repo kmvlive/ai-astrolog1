@@ -176,7 +176,7 @@ function Widget() {
         {type === "tarot" && data && (
           <div className="flex gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`${API}/storage/${data.image}`} alt={data.name} className="w-20 rounded-lg border border-amber-400/50" />
+            <img src={`${API}/storage/${data.image}`} alt={data.name} className="w-20 aspect-[7/10] object-cover rounded-lg border border-amber-400/50" />
             <div>
               <div className="font-bold text-lg">🃏 {data.name}</div>
               <div className="text-xs mt-1 leading-relaxed">{smartCut(String(data.description || ""), 300)}</div>

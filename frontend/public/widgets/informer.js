@@ -39,7 +39,7 @@
       ".nai-title{font-size:16px;font-weight:700;margin-bottom:6px}" +
       ".nai-text{font-size:13px;line-height:1.45;margin-bottom:6px}" +
       ".nai-muted{font-size:12px;opacity:.75;font-style:italic}" +
-      ".nai-img{width:84px;border-radius:8px;border:1px solid rgba(251,191,36,.5)}" +
+      ".nai-img{width:84px;aspect-ratio:7/10;object-fit:cover;border-radius:8px;border:1px solid rgba(251,191,36,.5)}" +
       ".nai-row{display:flex;gap:10px;align-items:flex-start}" +
       ".nai-glyph{font-size:22px;color:#fbbf24}" +
       ".nai-link{display:inline-block;margin-top:8px;font-size:11px;color:#a78bfa;text-decoration:none}" +
