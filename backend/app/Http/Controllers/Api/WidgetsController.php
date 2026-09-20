@@ -262,17 +262,6 @@ class WidgetsController
         ];
     }
 
-
-        }
-
-        return [
-            'type' => 'nameday',
-            'date' => date('d.m.Y'),
-            'names' => array_slice(array_unique($names), 0, 10),
-            'emoji' => '🎂',
-        ];
-    }
-
     private function getLunar(): array
     {
         $moon = $this->getMoon();
