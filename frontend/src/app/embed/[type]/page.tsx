@@ -94,7 +94,6 @@ function Widget() {
         {/* Лунный календарь */}
         {type === "lunar" && data && (
           <>
-            <div className="text-3xl mb-2">{data.emoji}</div>
             <div className="font-bold text-lg mb-1">{data.day}-й лунный день</div>
             <div className="text-sm mb-2">{data.phase}</div>
             <div className="text-xs opacity-70 italic">{data.recommendation}</div>
