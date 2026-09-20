@@ -101,7 +101,7 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
   height: 2px;
   background: linear-gradient(to left, rgba(200,220,255,0.9) 0%, rgba(200,220,255,0.4) 40%, transparent 100%);
   transform: translateY(-50%);
-  filter: blur(1px);
+  filter: blur(0.5px);
 }
 
 @keyframes comet-fly {
@@ -204,12 +204,10 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 @keyframes zodiac-pulse {
   0%, 100% { 
     transform: scale(1);
-    filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.3));
-  }
+    }
   50% { 
     transform: scale(1.08);
-    filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.7));
-  }
+    }
 }
 
 @keyframes zodiac-shimmer {
@@ -246,7 +244,7 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 .zodiac-card {
   position: relative;
   animation: zodiac-appear 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
 }
 
 /* Staggered появление */
@@ -268,7 +266,6 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
   line-height: 1;
   display: inline-block;
   animation: zodiac-pulse 4s ease-in-out infinite;
-  filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.4));
 }
 
 /* Каждый знак пульсирует со своим сдвигом */
@@ -395,7 +392,7 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
   border-radius: 50%;
   background: conic-gradient(from 0deg, transparent 0 35%, rgba(167, 139, 250, 0.9) 50%, transparent 65% 100%);
   animation: zodiac-ring-spin 5s linear infinite;
-  filter: blur(3px);
+  filter: blur(1px);
   z-index: 1;
 }
 .zodiac-hero::after {
@@ -713,7 +710,7 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
   height: 2px;
   background: linear-gradient(to left, rgba(200,220,255,0.9) 0%, rgba(200,220,255,0.4) 40%, transparent 100%);
   transform: translateY(-50%);
-  filter: blur(1px);
+  filter: blur(0.5px);
 }
 
 @keyframes comet-fly {
@@ -816,12 +813,10 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 @keyframes zodiac-pulse {
   0%, 100% { 
     transform: scale(1);
-    filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.3));
-  }
+    }
   50% { 
     transform: scale(1.08);
-    filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.7));
-  }
+    }
 }
 
 @keyframes zodiac-shimmer {
@@ -858,7 +853,7 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
 .zodiac-card {
   position: relative;
   animation: zodiac-appear 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
 }
 
 /* Staggered появление */
@@ -880,7 +875,6 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
   line-height: 1;
   display: inline-block;
   animation: zodiac-pulse 4s ease-in-out infinite;
-  filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.4));
 }
 
 /* Каждый знак пульсирует со своим сдвигом */
@@ -1007,7 +1001,7 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
   border-radius: 50%;
   background: conic-gradient(from 0deg, transparent 0 35%, rgba(167, 139, 250, 0.9) 50%, transparent 65% 100%);
   animation: zodiac-ring-spin 5s linear infinite;
-  filter: blur(3px);
+  filter: blur(1px);
   z-index: 1;
 }
 .zodiac-hero::after {
