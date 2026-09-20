@@ -115,6 +115,41 @@ export default function InformersPage() {
             <li>Несколько виджетов на странице — один скрипт <code className="text-amber-300">informer.js</code></li>
           </ul>
         </div>
+
+        <div className="mt-6 grid md:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-6">
+            <h3 className="font-bold text-white text-lg mb-2">📡 Информеры</h3>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Если вы не нашли на этой странице нужный информер — напишите нам в разделе{" "}
+              <a
+                href="https://neiro-astro.ru/kontakty/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-violet-300 hover:text-violet-200 underline font-semibold"
+              >
+                КОНТАКТЫ
+              </a>
+              .
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-6">
+            <h3 className="font-bold text-white text-lg mb-2">📰 Экспорт для СМИ</h3>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Мы подготовили для вас развернутое предложение по экспорту гороскопов, календарей и множества всего другого.
+              Подробнее в разделе{" "}
+              <a
+                href="https://neiro-astro.ru/goroskop-dlya-smi-bloga-sajta-portala/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-violet-300 hover:text-violet-200 underline font-semibold"
+              >
+                ГОРОСКОП ДЛЯ СМИ
+              </a>
+              .
+            </p>
+          </div>
+        </div>
       </div>
       <SiteFooter />
     </main>
