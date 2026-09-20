@@ -81,9 +81,13 @@ function Widget() {
             <select
               value={sign}
               onChange={(e) => setSign(e.target.value)}
-              className="w-full mb-2 px-3 py-2 rounded-lg bg-white/10 border border-violet-500/40 text-sm"
+              className="w-full mb-2 px-3 py-2 rounded-lg bg-[#1a1430] border border-violet-500/40 text-sm text-[#e9e4f7]"
             >
-              {SIGNS.map((s) => <option key={s.slug} value={s.slug}>{s.name}</option>)}
+              {SIGNS.map((s) => (
+                <option key={s.slug} value={s.slug} className="bg-[#1a1430] text-[#e9e4f7]">
+                  {s.name}
+                </option>
+              ))}
             </select>
             {type === "horoscope-daily" && (
               <div className="flex gap-2 mb-2">
@@ -178,7 +182,7 @@ function Widget() {
               value={dreamQ}
               onChange={(e) => setDreamQ(e.target.value)}
               placeholder="Что приснилось? Например: вода"
-              className="w-full px-3 py-2 rounded-lg bg-white/10 border border-violet-500/40 text-sm mb-2"
+              className="w-full px-3 py-2 rounded-lg bg-[#1a1430] border border-violet-500/40 text-sm text-[#e9e4f7] mb-2 placeholder:text-slate-500"
             />
             <button
               onClick={searchDream}
