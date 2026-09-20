@@ -99,7 +99,7 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
   height: 2px;
   background: linear-gradient(to left, rgba(200,220,255,0.9) 0%, rgba(200,220,255,0.4) 40%, transparent 100%);
   transform: translateY(-50%);
-  filter: blur(0.5px);
+  
 }
 
 @keyframes comet-fly {
@@ -359,7 +359,7 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
   height: 2px;
   background: linear-gradient(to left, var(--glow), transparent);
   transform: translateY(-50%);
-  filter: blur(0.5px);
+  
 }
 @keyframes comet-r-fly {
   0%   { transform: translateX(0); opacity: 0; }
@@ -390,7 +390,7 @@ img[src*="/moon/moon-7"] { animation-delay: 4.2s; }
   border-radius: 50%;
   background: conic-gradient(from 0deg, transparent 0 35%, rgba(167, 139, 250, 0.9) 50%, transparent 65% 100%);
   animation: zodiac-ring-spin 5s linear infinite;
-  filter: blur(1px);
+  
   z-index: 1;
 }
 .zodiac-hero::after {
@@ -1636,7 +1636,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
     radial-gradient(ellipse at 20% 80%, rgba(217, 70, 239, 0.2) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(56, 189, 248, 0.15) 0%, transparent 50%),
     radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
-  filter: blur(20px);
+  
   animation: crystal-mist-drift 20s ease-in-out infinite;
 }
 
@@ -1658,7 +1658,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
     rgba(236, 72, 153, 0.6) 0%,
     rgba(168, 85, 247, 0.4) 40%,
     transparent 70%);
-  filter: blur(15px);
+  
   animation: crystal-core-pulse 3s ease-in-out infinite;
 }
 
@@ -1684,7 +1684,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 .crystal-highlight {
   position: absolute;
   border-radius: 50%;
-  filter: blur(8px);
+  
   opacity: 0.5;
 }
 
@@ -1748,7 +1748,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
     rgba(255, 255, 255, 0.25) 0%,
     rgba(255, 255, 255, 0.1) 40%,
     transparent 70%);
-  filter: blur(4px);
+  
 }
 
 .crystal-glass-shine {
@@ -1759,7 +1759,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   height: 15%;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.4);
-  filter: blur(6px);
+  
   animation: crystal-shine-pulse 4s ease-in-out infinite;
 }
 
@@ -1879,7 +1879,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   background: radial-gradient(ellipse,
     rgba(251, 191, 36, 0.3) 0%,
     transparent 70%);
-  filter: blur(8px);
+  
   z-index: 0;
   animation: crystal-stand-glow-pulse 4s ease-in-out infinite;
 }
