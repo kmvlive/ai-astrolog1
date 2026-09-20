@@ -18,6 +18,14 @@ type MatrixResult = {
   from_db?: boolean;
 };
 
+function bdToStr(bd: any): string {
+  const d = new Date(bd);
+  if (!isNaN(d.getTime())) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+  return String(bd).slice(0, 10);
+}
+
 export default function MatrixPage() {
   const [birthDate, setBirthDate] = useState("");
   const [result, setResult] = useState<MatrixResult | null>(null);

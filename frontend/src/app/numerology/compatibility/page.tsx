@@ -39,6 +39,14 @@ function calcArcana(day: number, month: number, year: number): number {
   return n || 22;
 }
 
+function bdToStr(bd: any): string {
+  const d = new Date(bd);
+  if (!isNaN(d.getTime())) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+  return String(bd).slice(0, 10);
+}
+
 export default function CompatibilityPage() {
   const [date1, setDate1] = useState("");
   const [date2, setDate2] = useState("");
