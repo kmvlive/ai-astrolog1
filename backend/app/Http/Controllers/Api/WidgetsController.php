@@ -94,7 +94,13 @@ class WidgetsController
             'sign' => $sign,
             'period' => $period,
             'sign_name' => $this->signName($sign),
-            'text' => is_array($text) ? ($text['text'] ?? implode(' ', array_filter(array_map('strval', $text))) : $text,
+            $textVal = is_array($text) ? ($text['text'] ?? implode(' ', array_filter(array_map('strval', $text)))) : $text;
+        return [
+            'type' => 'horoscope',
+            'sign' => $sign,
+            'period' => $period,
+            'sign_name' => $this->signName($sign),
+            'text' => $textVal,
             'emoji' => $this->signEmoji($sign),
         ];
     }
