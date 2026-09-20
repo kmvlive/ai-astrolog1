@@ -33,6 +33,13 @@ export default function PwaBanner() {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
 
+    // Принудительный показ для теста
+    if (localStorage.getItem("pwa_force_show") === "1") {
+      setMode("prompt");
+      localStorage.removeItem("pwa_force_show");
+      return;
+    }
+
     // Тест-режим с десктопа
     if (new URLSearchParams(location.search).has("pwa_ios")) {
       setMode("ios");

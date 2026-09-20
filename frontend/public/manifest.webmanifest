@@ -1,0 +1,3 @@
+
+// Тест: в консоли браузера выполните
+// localStorage.setItem('pwa_force_show', '1'); location.reload();
