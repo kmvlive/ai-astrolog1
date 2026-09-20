@@ -29,12 +29,17 @@ export default function PwaBanner() {
   const [deferred, setDeferred] = useState<any>(null);
 
   useEffect(() => {
+    console.log("[PWA] Banner component mounted");
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
+      navigator.serviceWorker.register("/sw.js").then(
+        () => console.log("[PWA] Service Worker registered"),
+        (err) => console.error("[PWA] SW registration failed:", err)
+      );
     }
 
     // Принудительный показ для теста
     if (localStorage.getItem("pwa_force_show") === "1") {
+      console.log("[PWA] Force show triggered");
       setMode("prompt");
       localStorage.removeItem("pwa_force_show");
       return;
