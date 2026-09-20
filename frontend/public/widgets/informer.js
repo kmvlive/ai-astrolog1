@@ -1,5 +1,11 @@
 (function () {
   var API = "https://my.neiro-astro.ru";
+  var LINKS = {
+    moon: "/moon", lunar: "/moon", horoscope: "/horoscopes", affirmation: "/affirmations",
+    rune: "/runes", tarot: "/tarot", holiday: "/calendars/holidays", orthodox: "/calendars/orthodox",
+    garden: "/calendars/gardener", nameday: "/calendars/names", dream: "/dreams"
+  };
+
   var titles = {
     moon: "Фаза луны", horoscope: "Гороскоп", affirmation: "Аффирмация дня",
     rune: "Руна дня", tarot: "Карта дня Таро", holiday: "Праздники сегодня",
@@ -32,8 +38,8 @@
     document.head.appendChild(s);
   }
 
-  function link() {
-    return '<a class="nai-link" href="' + API + '?utm_source=widget" target="_blank" rel="noopener">🔮 AI Астролог</a>';
+  function link(d) {
+    return '<a class="nai-link" href="' + API + (LINKS[d.type] || "") + '?utm_source=widget" target="_blank" rel="noopener">🔮 AI Астролог</a>';
   }
   function esc(s) { return String(s == null ? "" : s).replace(/</g, "&lt;"); }
   function head(d) { return '<div class="nai-head"><span>' + (d.emoji || "🔮") + "</span><span>" + (titles[d.type] || "") + "</span></div>"; }
@@ -41,33 +47,33 @@
   function cardHtml(d) {
     switch (d.type) {
       case "moon":
-        return head(d) + '<div class="nai-title">' + d.emoji + " " + esc(d.phase) + '</div><div class="nai-text">' + d.day + "-й лунный день</div>" + link();
+        return head(d) + '<div class="nai-title">' + esc(d.phase) + '</div><div class="nai-text">' + d.day + "-й лунный день</div>" + link(d);
       case "lunar":
-        return head(d) + '<div class="nai-title">' + d.emoji + " " + d.day + "-й лунный день</div><div class=\"nai-text\">" + esc(d.phase) + '</div><div class="nai-muted">' + esc(d.recommendation) + "</div>" + link();
+        return head(d) + '<div class="nai-title">' + d.emoji + " " + d.day + "-й лунный день</div><div class=\"nai-text\">" + esc(d.phase) + '</div><div class="nai-muted">' + esc(d.recommendation) + "</div>" + link(d);
       case "horoscope":
-        return head(d) + '<div class="nai-title">' + d.emoji + " " + esc(d.sign_name || d.sign) + '</div><div class="nai-text">' + esc((d.text || "").slice(0, 220)) + "…</div>" + link();
+        return head(d) + '<div class="nai-title">' + d.emoji + " " + esc(d.sign_name || d.sign) + '</div><div class="nai-text">' + esc((d.text || "").slice(0, 220)) + "…</div>" + link(d);
       case "affirmation":
-        return head(d) + '<div class="nai-title">💫 ' + esc(d.title) + '</div><div class="nai-muted">' + esc((d.text || "").slice(0, 160)) + "…</div>" + link();
+        return head(d) + '<div class="nai-title">💫 ' + esc(d.title) + '</div><div class="nai-muted">' + esc((d.text || "").slice(0, 160)) + "…</div>" + link(d);
       case "rune":
-        return head(d) + '<div class="nai-row"><img class="nai-img" src="' + API + "/storage/" + d.image + '" alt=""><div><div class="nai-title">' + esc(d.name) + ' <span class="nai-glyph">' + d.glyph + '</span></div><div class="nai-text">' + esc(d.meaning) + '</div><div class="nai-muted">💡 ' + esc(d.advice) + "</div></div></div>" + link();
+        return head(d) + '<div class="nai-row"><img class="nai-img" src="' + API + "/storage/" + d.image + '" alt=""><div><div class="nai-title">' + esc(d.name) + ' <span class="nai-glyph">' + d.glyph + '</span></div><div class="nai-text">' + esc(d.meaning) + '</div><div class="nai-muted">💡 ' + esc(d.advice) + "</div></div></div>" + link(d);
       case "tarot":
-        return head(d) + '<div class="nai-row"><img class="nai-img" src="' + API + "/storage/" + d.image + '" alt=""><div><div class="nai-title">🃏 ' + esc(d.name) + '</div><div class="nai-text">' + esc((d.description || "").slice(0, 140)) + "…</div></div></div>" + link();
+        return head(d) + '<div class="nai-row"><img class="nai-img" src="' + API + "/storage/" + d.image + '" alt=""><div><div class="nai-title">🃏 ' + esc(d.name) + '</div><div class="nai-text">' + esc((d.description || "").slice(0, 140)) + "…</div></div></div>" + link(d);
       case "holiday":
       case "orthodox":
-        return head(d) + '<div class="nai-title">' + d.emoji + " " + esc(d.date) + '</div><ul class="nai-list">' + (d.holidays || []).map(function (h) { return "<li>" + esc(h.name) + "</li>"; }).join("") + "</ul>" + link();
+        return head(d) + '<div class="nai-title">' + d.emoji + " " + esc(d.date) + '</div><ul class="nai-list">' + (d.holidays || []).map(function (h) { return "<li>" + esc(h.name) + "</li>"; }).join("") + "</ul>" + link(d);
       case "garden":
-        return head(d) + '<div class="nai-title">🌱 ' + esc(d.title) + '</div><div class="nai-text">' + esc((d.text || "").slice(0, 140)) + '…</div><ul class="nai-list">' + (d.works || []).map(function (w) { return "<li>" + esc(w) + "</li>"; }).join("") + "</ul>" + link();
+        return head(d) + '<div class="nai-title">🌱 ' + esc(d.title) + '</div><div class="nai-text">' + esc((d.text || "").slice(0, 140)) + '…</div><ul class="nai-list">' + (d.works || []).map(function (w) { return "<li>" + esc(w) + "</li>"; }).join("") + "</ul>" + link(d);
       case "nameday":
-        return head(d) + '<div class="nai-title">🎂 Именины сегодня</div><div class="nai-text">' + esc((d.names || []).join(", ")) + "</div>" + link();
+        return head(d) + '<div class="nai-title">🎂 Именины сегодня</div><div class="nai-text">' + esc((d.names || []).join(", ")) + "</div>" + link(d);
       case "dream":
-        return head(d) + '<input class="nai-input" placeholder="Что приснилось? Например: вода"><button class="nai-btn">🔍 Толковать</button><div class="nai-dream-res"></div>' + link();
+        return head(d) + '<input class="nai-input" placeholder="Что приснилось? Например: вода"><button class="nai-btn">🔍 Толковать</button><div class="nai-dream-res"></div>' + link(d);
     }
     return "";
   }
 
   function inlineHtml(d) {
     switch (d.type) {
-      case "moon": return d.emoji + " Луна: " + d.phase + ", " + d.day + "-й день";
+      case "moon": return d.phase + ", " + d.day + "-й лунный день";
       case "lunar": return d.emoji + " " + d.day + "-й лунный день — " + d.recommendation;
       case "horoscope": return d.emoji + " " + (d.sign_name || "") + ": " + (d.text || "").slice(0, 140) + "…";
       case "affirmation": return "💫 " + d.title;

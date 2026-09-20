@@ -6,6 +6,19 @@ import { Suspense } from "react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://my.neiro-astro.ru";
 
+const LINKS: Record<string, string> = {
+  moon: "/moon", lunar: "/moon",
+  horoscope: "/horoscopes",
+  affirmation: "/affirmations",
+  rune: "/runes",
+  tarot: "/tarot",
+  holidays: "/calendars/holidays",
+  orthodox: "/calendars/orthodox",
+  garden: "/calendars/gardener",
+  nameday: "/calendars/names",
+  dreams: "/dreams",
+};
+
 const SIGNS = [
   { slug: "aries", name: "Овен" }, { slug: "taurus", name: "Телец" },
   { slug: "gemini", name: "Близнецы" }, { slug: "cancer", name: "Рак" },
@@ -47,7 +60,6 @@ function Widget() {
         {/* Фаза луны */}
         {type === "moon" && data && (
           <>
-            <div className="text-3xl mb-2">{data.emoji}</div>
             <div className="font-bold text-lg mb-1">{data.phase}</div>
             <div className="text-sm opacity-80">{data.day}-й лунный день</div>
           </>
@@ -195,7 +207,7 @@ function Widget() {
 
         {/* Ссылка-бренд */}
         {type !== "dreams" && (
-          <a href={`${API}?utm_source=widget`} target="_blank" rel="noopener noreferrer" className="block mt-3 text-[11px] text-violet-300 hover:text-violet-200">
+          <a href={`${API}${LINKS[type] || ""}?utm_source=widget`} target="_blank" rel="noopener noreferrer" className="block mt-3 text-[11px] text-violet-300 hover:text-violet-200">
             🔮 AI Астролог
           </a>
         )}
