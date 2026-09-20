@@ -46,7 +46,7 @@ export default function InformersPage() {
             Информеры и экспорт
           </h1>
           <p className="text-slate-400 max-w-2xl mx-auto">
-            Служебный раздел. Два формата вставки: <b>iframe</b> (готовая карточка) и{" "}
+            Два формата вставки: <b>iframe</b> (готовая карточка) и{" "}
             <b>JS-виджет</b> (вливается в чужой сайт, режимы card/inline, темы dark/light).
           </p>
         </div>
