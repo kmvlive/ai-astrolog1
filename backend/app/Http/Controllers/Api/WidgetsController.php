@@ -190,7 +190,7 @@ class WidgetsController
     private function getHoliday(): array
     {
         $mmdd = date('m-d');
-        $holidays = json_decode(Storage::disk('local')->get('data/holidays-curated.json'), true);
+        $holidays = json_decode(file_get_contents(config_path('widgets/holidays-curated.json')), true);
         $today = $holidays[$mmdd] ?? [];
 
         return [
@@ -204,7 +204,7 @@ class WidgetsController
     private function getOrthodox(): array
     {
         $mmdd = date('m-d');
-        $orthodox = json_decode(Storage::disk('local')->get('data/orthodox.json'), true);
+        $orthodox = json_decode(file_get_contents(config_path('widgets/orthodox.json')), true);
         $today = $orthodox[$mmdd] ?? [];
 
         return [
@@ -218,7 +218,7 @@ class WidgetsController
     private function getGarden(): array
     {
         $mmdd = date('m-d');
-        $garden = json_decode(Storage::disk('local')->get('data/garden.json'), true);
+        $garden = json_decode(file_get_contents(config_path('widgets/garden.json')), true);
         $today = $garden[$mmdd] ?? [];
 
         return [
@@ -233,7 +233,7 @@ class WidgetsController
     private function getNameday(): array
     {
         $mmdd = date('m-d');
-        $orthodox = json_decode(Storage::disk('local')->get('data/orthodox.json'), true);
+        $orthodox = json_decode(file_get_contents(config_path('widgets/orthodox.json')), true);
         $today = $orthodox[$mmdd] ?? [];
 
         // Извлекаем имена из православных праздников
