@@ -223,7 +223,14 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <button
+          onClick={() => setNoAnim(!noAnim)}
+          className="fixed top-2 right-2 z-[100] px-3 py-1 bg-red-500 text-white text-xs rounded shadow"
+          style={{fontSize: '11px'}}
+        >
+          {noAnim ? "✓ Анимации OFF" : "Анимации ON"}
+        </button>
+        <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
       <SiteHeader />
       <CometField count={8} />
 
@@ -429,7 +436,12 @@ export default function HomePage() {
                 lunar: "#a78bfa", gardener: "#4ade80", haircut: "#e879f9",
                 names: "#38bdf8", conception: "#fb7185"
               };
-              return (
+                const [noAnim, setNoAnim] = React.useState(false);
+  React.useEffect(() => {
+    document.body.classList.toggle('no-animations', noAnim);
+  }, [noAnim]);
+
+return (
                 <Link
                   key={c.slug}
                   href={`/calendars/${c.slug}`}
