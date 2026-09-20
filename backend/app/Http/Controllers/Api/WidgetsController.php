@@ -88,19 +88,16 @@ class WidgetsController
         }
 
         $text = $data['periods'][$period] ?? $data['forecast'] ?? $data['text'] ?? 'Гороскоп временно недоступен';
+        if (is_array($text)) {
+            $text = $text['text'] ?? implode(' ', array_filter(array_map('strval', $text)));
+        }
 
         return [
             'type' => 'horoscope',
             'sign' => $sign,
             'period' => $period,
             'sign_name' => $this->signName($sign),
-            $textVal = is_array($text) ? ($text['text'] ?? implode(' ', array_filter(array_map('strval', $text)))) : $text;
-        return [
-            'type' => 'horoscope',
-            'sign' => $sign,
-            'period' => $period,
-            'sign_name' => $this->signName($sign),
-            'text' => $textVal,
+            'text' => $text,
             'emoji' => $this->signEmoji($sign),
         ];
     }
