@@ -44,6 +44,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-import ScrollMeter from "./dev/ScrollMeter";
-// В <body> добавить <ScrollMeter /> рядом с PwaBanner
