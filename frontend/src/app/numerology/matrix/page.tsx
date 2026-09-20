@@ -68,7 +68,7 @@ export default function MatrixPage() {
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((dd) => {
         const bd = dd?.profile?.birth_date ?? dd?.birth_date;
-        if (bd) setBirthDate(String(bd).slice(0, 10));
+        if (bd) setBirthDate(bdToStr(bd));
       })
       .catch(() => {});
   }, [doCalc]);
