@@ -52,8 +52,15 @@
     document.head.appendChild(s);
   }
 
+  var LINK_TEXT = {
+    moon: "Фазы луны", lunar: "Лунный календарь", affirmation: "Аффирмации дня",
+    rune: "Руна дня и каталог рун", tarot: "Карта дня и расклады Таро",
+    holiday: "Праздники сегодня", orthodox: "Православный календарь",
+    garden: "Календарь садовода", nameday: "Именины и день ангела"
+  };
   function link(d) {
-    return '<a class="nai-link" href="' + API + (LINKS[d.type] || "") + '?utm_source=widget" target="_blank" rel="noopener">🔮 AI Астролог</a>';
+    if (!LINK_TEXT[d.type]) return "";
+    return '<a class="nai-link" href="' + API + (LINKS[d.type] || "") + '?utm_source=widget" target="_blank" rel="noopener" style="font-weight:600">' + LINK_TEXT[d.type] + " →</a>";
   }
   function esc(s) { return String(s == null ? "" : s).replace(/</g, "&lt;"); }
   function head(d) { return '<div class="nai-head"><span>' + (d.emoji || "🔮") + "</span><span>" + (titles[d.type] || "") + "</span></div>"; }

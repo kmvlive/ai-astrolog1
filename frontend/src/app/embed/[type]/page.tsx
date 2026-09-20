@@ -20,6 +20,18 @@ function smartCut(text: string, limit: number): string {
   return cut.slice(0, sp > 0 ? sp : limit) + "…";
 }
 
+const LINK_TEXT: Record<string, string> = {
+  moon: "Фазы луны",
+  lunar: "Лунный календарь",
+  affirmation: "Аффирмации дня",
+  rune: "Руна дня и каталог рун",
+  tarot: "Карта дня и расклады Таро",
+  holidays: "Праздники сегодня",
+  orthodox: "Православный календарь",
+  garden: "Календарь садовода",
+  nameday: "Именины и день ангела",
+};
+
 const LINKS: Record<string, string> = {
   moon: "/moon", lunar: "/moon",
   horoscope: "/horoscopes",
@@ -231,10 +243,15 @@ function Widget() {
           </>
         )}
 
-        {/* Ссылка-бренд */}
-        {type !== "dreams" && (
-          <a href={`${API}${LINKS[type] || ""}?utm_source=widget`} target="_blank" rel="noopener noreferrer" className="block mt-3 text-[11px] text-violet-300 hover:text-violet-200">
-            🔮 AI Астролог
+        {/* Одна содержательная ссылка на раздел */}
+        {LINK_TEXT[type] && (
+          <a
+            href={`${API}${LINKS[type]}?utm_source=widget`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block mt-3 text-[11px] font-semibold text-violet-300 hover:text-violet-200"
+          >
+            {LINK_TEXT[type]} →
           </a>
         )}
       </div>
