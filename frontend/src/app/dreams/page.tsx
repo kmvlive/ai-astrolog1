@@ -97,7 +97,7 @@ export default function DreamsPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Введите, что вам приснилось..."
-              className="w-full px-5 py-4 bg-slate-900/60 border border-white/10 rounded-xl focus:outline-none focus:border-violet-500 text-lg pr-12 backdrop-blur"
+              className="w-full px-5 py-4 bg-slate-900/60 border border-white/10 rounded-xl focus:outline-none focus:border-violet-500 text-lg pr-12 "
             />
             {query && (
               <button

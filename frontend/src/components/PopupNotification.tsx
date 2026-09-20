@@ -152,7 +152,7 @@ export default function PopupNotification() {
       {toasts.map((toast, idx) => (
         <div
           key={toast.isWelcome ? "welcome" : toast.id}
-          className={`pointer-events-auto relative rounded-xl border ${borderColors[toast.type] || borderColors.info} bg-slate-900/95 backdrop-blur-md shadow-2xl shadow-black/40 overflow-hidden transition-all duration-300 ${toast.closing ? "opacity-0 translate-x-full scale-95" : "opacity-100 translate-x-0 scale-100"}`}
+          className={`pointer-events-auto relative rounded-xl border ${borderColors[toast.type] || borderColors.info} bg-slate-900/95 shadow-2xl shadow-black/40 overflow-hidden transition-all duration-300 ${toast.closing ? "opacity-0 translate-x-full scale-95" : "opacity-100 translate-x-0 scale-100"}`}
           style={{ animation: toast.closing ? undefined : "slideInRight 0.4s ease-out" }}
         >
           {/* Accent line */}

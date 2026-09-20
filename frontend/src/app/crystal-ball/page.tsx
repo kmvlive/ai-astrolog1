@@ -185,7 +185,7 @@ export default function CrystalBallPage() {
               onKeyDown={handleKeyDown}
               placeholder="Задайте свой вопрос хрустальному шару..."
               disabled={loading}
-              className="w-full px-5 py-4 pr-14 rounded-2xl bg-slate-900/80 border border-violet-500/30 text-white placeholder-slate-500 focus:outline-none focus:border-violet-400/60 focus:ring-2 focus:ring-violet-500/20 transition text-lg backdrop-blur-sm"
+              className="w-full px-5 py-4 pr-14 rounded-2xl bg-slate-900/80 border border-violet-500/30 text-white placeholder-slate-500 focus:outline-none focus:border-violet-400/60 focus:ring-2 focus:ring-violet-500/20 transition text-lg "
             />
             <button
               onClick={askBall}
@@ -202,7 +202,7 @@ export default function CrystalBallPage() {
 
         {/* Предсказание под шаром (дублируем для удобства чтения) */}
         {prediction && !loading && (
-          <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-violet-900/30 to-purple-900/20 border border-violet-500/20 backdrop-blur-sm">
+          <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-violet-900/30 to-purple-900/20 border border-violet-500/20 ">
             <div className="flex items-start gap-3">
               <span className="text-2xl mt-1">🔮</span>
               <div>

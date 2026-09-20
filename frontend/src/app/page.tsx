@@ -250,7 +250,7 @@ export default function HomePage() {
             Не общие фразы — а расчёт по вашей дате, времени и месту рождения.
           </p>
 
-          <div className="max-w-md mx-auto bg-slate-900/70 border border-white/10 rounded-2xl p-6 backdrop-blur">
+          <div className="max-w-md mx-auto bg-slate-900/70 border border-white/10 rounded-2xl p-6 ">
             <div className="text-sm text-slate-400 mb-3">Узнайте свой знак зодиака</div>
             <div className="flex gap-2">
               <input

@@ -114,7 +114,7 @@ export default function NamesPage() {
                 onFocus={() => setDropOpen(true)}
                 onBlur={() => setTimeout(() => setDropOpen(false), 180)}
                 placeholder="Введите имя (например: Андрей)"
-                className="flex-1 px-5 py-3.5 bg-slate-900/60 border border-white/10 rounded-xl text-lg focus:outline-none focus:border-violet-400 backdrop-blur"
+                className="flex-1 px-5 py-3.5 bg-slate-900/60 border border-white/10 rounded-xl text-lg focus:outline-none focus:border-violet-400 "
                 onKeyDown={(e) => {
                   const open = dropOpen && results.length > 0;
                   if (e.key === "ArrowDown" && open) { e.preventDefault(); setActiveIdx((i) => Math.min(i + 1, Math.min(results.length, 8) - 1)); }
@@ -138,7 +138,7 @@ export default function NamesPage() {
 
             {/* Дропдаун: совпадения из каталога */}
             {dropOpen && query.length >= 2 && results.length > 0 && (
-              <div className="absolute left-0 right-0 top-full mt-2 rounded-2xl border border-violet-500/30 bg-slate-900/95 backdrop-blur-xl shadow-2xl shadow-violet-950/60 overflow-hidden z-50">
+              <div className="absolute left-0 right-0 top-full mt-2 rounded-2xl border border-violet-500/30 bg-slate-900/95 shadow-2xl shadow-violet-950/60 overflow-hidden z-50">
                 {results.slice(0, 8).map((n: any, i: number) => (
                   <Link
                     key={n.translit}
@@ -158,7 +158,7 @@ export default function NamesPage() {
 
             {/* Нет в каталоге — предлагаем AI */}
             {dropOpen && query.length >= 2 && !loading && results.length === 0 && (
-              <div className="absolute left-0 right-0 top-full mt-2 rounded-2xl border border-white/10 bg-slate-900/95 backdrop-blur-xl px-5 py-3 text-sm text-slate-400 z-50">
+              <div className="absolute left-0 right-0 top-full mt-2 rounded-2xl border border-white/10 bg-slate-900/95 px-5 py-3 text-sm text-slate-400 z-50">
                 В каталоге такого имени нет — нажмите «✨ Узнать значение», и AI напишет толкование
               </div>
             )}
