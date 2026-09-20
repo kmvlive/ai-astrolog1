@@ -88,7 +88,7 @@ export default function RetrogradePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+      <main className="min-h-screen text-white relative overflow-hidden isolate">
         <SiteHeader />
         <div className="max-w-4xl mx-auto px-4 py-12">
           <div className="animate-pulse space-y-4">
@@ -103,7 +103,7 @@ export default function RetrogradePage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate aura-top" style={{ ["--accent" as any]: "#a855f7" }}>
+    <main className="min-h-screen text-white relative overflow-hidden isolate aura-top" style={{ ["--accent" as any]: "#a855f7" }}>
       <SiteHeader />
 
       <div className="max-w-4xl mx-auto px-4 py-12">

@@ -44,7 +44,7 @@ export default function HoroscopesPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen text-white relative overflow-hidden isolate">
       <SiteHeader />
       <div className="max-w-6xl mx-auto px-4 py-12 relative z-10">
         <div className="text-center mb-10">

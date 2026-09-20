@@ -59,7 +59,7 @@ export default async function NameMeaningPage({ params }: { params: Promise<{ na
   const by_letter = related.by_letter || [];
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen text-white relative overflow-hidden isolate">
       <SiteHeader />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="text-sm text-slate-400 mb-6">

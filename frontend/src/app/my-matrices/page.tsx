@@ -65,7 +65,7 @@ export default function MyMatricesPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+      <main className="min-h-screen text-white relative overflow-hidden isolate">
         <SiteHeader />
         <div className="text-center py-20 text-slate-400">
           <div className="inline-block animate-spin rounded-full h-10 w-10 border-2 border-violet-500 border-t-transparent mb-4" />
@@ -76,7 +76,7 @@ export default function MyMatricesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen text-white relative overflow-hidden isolate">
       <SiteHeader />
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-8">

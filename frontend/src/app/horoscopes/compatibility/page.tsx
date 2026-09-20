@@ -42,7 +42,7 @@ export default function CompatibilityPage() {
   const s2 = SIGNS.find((s) => s.slug === sign2)!;
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen text-white relative overflow-hidden isolate">
       <SiteHeader />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="text-center mb-10">

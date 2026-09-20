@@ -45,7 +45,7 @@ export default function ShareMatrixPage() {
   const sel = selected && data?.positions ? data.positions[String(selected)] : null;
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen text-white">
       <SiteHeader />
       <div className="max-w-4xl mx-auto px-4 py-12">
         {error && (

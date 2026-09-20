@@ -76,7 +76,7 @@ export default function NamesPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen text-white relative overflow-hidden isolate">
       <SiteHeader />
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="text-sm text-slate-400 mb-6">

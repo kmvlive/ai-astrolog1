@@ -23,7 +23,7 @@ export default function ArcanaPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen text-white">
       <SiteHeader />
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center mb-10">

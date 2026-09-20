@@ -34,6 +34,10 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={`${inter.className} bg-slate-950 text-white antialiased`}>
+    <div className="star-field" aria-hidden="true">
+      <div className="star-layer" />
+      <div className="star-layer star-twinkle" />
+    </div>
       <Suspense><ReferralTracker /></Suspense>
         <PwaBanner />
         {children}

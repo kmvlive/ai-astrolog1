@@ -99,7 +99,7 @@ export default function MatrixPage() {
   const sel = selected && result?.positions ? result.positions[String(selected)] : null;
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen text-white">
       <SiteHeader />
       <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="text-sm text-slate-500 mb-6">

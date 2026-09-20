@@ -42,7 +42,7 @@ export default function MoonPage() {
 
   if (!now) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+      <main className="min-h-screen text-white relative overflow-hidden isolate">
         <SiteHeader />
         <div className="text-center py-20 text-slate-400">Смотрим на Луну...</div>
       </main>
@@ -74,7 +74,7 @@ export default function MoonPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen text-white relative overflow-hidden isolate">
       <SiteHeader />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="text-center mb-8">

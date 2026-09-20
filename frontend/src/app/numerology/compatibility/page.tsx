@@ -84,7 +84,7 @@ export default function CompatibilityPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen text-white">
       <SiteHeader />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="text-center mb-10">

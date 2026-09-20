@@ -2305,3 +2305,28 @@ input[type="search"]::-webkit-search-decoration {
   display: none !important;
   animation: none !important;
 }
+
+/* === Звёздное поле: fixed-фон на всех страницах (perf-safe) === */
+.star-field {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.star-field .star-layer {
+  position: absolute;
+  inset: 0;
+  animation: none; /* дрейф отключён: был причиной paint при скролле */
+}
+/* Мерцание через opacity — композитное свойство, не вызывает перерисовку */
+.star-field .star-twinkle {
+  animation: star-twinkle 7s ease-in-out infinite;
+}
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .star-field .star-twinkle { animation: none; }
+}

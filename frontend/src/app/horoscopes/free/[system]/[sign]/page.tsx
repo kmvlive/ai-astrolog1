@@ -48,7 +48,7 @@ export default function SignPage() {
 
   if (!data) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center relative overflow-hidden isolate">
+      <main className="min-h-screen text-white flex items-center justify-center relative overflow-hidden isolate">
         <div className="animate-spin rounded-full h-10 w-10 border-2 border-violet-500 border-t-transparent" />
       </main>
     );
@@ -57,7 +57,7 @@ export default function SignPage() {
   const content = tab === "today" ? data.today : data.tomorrow;
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate aura-top" style={{ ["--accent" as any]: ACCENTS[data.system.slug] || "#a78bfa" }}>
+    <main className="min-h-screen text-white relative overflow-hidden isolate aura-top" style={{ ["--accent" as any]: ACCENTS[data.system.slug] || "#a78bfa" }}>
       <SiteHeader />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <Link href={`/horoscopes/free/${system}`} className="text-violet-400 hover:text-violet-300 text-sm transition">

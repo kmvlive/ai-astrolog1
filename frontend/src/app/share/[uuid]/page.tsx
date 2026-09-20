@@ -73,7 +73,7 @@ export default async function Page(props: any) {
   const d = await getData(params.uuid);
   const t = TYPES[d?.type] ?? TYPES.default;
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen text-white relative overflow-hidden isolate">
       <SiteHeader />
       <div className="max-w-3xl mx-auto px-4 py-12">
         {d ? (<>

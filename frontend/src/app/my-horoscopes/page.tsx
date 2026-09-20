@@ -66,7 +66,7 @@ export default function HoroscopesPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+      <main className="min-h-screen text-white relative overflow-hidden isolate">
         <SiteHeader />
         <div className="text-center py-20 text-slate-400">
           <div className="inline-block animate-spin rounded-full h-10 w-10 border-2 border-violet-500 border-t-transparent mb-4" />
@@ -79,7 +79,7 @@ export default function HoroscopesPage() {
   // Авторизован — показываем персональные гороскопы
   if (isLoggedIn) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+      <main className="min-h-screen text-white relative overflow-hidden isolate">
         <SiteHeader />
         <div className="max-w-4xl mx-auto px-4 py-12">
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-violet-400 to-amber-400 bg-clip-text text-transparent">
@@ -147,7 +147,7 @@ export default function HoroscopesPage() {
 
   // Не авторизован — показываем общий гороскоп (как было)
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen text-white relative overflow-hidden isolate">
       <SiteHeader />
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center mb-8">

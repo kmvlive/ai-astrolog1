@@ -141,7 +141,7 @@ export default function SignHoroscopePage() {
 
   if (!currentSign) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center relative overflow-hidden isolate">
+      <main className="min-h-screen text-white flex items-center justify-center relative overflow-hidden isolate">
         <div className="text-center">
           <div className="text-6xl mb-4">🔍</div>
           <h1 className="page-anim page-anim-1 text-2xl font-bold mb-4">Знак не найден</h1>
@@ -152,7 +152,7 @@ export default function SignHoroscopePage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen text-white relative overflow-hidden isolate">
       <SiteHeader />
       <div className="max-w-3xl mx-auto px-4 py-12 relative z-10">
         <Link href="/horoscopes" className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition">

@@ -42,7 +42,7 @@ export default function HoroscopePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+      <main className="min-h-screen text-white relative overflow-hidden isolate">
         <SiteHeader />
         <div className="text-center py-20 text-slate-400">
           <div className="inline-block animate-spin rounded-full h-10 w-10 border-2 border-violet-500 border-t-transparent mb-4" />
@@ -54,7 +54,7 @@ export default function HoroscopePage() {
 
   if (!horoscope) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+      <main className="min-h-screen text-white relative overflow-hidden isolate">
         <SiteHeader />
         <div className="text-center py-20 text-slate-400">Гороскоп не найден</div>
       </main>
@@ -62,7 +62,7 @@ export default function HoroscopePage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen text-white relative overflow-hidden isolate">
       <SiteHeader />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <Link href="/my-horoscopes" className="text-violet-400 hover:text-violet-300 mb-6 inline-block">

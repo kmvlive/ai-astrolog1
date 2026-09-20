@@ -64,7 +64,7 @@ export default async function Page(props: any) {
     : "bg-slate-800/60 border-white/10 text-slate-300 hover:border-violet-500/40";
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen text-white relative overflow-hidden isolate">
       <SiteHeader />
       <div className="max-w-5xl mx-auto px-4 py-10">
         <div className="text-sm text-slate-500 mb-6">

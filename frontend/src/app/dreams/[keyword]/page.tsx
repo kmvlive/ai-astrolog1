@@ -79,7 +79,7 @@ export default async function DreamSymbolPage({ params }: { params: { keyword: s
   const related = await getRelated(params.keyword);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen text-white relative overflow-hidden isolate">
       <SiteHeader />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="text-sm text-slate-400 mb-6">

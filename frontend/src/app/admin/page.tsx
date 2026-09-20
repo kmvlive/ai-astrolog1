@@ -105,7 +105,7 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white">
+      <main className="min-h-screen text-white">
         <SiteHeader />
         <div className="text-center py-20 text-slate-400">Загрузка...</div>
       </main>
@@ -113,7 +113,7 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen text-white">
       <SiteHeader />
       <div className="max-w-5xl mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold mb-2">⚙️ Админ-панель</h1>

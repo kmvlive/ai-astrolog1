@@ -43,7 +43,7 @@ export default function VerifyEmailPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 relative overflow-hidden isolate">
+    <main className="min-h-screen text-white flex items-center justify-center px-4 relative overflow-hidden isolate">
       <div className="text-center max-w-md">
         {state === "loading" && (
           <>

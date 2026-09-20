@@ -353,7 +353,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center relative overflow-hidden isolate">
+      <main className="min-h-screen text-white flex items-center justify-center relative overflow-hidden isolate">
         <div className="text-center">
           <div className="text-6xl mb-4 animate-pulse">🔮</div>
           <p className="text-slate-400">Загрузка...</p>
@@ -364,7 +364,7 @@ export default function DashboardPage() {
 
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen text-white relative overflow-hidden isolate">
       <SiteHeader />
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="pricing-eyebrow mb-6">👤 Личный кабинет</div>
