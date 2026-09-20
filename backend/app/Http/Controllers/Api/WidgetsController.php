@@ -293,14 +293,23 @@ class WidgetsController
             return ['type' => 'dream', 'error' => 'Укажите символ сна'];
         }
 
-        $url = url('/api/dreams?q=' . urlencode($symbol));
-        $response = file_get_contents($url);
-        $data = json_decode($response, true);
+        $rows = \App\Models\DreamSymbol::where('keyword', 'like', '%' . $symbol . '%')
+            ->limit(3)
+            ->get();
+
+        $results = [];
+        foreach ($rows as $r) {
+            $arr = $r->toArray();
+            $results[] = [
+                'keyword' => $arr['keyword'] ?? $symbol,
+                'meaning' => $arr['meaning'] ?? $arr['text'] ?? $arr['description'] ?? $arr['interpretation'] ?? '',
+            ];
+        }
 
         return [
             'type' => 'dream',
             'symbol' => $symbol,
-            'results' => array_slice($data['symbols'] ?? [], 0, 3),
+            'results' => $results,
             'emoji' => '💭',
         ];
     }
