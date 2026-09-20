@@ -148,9 +148,14 @@ function Widget() {
         {/* Аффирмация */}
         {type === "affirmation" && data && (
           <>
-            <div className="text-3xl mb-2">💫</div>
+            <div className="flex items-center gap-2 mb-3 text-[11px] uppercase tracking-[0.08em] text-violet-300">
+              <span className="text-2xl">💫</span>
+              <span>Ежедневная аффирмация</span>
+            </div>
             <div className="font-bold text-lg mb-2">{data.title}</div>
-            <div className="text-sm opacity-80 italic">{smartCut(String(data.text || ""), 300)}</div>
+            {data.text && (
+              <div className="text-sm opacity-80 italic">{smartCut(String(data.text), 300)}</div>
+            )}
           </>
         )}
 

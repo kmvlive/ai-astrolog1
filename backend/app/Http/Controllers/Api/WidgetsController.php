@@ -141,8 +141,8 @@ class WidgetsController
 
         return [
             'type' => 'affirmation',
-            'title' => $data['title'] ?? 'Аффирмация дня',
-            'text' => $data['text'] ?? '',
+            'title' => $data['title'] ?? $data['affirmation'] ?? 'Аффирмация дня',
+            'text' => $data['text'] ?? $data['description'] ?? $data['body'] ?? '',
             'emoji' => '💫',
         ];
     }
