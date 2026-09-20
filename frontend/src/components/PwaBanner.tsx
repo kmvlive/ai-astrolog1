@@ -122,7 +122,7 @@ export default function PwaBanner() {
         </button>
         <div className="flex items-start gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icons/icon-192.png" alt="" className="w-9 h-9 rounded-lg shrink-0" />
+          <img loading="lazy" decoding="async" src="/icons/icon-192.png" alt="" className="w-9 h-9 rounded-lg shrink-0" />
           <div className="text-[11px] text-slate-300 leading-relaxed">
             <div className="text-sm font-bold text-white mb-1">AI Астролог на домашнем экране</div>
             <div className="mb-1">
@@ -155,7 +155,7 @@ export default function PwaBanner() {
       </button>
       <div className="flex items-start gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icons/icon-192.png" alt="" className="w-9 h-9 rounded-lg shrink-0" />
+        <img loading="lazy" decoding="async" src="/icons/icon-192.png" alt="" className="w-9 h-9 rounded-lg shrink-0" />
         <div>
           <div className="text-sm font-bold text-white mb-0.5">AI Астролог</div>
           <div className="text-[11px] text-slate-400 leading-snug mb-2">

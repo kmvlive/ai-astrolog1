@@ -120,7 +120,7 @@ const MoonWidget = () => {
       <Link href="/moon" className="group block max-w-2xl mx-auto relative z-10">
         <div className="relative overflow-hidden rounded-2xl border border-violet-500/30 bg-slate-900 hover:border-violet-500/60 transition shadow-xl shadow-violet-900/30">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={phase.img} alt={phase.name} className="w-full h-48 object-cover" />
+          <img loading="lazy" decoding="async" src={phase.img} alt={phase.name} className="w-full h-48 object-cover" />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent p-5 pt-14">
             <div className="flex items-end justify-between gap-3">
               <div>
@@ -604,7 +604,7 @@ return (
                 <a key={post.slug} href={post.url} style={{ ["--accent" as any]: ["#fbbf24", "#a855f7", "#38bdf8"][i % 3] }} className="cal-card group relative bg-gradient-to-br from-slate-900/80 to-indigo-950/40 border border-white/5 rounded-2xl overflow-hidden flex flex-col">
                   {post.cover_image ? (
                     <div className="aspect-video overflow-hidden bg-slate-900">
-                      <img src={post.cover_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition" />
+                      <img loading="lazy" decoding="async" src={post.cover_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition" />
                     </div>
                   ) : (
                     <div className="aspect-video bg-gradient-to-br from-violet-600/40 to-indigo-700/40 flex items-center justify-center text-5xl">✨</div>
