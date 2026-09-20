@@ -2298,3 +2298,10 @@ input[type="search"]::-webkit-search-decoration {
 .div-card:hover::after {
 .div-card > * { position: relative; z-index: 1; }
 }}}
+/* === ПОЛНОЕ ОТКЛЮЧЕНИЕ КОМЕТ (perf-fix) === */
+.comet-field,
+.moon-comets,
+[class*="comet-"] {
+  display: none !important;
+  animation: none !important;
+}
