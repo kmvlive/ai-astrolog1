@@ -479,7 +479,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 /* --- Карточки гаданий --- */
 .div-card {
   position: relative;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   animation: div-card-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
@@ -1088,7 +1088,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 /* --- Карточки гаданий --- */
 .div-card {
   position: relative;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   animation: div-card-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
@@ -1423,7 +1423,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   color: var(--accent);
   font-size: 1rem;
   background: color-mix(in srgb, var(--accent) 8%, transparent);
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   z-index: 1;
 }
@@ -1489,7 +1489,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 
 /* Навигация по месяцам */
 .cal-nav-btn {
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cal-nav-btn:hover {
@@ -1517,7 +1517,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 /* Дни календаря */
 .cal-day {
   position: relative;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cal-day:hover {
@@ -1566,7 +1566,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 
 /* Особые даты */
 .cal-notable {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cal-notable:hover {
@@ -1600,7 +1600,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   color: var(--accent);
   font-size: 1rem;
   background: color-mix(in srgb, var(--accent) 8%, transparent);
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cal-notable:hover .cal-notable-arrow {
@@ -1616,7 +1616,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 
 /* Мини-карточки других календарей */
 .cal-mini {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cal-mini:hover {
@@ -1731,7 +1731,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 
 /* Блоки информации */
 .cal-date-block {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cal-date-block:hover {
@@ -1771,7 +1771,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 
 /* Навигация prev/next */
 .cal-date-nav {
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cal-date-nav:hover {
@@ -1819,7 +1819,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   border-radius: 1.75rem;
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 27, 75, 0.45));
   border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .home-panel::before {
@@ -1880,7 +1880,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   color: #fff;
   background: linear-gradient(135deg, #7c3aed, #a855f7);
   box-shadow: 0 0 30px -6px rgba(168, 85, 247, 0.6);
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 }
 
@@ -1932,7 +1932,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 .plan-card {
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 27, 75, 0.45));
   border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   animation: div-card-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
@@ -2132,7 +2132,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #cbd5e1;
   font-weight: 600;
-  transition: all 0.3s;
+  transition: transform 0.3s, opacity 0.3s;
 }
 
 .login-pill:hover {
@@ -2519,7 +2519,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   color: #cbd5e1;
   font-size: 0.875rem;
   font-weight: 500;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
 }
 
@@ -2548,7 +2548,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(30, 41, 59, 0.4);
-  transition: all 0.3s;
+  transition: transform 0.3s, opacity 0.3s;
 }
 
 .dash-cal-card:hover {
@@ -2602,7 +2602,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
   color: #6ee7b7;
   font-size: 0.875rem;
   font-weight: 500;
-  transition: all 0.3s;
+  transition: transform 0.3s, opacity 0.3s;
 }
 
 .dash-edit-link:hover {
@@ -2614,7 +2614,7 @@ main.isolate > .comet-field { position: absolute; inset: 0; z-index: 0; }
 
 /* Карточки истории */
 .dash-history-card {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dash-history-card:hover {
