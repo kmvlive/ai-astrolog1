@@ -232,8 +232,8 @@ export default function HomePage() {
       {!isLoggedIn && (
 <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-violet-900/20 via-transparent to-transparent" />
-        <div className="absolute top-20 left-10 text-4xl opacity-20 animate-pulse">✦</div>
-        <div className="absolute top-40 right-20 text-3xl opacity-20 animate-pulse" style={{ animationDelay: "0.5s" }}>✦</div>
+        <div className="absolute top-20 left-10 text-4xl opacity-20">✦</div>
+        <div className="absolute top-40 right-20 text-3xl opacity-20">✦</div>
 
         <div className="relative max-w-6xl mx-auto px-4 py-20 sm:py-28 text-center">
           <div className="inline-block bg-violet-500/10 border border-violet-500/30 rounded-full px-4 py-1.5 text-sm text-violet-300 mb-6">
