@@ -2902,3 +2902,31 @@ input[type="search"]::-webkit-search-decoration {
   }
 }
 
+
+/* GPU-ускорение: выносим анимированные элементы в отдельные слои,
+   чтобы скролл не перерисовывал их каждый пиксель */
+.moon,
+.moon-glow,
+.moon-face,
+.comet-1, .comet-2, .comet-3,
+.star-layer,
+.zodiac-card-star,
+.zodiac-card-ring,
+.zodiac-card-halo,
+[class*="comet-"] {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Отключаем тяжёлые анимации для пользователей с motion sickness */
+@media (prefers-reduced-motion: reduce) {
+  .moon,
+  [class*="comet-"],
+  .zodiac-card-star,
+  .zodiac-card-ring,
+  .zodiac-card-halo {
+    animation: none !important;
+  }
+}
