@@ -542,9 +542,12 @@ export default function HomePage() {
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300 mb-4">
                 <span>ᚱ</span> Руна дня
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent mb-3">
-                {runeOfTheDay.rune.name}
-              </h2>
+              <div className="flex items-baseline gap-3 justify-center mb-3">
+                <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-violet-200 to-sky-200 bg-clip-text text-transparent">
+                  {runeOfTheDay.rune.name}
+                </h2>
+                <span className="text-3xl md:text-4xl text-amber-400">{runeOfTheDay.rune.glyph}</span>
+              </div>
             </div>
             <div className="relative z-10 flex flex-col sm:flex-row items-center gap-6">
               <div className="shrink-0 w-32 h-44 rounded-xl overflow-hidden border-2 border-amber-400/60 shadow-lg shadow-amber-900/30">
@@ -556,7 +559,6 @@ export default function HomePage() {
                 />
               </div>
               <div className="flex-1 text-center sm:text-left">
-                <div className="text-4xl mb-2 text-amber-400">{runeOfTheDay.rune.glyph}</div>
                 <p className="text-white text-lg leading-relaxed mb-2">
                   {runeOfTheDay.rune.meaning}
                 </p>
