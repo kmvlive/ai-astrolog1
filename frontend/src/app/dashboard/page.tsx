@@ -940,6 +940,23 @@ export default function DashboardPage() {
         </Link>
       </section>
 
+      {/* Медитации */}
+      <section className="max-w-4xl mx-auto px-4 py-12">
+        <Link
+          href="/meditations"
+          className="block rounded-2xl p-6 bg-gradient-to-br from-emerald-900/40 to-teal-900/30 border border-emerald-500/30 hover:border-emerald-500/60 transition"
+        >
+          <div className="flex items-center gap-4">
+            <div className="text-5xl"></div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold mb-1">Медитации</h3>
+              <p className="text-slate-400 text-sm">Звуки природы, космоса и практики для расслабления</p>
+            </div>
+            <div className="text-2xl text-emerald-400">→</div>
+          </div>
+        </Link>
+      </section>
+
       </div>
 
           <SiteFooter />
