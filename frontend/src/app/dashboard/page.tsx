@@ -910,19 +910,22 @@ export default function DashboardPage() {
 </div>
 
         {/* Приведи друзей */}
-        <div className="max-w-6xl mx-auto px-4">
-          <section className="mt-8">
-            <Link href="/profile/referrals" style={{ ["--accent" as any]: "#ec4899" }} className="home-panel block p-6 group">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold mb-1">🎁 Приведи друзей</h2>
-                  <p className="text-slate-400">5 друзей = 3 месяца бесплатных персональных гороскопов</p>
-                </div>
-                <span className="relative z-10 cal-go shrink-0 group-hover:translate-x-1 transition-transform">→</span>
+        <section className="max-w-4xl mx-auto px-4 py-12">
+          <Link
+            href="/profile/referrals"
+            className="block rounded-2xl p-6 bg-gradient-to-br from-pink-900/40 to-rose-900/30 border border-pink-500/30 hover:border-pink-500/60 transition"
+          >
+            <div className="flex items-center gap-4">
+              <div className="text-5xl">🎁</div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold mb-1">Приведи друзей</h3>
+                <p className="text-slate-400 text-sm">5 друзей = 3 месяца бесплатных персональных гороскопов</p>
               </div>
-            </Link>
-          </section>
-  
+              <div className="text-2xl text-pink-400">→</div>
+            </div>
+          </Link>
+        </section>
+
       {/* Мои матрицы */}
       <section className="max-w-4xl mx-auto px-4 py-12">
         <Link
