@@ -910,7 +910,7 @@ export default function DashboardPage() {
 </div>
 
         {/* Приведи друзей */}
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-4xl mx-auto px-4">
           <section className="mt-8">
             <Link href="/profile/referrals" style={{ ["--accent" as any]: "#ec4899" }} className="home-panel block p-6 group">
               <div className="flex items-center justify-between">
