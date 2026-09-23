@@ -145,9 +145,9 @@ export default function EarthScene() {
       });
 
       // Земля
-      const R = base * 0.65;
+      const R = base * 0.48; // весь глобус в кадре
       const cx = w * 0.5;
-      const cy = h * 0.65;
+      const cy = h * 0.5;
       const surfaceRot = time * 0.005;
 
       ctx.save();
@@ -157,8 +157,12 @@ export default function EarthScene() {
 
       if (earthImg && !useFallback) {
         const S = Math.min(2048, Math.max(1024, Math.round((R * 2) / 128) * 128));
-        const proj = projectEarth(earthImg, surfaceRot + 0.35, S, 0.87);
-        ctx.drawImage(proj, cx - R, cy - R, R * 2, R * 2);
+        const proj = projectEarth(earthImg, surfaceRot + 0.35, S, 0.6);
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(-0.18); // лёгкий наклон оси — вид как с орбиты
+        ctx.drawImage(proj, -R, -R, R * 2, R * 2);
+        ctx.restore();
       } else {
         const grad = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.3, R * 0.1, cx, cy, R);
         grad.addColorStop(0, "#1a4d8f");
