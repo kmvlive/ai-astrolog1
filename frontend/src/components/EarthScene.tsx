@@ -83,7 +83,7 @@ export default function EarthScene() {
 
 
       // Земля
-      const R = base * 0.48; // весь глобус в кадре
+      const R = base * 0.40; // весь глобус в кадре с воздухом вокруг
       const cx = w * 0.5;
       const cy = h * 0.5;
       const surfaceRot = time * 0.005;
