@@ -67,7 +67,8 @@ export default function SpaceScene({ moonPhase = 4, hideInterior = false }: Prop
     console.log("[SpaceScene] Загружаю earth_night.jpg...");
     earthImg.onload = () => { 
       console.log("[SpaceScene] earth_night.jpg загружен, создаю проекцию...");
-      earthProjRef.current = projectEarth(earthImg);
+      earthImgRef.current = earthImg;
+      earthProjRef.current = projectEarth(earthImg, 0);
       console.log("[SpaceScene] Проекция Земли создана");
     };
     earthImg.onerror = (err) => {
