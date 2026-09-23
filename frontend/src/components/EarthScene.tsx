@@ -1,47 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
-function projectEarth(tex: HTMLImageElement, rotation: number): HTMLCanvasElement {
-  const S = 1024;
-  const c = document.createElement("canvas");
-  c.width = S; c.height = S;
-  const g = c.getContext("2d")!;
-  const tc = document.createElement("canvas");
-  tc.width = tex.width; tc.height = tex.height;
-  const tg = tc.getContext("2d", { willReadFrequently: true })!;
-  tg.drawImage(tex, 0, 0);
-  const td = tg.getImageData(0, 0, tc.width, tc.height).data;
-  const out = g.createImageData(S, S);
-  const od = out.data;
-  const lon0 = rotation + 0.35; // Европа
-  
-  for (let y = 0; y < S; y++) {
-    const ny = (y / S) * 2 - 1;
-    for (let x = 0; x < S; x++) {
-      const nx = (x / S) * 2 - 1;
-      const i = (y * S + x) * 4;
-      const r2 = nx * nx + ny * ny;
-      if (r2 > 1) { od[i + 3] = 0; continue; }
-      const z = Math.sqrt(1 - r2);
-      const lat = Math.asin(-ny) + 0.87; // 50°N
-      const lon = lon0 + Math.atan2(nx, z);
-      let u = lon / (2 * Math.PI) + 0.5;
-      u = ((u % 1) + 1) % 1;
-      const v = Math.max(0, Math.min(1, 0.5 - lat / Math.PI));
-      const tx = Math.min(tc.width - 1, Math.floor(u * tc.width));
-      const ty = Math.min(tc.height - 1, Math.floor(v * tc.height));
-      const ti = (ty * tc.width + tx) * 4;
-      const limb = 0.50 + 0.50 * Math.pow(z, 0.5);
-      od[i] = td[ti] * limb;
-      od[i + 1] = td[ti + 1] * limb;
-      od[i + 2] = td[ti + 2] * limb;
-      od[i + 3] = 255;
-    }
-  }
-  g.putImageData(out, 0, 0);
-  return c;
-}
+import { projectEarth } from "@/lib/earthProjection";
 
 export default function EarthScene() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -196,7 +156,8 @@ export default function EarthScene() {
       ctx.clip();
 
       if (earthImg && !useFallback) {
-        const proj = projectEarth(earthImg, surfaceRot);
+        const S = Math.min(2048, Math.max(1024, Math.round((R * 2) / 128) * 128));
+        const proj = projectEarth(earthImg, surfaceRot + 0.35, S, 0.87);
         ctx.drawImage(proj, cx - R, cy - R, R * 2, R * 2);
       } else {
         const grad = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.3, R * 0.1, cx, cy, R);
