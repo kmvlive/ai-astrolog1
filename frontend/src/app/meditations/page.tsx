@@ -12,11 +12,47 @@ const meditations = [
     duration: "15 мин",
     emoji: "🌍",
     color: "emerald"
+  },
+  {
+    slug: "forest",
+    title: "Звуки леса",
+    description: "Погружение в природу для снятия стресса и восстановления",
+    duration: "20 мин",
+    emoji: "🌲",
+    color: "green"
+  },
+  {
+    slug: "cosmos",
+    title: "Космическая гармония",
+    description: "Медитация под звуки вселенной для расширения сознания",
+    duration: "15 мин",
+    emoji: "🌌",
+    color: "violet"
+  },
+  {
+    slug: "evening",
+    title: "Вечернее расслабление",
+    description: "Подготовка ко сну и глубокий отдых после дня",
+    duration: "25 мин",
+    emoji: "🌙",
+    color: "blue"
+  },
+  {
+    slug: "morning",
+    title: "Утреннее пробуждение",
+    description: "Мягкая практика для начала дня с ясным умом и энергией",
+    duration: "10 мин",
+    emoji: "🌅",
+    color: "amber"
   }
 ];
 
 const colorMap: Record<string, string> = {
   emerald: "from-emerald-900/40 to-teal-900/30 border-emerald-500/30 hover:border-emerald-500/60",
+  green: "from-green-900/40 to-emerald-900/30 border-green-500/30 hover:border-green-500/60",
+  violet: "from-violet-900/40 to-purple-900/30 border-violet-500/30 hover:border-violet-500/60",
+  blue: "from-blue-900/40 to-indigo-900/30 border-blue-500/30 hover:border-blue-500/60",
+  amber: "from-amber-900/40 to-orange-900/30 border-amber-500/30 hover:border-amber-500/60"
 };
 
 export default function MeditationsPage() {
@@ -46,10 +82,14 @@ export default function MeditationsPage() {
                   <h3 className="text-xl font-bold mb-1">{med.title}</h3>
                   <p className="text-slate-400 text-sm">{med.description}</p>
                 </div>
-                <div className="text-sm text-emerald-400">{med.duration}</div>
+                <div className="text-sm text-slate-300">{med.duration}</div>
               </div>
             </Link>
           ))}
+        </div>
+
+        <div className="mt-12 text-center">
+          <p className="text-slate-500 text-sm">Новые медитации добавляются регулярно. Следите за обновлениями!</p>
         </div>
       </div>
       <SiteFooter />
