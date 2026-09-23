@@ -51,6 +51,8 @@ export default function EarthScene() {
   const starsRef = useRef<{x: number; y: number; r: number; alpha: number; speed: number; phase: number; vx: number; vy: number;}[]>([]);
   const cometsRef = useRef<{x: number; y: number; vx: number; vy: number; alpha: number;}[]>([]);
   const nextCometTimeRef = useRef(8);
+  const projCacheRef = useRef<HTMLCanvasElement | null>(null);
+  const lastRotRef = useRef(0);
 
   useEffect(() => {
     if (starsRef.current.length === 0) {
@@ -194,8 +196,18 @@ export default function EarthScene() {
       ctx.clip();
 
       if (earthImg && !useFallback) {
-        const proj = projectEarth(earthImg, surfaceRot);
-        ctx.drawImage(proj, cx - R, cy - R, R * 2, R * 2);
+        const delta = surfaceRot - lastRotRef.current;
+        if (!projCacheRef.current || Math.abs(delta) > 0.02) {
+          projCacheRef.current = projectEarth(earthImg, surfaceRot);
+          lastRotRef.current = surfaceRot;
+          ctx.drawImage(projCacheRef.current, cx - R, cy - R, R * 2, R * 2);
+        } else {
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(delta);
+          ctx.drawImage(projCacheRef.current, -R, -R, R * 2, R * 2);
+          ctx.restore();
+        }
       } else {
         const grad = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.3, R * 0.1, cx, cy, R);
         grad.addColorStop(0, "#1a4d8f");
