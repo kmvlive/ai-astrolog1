@@ -85,7 +85,7 @@ export default function EarthScene() {
       // Земля
       const R = base * 0.40; // весь глобус в кадре с воздухом вокруг
       const cx = w * 0.5;
-      const cy = h * 0.5;
+      const cy = h * 0.48;
       const surfaceRot = time * 0.005;
 
       ctx.save();
@@ -111,13 +111,13 @@ export default function EarthScene() {
       }
       ctx.restore();
 
-      const rim = ctx.createRadialGradient(cx, cy, R * 0.95, cx, cy, R * 1.05);
+      const rim = ctx.createRadialGradient(cx, cy, R * 0.98, cx, cy, R * 1.01);
       rim.addColorStop(0, "rgba(90,160,255,0)");
-      rim.addColorStop(0.5, "rgba(90,160,255,0.25)");
+      rim.addColorStop(0.5, "rgba(90,160,255,0.08)");
       rim.addColorStop(1, "rgba(90,160,255,0)");
       ctx.fillStyle = rim;
       ctx.beginPath();
-      ctx.arc(cx, cy, R * 1.05, 0, Math.PI * 2);
+      ctx.arc(cx, cy, R * 1.01, 0, Math.PI * 2);
       ctx.fill();
 
       time += dt;
