@@ -18,7 +18,7 @@ export default function ShareButtons({
   const [copied, setCopied] = useState(false);
 
   const shareUrl = url || (typeof window !== "undefined" ? window.location.href : "");
-  const shareText = text || document.title;
+  const shareText = text || (typeof document !== "undefined" ? document.title : "");
   const encodedUrl = encodeURIComponent(shareUrl);
   const encodedText = encodeURIComponent(shareText);
 
