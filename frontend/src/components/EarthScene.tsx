@@ -72,25 +72,7 @@ export default function EarthScene() {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = "/storage/space/earth_night.jpg?v=" + Date.now();
-    img.onload = () => {
-      // Поворот текстуры на 90° против часовой — исправляет "колесо" → "глобус"
-      // Нужно, когда на исходной картинке полюса слева/справа, а не сверху/снизу
-      const canvas = document.createElement("canvas");
-      canvas.width = img.height;
-      canvas.height = img.width;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        ctx.rotate(-Math.PI / 2);
-        ctx.drawImage(img, -img.width / 2, -img.height / 2);
-        const rotatedImg = new Image();
-        rotatedImg.crossOrigin = "anonymous";
-        rotatedImg.onload = () => setEarthImg(rotatedImg);
-        rotatedImg.src = canvas.toDataURL();
-      } else {
-        setEarthImg(img);
-      }
-    };
+    img.onload = () => setEarthImg(img);
     img.onerror = () => setUseFallback(true);
   }, []);
 
