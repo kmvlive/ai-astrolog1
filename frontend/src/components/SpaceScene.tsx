@@ -12,7 +12,7 @@ const LAMP_POS = { x: 0.204, y: 0.744 };
 const MONITOR_POS = { x: 0.895, y: 0.652 };
 
 function projectEarth(tex: HTMLImageElement, rotation: number = 0): HTMLCanvasElement {
-  const S = 1024;
+  const S = 512;
   const c = document.createElement("canvas");
   c.width = S; c.height = S;
   const g = c.getContext("2d")!;
@@ -55,6 +55,7 @@ export default function SpaceScene({ moonPhase = 4, hideInterior = false }: Prop
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const interiorRef = useRef<HTMLCanvasElement | null>(null);
   const earthImgRef = useRef<HTMLImageElement | null>(null);
+  const lastProjRotRef = useRef<number>(-999);
   const earthProjRef = useRef<HTMLCanvasElement | null>(null);
   const [interiorLoaded, setInteriorLoaded] = useState(false);
 
@@ -203,8 +204,15 @@ export default function SpaceScene({ moonPhase = 4, hideInterior = false }: Prop
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
       ctx.clip();
       if (earthImgRef.current) {
-        const proj = projectEarth(earthImgRef.current, surfaceRot);
-        ctx.drawImage(proj, cx - R, cy - R, R * 2, R * 2);
+        // Пересчитываем проекцию только если вращение изменилось на ~0.02 рад
+        // (иначе используем закэшированную — экономит CPU)
+        if (Math.abs(surfaceRot - lastProjRotRef.current) > 0.02) {
+          earthProjRef.current = projectEarth(earthImgRef.current, surfaceRot);
+          lastProjRotRef.current = surfaceRot;
+        }
+        if (earthProjRef.current) {
+          ctx.drawImage(earthProjRef.current, cx - R, cy - R, R * 2, R * 2);
+        }
       } else {
         const disc = ctx.createRadialGradient(cx - R * 0.2, cy - R * 0.85, R * 0.1, cx, cy, R);
         disc.addColorStop(0, "#12305e");
