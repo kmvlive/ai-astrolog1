@@ -158,7 +158,7 @@ export default function SpaceScene({ moonPhase = 4, hideInterior = false }: Prop
       const R = hideInterior ? base * 0.85 : base * 1.15;
       const cx = w * 0.5 + Math.sin(time * 0.09) * base * 0.004;
       const cy = hideInterior ? h * 0.5 : h * 0.58 + R + Math.cos(time * 0.06) * base * 0.003;
-      const surfaceRot = time * 0.02;
+      const surfaceRot = time * 0.008; // медленное вращение
 
       ctx.save();
       ctx.beginPath();
