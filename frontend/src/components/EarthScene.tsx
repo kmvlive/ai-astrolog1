@@ -14,7 +14,7 @@ function projectEarth(tex: HTMLImageElement, rotation: number): HTMLCanvasElemen
   const td = tg.getImageData(0, 0, tc.width, tc.height).data;
   const out = g.createImageData(S, S);
   const od = out.data;
-  const lon0 = rotation + 0.52;
+  const lon0 = rotation + 1.57;
   
   for (let y = 0; y < S; y++) {
     const ny = (y / S) * 2 - 1;
@@ -24,7 +24,7 @@ function projectEarth(tex: HTMLImageElement, rotation: number): HTMLCanvasElemen
       const r2 = nx * nx + ny * ny;
       if (r2 > 1) { od[i + 3] = 0; continue; }
       const z = Math.sqrt(1 - r2);
-      const lat = Math.asin(-ny) + 0.87;
+      const lat = Math.asin(-ny) + 0.52;
       const lon = lon0 + Math.atan2(nx, z);
       let u = lon / (2 * Math.PI) + 0.5;
       u = ((u % 1) + 1) % 1;
