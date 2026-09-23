@@ -11,7 +11,7 @@ interface Props {
 const LAMP_POS = { x: 0.204, y: 0.744 };
 const MONITOR_POS = { x: 0.895, y: 0.652 };
 
-function projectEarth(tex: HTMLImageElement): HTMLCanvasElement {
+function projectEarth(tex: HTMLImageElement, rotation: number = 0): HTMLCanvasElement {
   const S = 1024;
   const c = document.createElement("canvas");
   c.width = S; c.height = S;
@@ -23,7 +23,7 @@ function projectEarth(tex: HTMLImageElement): HTMLCanvasElement {
   const td = tg.getImageData(0, 0, tc.width, tc.height).data;
   const out = g.createImageData(S, S);
   const od = out.data;
-  const lon0 = 0.7;
+  const lon0 = rotation + 0.7;
   for (let y = 0; y < S; y++) {
     const ny = (y / S) * 2 - 1;
     for (let x = 0; x < S; x++) {
@@ -54,6 +54,7 @@ function projectEarth(tex: HTMLImageElement): HTMLCanvasElement {
 export default function SpaceScene({ moonPhase = 4, hideInterior = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const interiorRef = useRef<HTMLCanvasElement | null>(null);
+  const earthImgRef = useRef<HTMLImageElement | null>(null);
   const earthProjRef = useRef<HTMLCanvasElement | null>(null);
   const [interiorLoaded, setInteriorLoaded] = useState(false);
 
@@ -201,13 +202,9 @@ export default function SpaceScene({ moonPhase = 4, hideInterior = false }: Prop
       ctx.beginPath();
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
       ctx.clip();
-      const proj = earthProjRef.current;
-      if (proj) {
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(surfaceRot);
-        ctx.drawImage(proj, -R, -R, R * 2, R * 2);
-        ctx.restore();
+      if (earthImgRef.current) {
+        const proj = projectEarth(earthImgRef.current, surfaceRot);
+        ctx.drawImage(proj, cx - R, cy - R, R * 2, R * 2);
       } else {
         const disc = ctx.createRadialGradient(cx - R * 0.2, cy - R * 0.85, R * 0.1, cx, cy, R);
         disc.addColorStop(0, "#12305e");
