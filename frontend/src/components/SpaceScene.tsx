@@ -205,19 +205,8 @@ export default function SpaceScene({ moonPhase = 4, hideInterior = false }: Prop
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
       ctx.clip();
       if (earthImgRef.current) {
-        const delta = surfaceRot - lastProjRotRef.current;
-        if (!earthProjRef.current || Math.abs(delta) > 0.02) {
-          earthProjRef.current = projectEarth(earthImgRef.current, surfaceRot);
-          lastProjRotRef.current = surfaceRot;
-          ctx.drawImage(earthProjRef.current, cx - R, cy - R, R * 2, R * 2);
-        } else {
-          // Плавно доворачиваем кэш на микро-угол (<=1°) между пересчётами
-          ctx.save();
-          ctx.translate(cx, cy);
-          ctx.rotate(delta);
-          ctx.drawImage(earthProjRef.current, -R, -R, R * 2, R * 2);
-          ctx.restore();
-        }
+        const proj = projectEarth(earthImgRef.current, surfaceRot);
+        ctx.drawImage(proj, cx - R, cy - R, R * 2, R * 2);
       } else {
         const disc = ctx.createRadialGradient(cx - R * 0.2, cy - R * 0.85, R * 0.1, cx, cy, R);
         disc.addColorStop(0, "#12305e");

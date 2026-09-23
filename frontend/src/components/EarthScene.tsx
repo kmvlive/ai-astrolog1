@@ -196,18 +196,8 @@ export default function EarthScene() {
       ctx.clip();
 
       if (earthImg && !useFallback) {
-        const delta = surfaceRot - lastRotRef.current;
-        if (!projCacheRef.current || Math.abs(delta) > 0.02) {
-          projCacheRef.current = projectEarth(earthImg, surfaceRot);
-          lastRotRef.current = surfaceRot;
-          ctx.drawImage(projCacheRef.current, cx - R, cy - R, R * 2, R * 2);
-        } else {
-          ctx.save();
-          ctx.translate(cx, cy);
-          ctx.rotate(delta);
-          ctx.drawImage(projCacheRef.current, -R, -R, R * 2, R * 2);
-          ctx.restore();
-        }
+        const proj = projectEarth(earthImg, surfaceRot);
+        ctx.drawImage(proj, cx - R, cy - R, R * 2, R * 2);
       } else {
         const grad = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.3, R * 0.1, cx, cy, R);
         grad.addColorStop(0, "#1a4d8f");
