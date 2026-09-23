@@ -80,69 +80,7 @@ export default function EarthScene() {
         ctx.fill();
       }
 
-      nextCometTimeRef.current -= dt;
-      if (nextCometTimeRef.current <= 0) {
-        nextCometTimeRef.current = 8 + Math.random() * 10;
-        
-        // БЫСТРЫЕ КОМЕТЫ ЧЕРЕЗ ЦЕНТР ЭКРАНА
-        const side = Math.floor(Math.random() * 4);
-        let x = 0, y = 0, vx = 0, vy = 0;
-        const speed = 1.2 + Math.random() * 0.8; // ОЧЕНЬ БЫСТРО: 1.2-2.0 экрана/сек
-        
-        if (side === 0) { // Слева направо через центр
-          x = -0.1; y = 0.3 + Math.random() * 0.4; // y: 0.3-0.7 (центр)
-          vx = speed; vy = (Math.random() - 0.5) * 0.2; // Почти горизонтально
-        } else if (side === 1) { // Справа налево через центр
-          x = 1.1; y = 0.3 + Math.random() * 0.4;
-          vx = -speed; vy = (Math.random() - 0.5) * 0.2;
-        } else if (side === 2) { // Сверху вниз
-          x = 0.3 + Math.random() * 0.4; y = -0.1;
-          vx = (Math.random() - 0.5) * 0.2; vy = speed;
-        } else { // Снизу вверх
-          x = 0.3 + Math.random() * 0.4; y = 1.1;
-          vx = (Math.random() - 0.5) * 0.2; vy = -speed;
-        }
-        
-        cometsRef.current.push({ x, y, vx, vy, alpha: 1.0 });
-      }
 
-      cometsRef.current = cometsRef.current.filter(comet => {
-        comet.x += comet.vx * dt;
-        comet.y += comet.vy * dt;
-        comet.alpha -= dt * 0.1;
-
-        if (comet.x < -0.5 || comet.x > 1.5 || comet.y < -0.5 || comet.y > 1.5 || comet.alpha <= 0) {
-          return false;
-        }
-        
-        // ОЧЕНЬ ДЛИННЫЙ ЯРКИЙ ХВОСТ
-        const tailX = comet.x - comet.vx * 0.8;
-        const tailY = comet.y - comet.vy * 0.8;
-        
-        const gradient = ctx.createLinearGradient(comet.x * w, comet.y * h, tailX * w, tailY * h);
-        gradient.addColorStop(0, `rgba(255, 255, 255, ${comet.alpha})`);
-        gradient.addColorStop(0.3, `rgba(180, 220, 255, ${comet.alpha * 0.9})`);
-        gradient.addColorStop(1, "rgba(100, 150, 255, 0)");
-        
-        ctx.strokeStyle = gradient;
-        ctx.lineWidth = 5;
-        ctx.lineCap = "round";
-        ctx.beginPath();
-        ctx.moveTo(comet.x * w, comet.y * h);
-        ctx.lineTo(tailX * w, tailY * h);
-        ctx.stroke();
-        
-        // Яркая голова со свечением
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = "rgba(200, 230, 255, 1.0)";
-        ctx.fillStyle = `rgba(255, 255, 255, ${comet.alpha})`;
-        ctx.beginPath();
-        ctx.arc(comet.x * w, comet.y * h, 5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        
-        return true;
-      });
 
       // Земля
       const R = base * 0.48; // весь глобус в кадре
