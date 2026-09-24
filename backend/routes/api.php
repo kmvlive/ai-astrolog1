@@ -750,3 +750,6 @@ Route::get('/tarot-cards', function () {
 });
 
 Route::get('/widgets/{type}', [\App\Http\Controllers\Api\WidgetsController::class, 'show']);
+
+// Загрузка файлов для админки (медитации, блоги)
+Route::post('/upload', [App\Http\Controllers\Api\UploadController::class, 'store'])->name('api.upload');
