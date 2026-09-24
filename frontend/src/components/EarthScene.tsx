@@ -111,28 +111,28 @@ export default function EarthScene() {
       }
       ctx.restore();
 
-      // Адаптивное свечение атмосферы: на десктопе ярче, на мобильном умеренно
+      // Адаптивное внешнее свечение (ореол снаружи диска)
       const isMobile = w < 768;
-      const glowA = isMobile ? 0.16 : 0.34;
-      const glowReach = isMobile ? 1.07 : 1.15;
-      const halo = ctx.createRadialGradient(cx, cy, R * 0.97, cx, cy, R * glowReach);
-      halo.addColorStop(0, `rgba(90,160,255,${glowA})`);
-      halo.addColorStop(0.45, `rgba(90,160,255,${glowA * 0.35})`);
-      halo.addColorStop(1, "rgba(90,160,255,0)");
+      const glowA = isMobile ? 0.22 : 0.40;
+      const glowReach = isMobile ? 1.06 : 1.12;
+      const halo = ctx.createRadialGradient(cx, cy, R * 0.99, cx, cy, R * glowReach);
+      halo.addColorStop(0, `rgba(100,180,255,${glowA})`);
+      halo.addColorStop(0.5, `rgba(80,150,255,${glowA * 0.35})`);
+      halo.addColorStop(1, "rgba(60,120,255,0)");
       ctx.fillStyle = halo;
       ctx.beginPath();
       ctx.arc(cx, cy, R * glowReach, 0, Math.PI * 2);
       ctx.fill();
 
-      // Светящаяся кромка атмосферы поверх диска — отделяет Землю от космоса
+      // Тонкая светящаяся кромка ПО КРАЮ ДИСКА (только 96-100% радиуса)
       ctx.save();
       ctx.beginPath();
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
       ctx.clip();
-      const rimInner = ctx.createRadialGradient(cx, cy, R * 0.82, cx, cy, R);
-      rimInner.addColorStop(0, "rgba(90,160,255,0)");
-      rimInner.addColorStop(0.75, `rgba(90,160,255,${isMobile ? 0.05 : 0.09})`);
-      rimInner.addColorStop(1, `rgba(130,190,255,${isMobile ? 0.20 : 0.30})`);
+      const rimInner = ctx.createRadialGradient(cx, cy, R * 0.96, cx, cy, R * 1.0);
+      rimInner.addColorStop(0, "rgba(120,200,255,0)");
+      rimInner.addColorStop(0.7, `rgba(140,210,255,${isMobile ? 0.18 : 0.28})`);
+      rimInner.addColorStop(1, `rgba(180,230,255,${isMobile ? 0.45 : 0.60})`);
       ctx.fillStyle = rimInner;
       ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
       ctx.restore();
