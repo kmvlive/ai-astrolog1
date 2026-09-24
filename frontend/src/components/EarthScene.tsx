@@ -127,7 +127,6 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
 
 
       // Позиция солнца в реальном времени (для терминатора)
-      const sun = moon ? sunPos(new Date()) : null;
 
       // Позиция солнца в реальном времени (для терминатора)
       const sun = moon ? sunPos(new Date()) : null;
