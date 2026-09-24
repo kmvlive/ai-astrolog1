@@ -90,8 +90,14 @@ export default function EarthScene() {
 
       // Адаптивное внешнее свечение (ореол снаружи диска)
       const isMobile = w < 768;
-      const glowA = isMobile ? 0.11 : 0.40; // мобильный ореол в 2 раза тусклее
-      const glowReach = isMobile ? 1.03 : 1.12; // и в 2 раза ближе к краю
+      const glowBase = isMobile ? 0.11 : 0.40;
+      const reachBase = isMobile ? 1.03 : 1.12;
+
+      // Мягкое "дыхание" ореола (~20 сек период)
+      const breathe = 0.85 + 0.15 * Math.sin(time * 0.35);
+      const glowA = glowBase * breathe;
+      const glowReach = reachBase * (1 + 0.015 * Math.sin(time * 0.22 + 1.3));
+
       const halo = ctx.createRadialGradient(cx, cy, R * 0.99, cx, cy, R * glowReach);
       halo.addColorStop(0, `rgba(100,180,255,${glowA})`);
       halo.addColorStop(0.5, `rgba(80,150,255,${glowA * 0.35})`);
@@ -100,6 +106,26 @@ export default function EarthScene() {
       ctx.beginPath();
       ctx.arc(cx, cy, R * glowReach, 0, Math.PI * 2);
       ctx.fill();
+
+      // Пульсирующие блики по кромке: 3 направления дрейфуют и дышат независимо
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      for (let i = 0; i < 3; i++) {
+        const ang = i * 2.094 + time * (0.05 + i * 0.017) + Math.sin(time * 0.11 + i * 2.1) * 0.6;
+        const pulse = 0.5 + 0.5 * Math.sin(time * (0.23 + i * 0.11) + i * 2.4);
+        const a = glowBase * 0.6 * (0.2 + 0.8 * pulse) * breathe;
+        const px = cx + Math.cos(ang) * R * 0.94;
+        const py = cy + Math.sin(ang) * R * 0.94;
+        const pr = R * (0.30 + 0.18 * pulse);
+        const g = ctx.createRadialGradient(px, py, 0, px, py, pr);
+        g.addColorStop(0, `rgba(110,180,255,${a})`);
+        g.addColorStop(1, "rgba(110,180,255,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(px, py, pr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
 
       ctx.save();
       ctx.beginPath();
