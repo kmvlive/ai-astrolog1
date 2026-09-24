@@ -111,14 +111,31 @@ export default function EarthScene() {
       }
       ctx.restore();
 
-      const rim = ctx.createRadialGradient(cx, cy, R * 0.98, cx, cy, R * 1.01);
-      rim.addColorStop(0, "rgba(90,160,255,0)");
-      rim.addColorStop(0.5, "rgba(90,160,255,0.08)");
-      rim.addColorStop(1, "rgba(90,160,255,0)");
-      ctx.fillStyle = rim;
+      // Адаптивное свечение атмосферы: на десктопе ярче, на мобильном умеренно
+      const isMobile = w < 768;
+      const glowA = isMobile ? 0.16 : 0.34;
+      const glowReach = isMobile ? 1.07 : 1.15;
+      const halo = ctx.createRadialGradient(cx, cy, R * 0.97, cx, cy, R * glowReach);
+      halo.addColorStop(0, `rgba(90,160,255,${glowA})`);
+      halo.addColorStop(0.45, `rgba(90,160,255,${glowA * 0.35})`);
+      halo.addColorStop(1, "rgba(90,160,255,0)");
+      ctx.fillStyle = halo;
       ctx.beginPath();
-      ctx.arc(cx, cy, R * 1.01, 0, Math.PI * 2);
+      ctx.arc(cx, cy, R * glowReach, 0, Math.PI * 2);
       ctx.fill();
+
+      // Светящаяся кромка атмосферы поверх диска — отделяет Землю от космоса
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.clip();
+      const rimInner = ctx.createRadialGradient(cx, cy, R * 0.82, cx, cy, R);
+      rimInner.addColorStop(0, "rgba(90,160,255,0)");
+      rimInner.addColorStop(0.75, `rgba(90,160,255,${isMobile ? 0.05 : 0.09})`);
+      rimInner.addColorStop(1, `rgba(130,190,255,${isMobile ? 0.20 : 0.30})`);
+      ctx.fillStyle = rimInner;
+      ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+      ctx.restore();
 
       time += dt;
       raf = requestAnimationFrame(draw);
