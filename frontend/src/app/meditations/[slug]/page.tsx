@@ -40,7 +40,7 @@ function Player() {
   const [volume, setVolume] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("meditation_volume");
-      return saved ? parseFloat(saved) : 0.65;
+      return saved ? parseFloat(saved) : 0.35;
     }
     return 0.65;
   }); // Начальная громкость
@@ -66,7 +66,7 @@ function Player() {
     if (!audioRef.current) {
       audioRef.current = new AudioEngine();
     }
-    await audioRef.current.start(slug as "mountains" | "sea" | "space");
+    await audioRef.current.start(slug as "mountains" | "sea" | "space", volume);
     setAudioStarted(true);
   };
 
@@ -86,6 +86,15 @@ function Player() {
     }
   };
 
+  // Автозапуск звука если включён
+  useEffect(() => {
+    if (sound && !audioStarted) {
+      startAudio().catch((err) => {
+        console.warn("Автозапуск звука не удался (требует user gesture):", err);
+      });
+    }
+  }, [sound]);
+
   useEffect(() => {
     return () => {
       audioRef.current?.stop();
@@ -98,6 +107,15 @@ function Player() {
     const t = setTimeout(() => setLeft((v) => v - 1), 1000);
     return () => clearTimeout(t);
   }, [left, finished]);
+
+  // Авто-возврат через 5 секунд после завершения
+  useEffect(() => {
+    if (!finished) return;
+    const timer = setTimeout(() => {
+      router.push("/meditations");
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [finished, router]);
 
   const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   const meta = NAMES[slug] || { name: slug, emoji: "🧘" };
@@ -127,6 +145,7 @@ function Player() {
         {finished ? (
           <div>
             <p className="text-emerald-300 text-lg mb-6">✨ Сессия завершена. Как вы себя чувствуете?</p>
+            <p className="text-slate-400 text-sm mb-4">Автоматический возврат через 5 секунд...</p>
             <button onClick={() => router.push("/meditations")} className="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 font-semibold transition">
               К списку медитаций
             </button>

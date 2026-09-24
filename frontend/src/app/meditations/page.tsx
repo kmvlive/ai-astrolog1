@@ -23,9 +23,27 @@ const DURATIONS = [
 export default function MeditationsPage() {
   const router = useRouter();
   const [sel, setSel] = useState<(typeof SCENES)[number] | null>(null);
-  const [dur, setDur] = useState(10);
-  const [sound, setSound] = useState(true);
-  const [moon, setMoon] = useState(true);
+  const [dur, setDur] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("meditation_duration");
+      return saved ? parseInt(saved, 10) : 10;
+    }
+    return 10;
+  });
+  const [sound, setSound] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("meditation_sound");
+      return saved !== null ? saved === "1" : true;
+    }
+    return true;
+  });
+  const [moon, setMoon] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("meditation_moon");
+      return saved !== null ? saved === "1" : true;
+    }
+    return true;
+  });
   const isSubscribed = false; // TODO раунд 6: entitlement с бэкенда
 
   const start = () => {
@@ -103,11 +121,23 @@ export default function MeditationsPage() {
             </div>
 
             <div className="space-y-3 mb-6">
-              <button onClick={() => setSound(!sound)} className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
+              <button onClick={() => {
+                const newSound = !sound;
+                setSound(newSound);
+                if (typeof window !== "undefined") {
+                  localStorage.setItem("meditation_sound", newSound ? "1" : "0");
+                }
+              }} className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
                 <span className="text-sm font-semibold">🔊 Звук</span>
                 <span className={`text-sm font-bold ${sound ? "text-emerald-300" : "text-slate-500"}`}>{sound ? "Включён" : "Выключен"}</span>
               </button>
-              <button onClick={() => setMoon(!moon)} className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
+              <button onClick={() => {
+                const newMoon = !moon;
+                setMoon(newMoon);
+                if (typeof window !== "undefined") {
+                  localStorage.setItem("meditation_moon", newMoon ? "1" : "0");
+                }
+              }} className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
                 <span className="text-sm font-semibold">🌙 По фазе луны</span>
                 <span className={`text-sm font-bold ${moon ? "text-emerald-300" : "text-slate-500"}`}>{moon ? "Да" : "Нет"}</span>
               </button>
