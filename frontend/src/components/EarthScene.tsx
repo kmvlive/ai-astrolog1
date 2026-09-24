@@ -1,23 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { projectEarth } from "@/lib/earthProjection";
+import { projectEarth, SunPos } from "@/lib/earthProjection";
+import { drawStars, CometSystem, hash } from "@/lib/scenePaint";
 
 // Позиция подсолнечной точки из реальной даты/времени
-function sunPos(d: Date) {
-  const rad = Math.PI / 180;
-  const N = Math.floor((Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - Date.UTC(d.getUTCFullYear(), 0, 0)) / 86400000);
-  const utcH = d.getUTCHours() + d.getUTCMinutes() / 60 + d.getUTCSeconds() / 3600;
-  const decl = -23.44 * Math.cos(rad * (360 / 365) * (N + 10));
-  const B = rad * (360 / 365) * (N - 81);
-  const eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
-  let lonSub = -15 * (utcH - 12 + eot / 60);
-  lonSub = ((lonSub + 180) % 360 + 360) % 360 - 180;
-  return { decl: decl * rad, lonSub: lonSub * rad };
-}
-
-// Позиция подсолнечной точки из реальной даты/времени
-function sunPos(d: Date) {
+function sunPos(d: Date): SunPos {
   const rad = Math.PI / 180;
   const N = Math.floor((Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - Date.UTC(d.getUTCFullYear(), 0, 0)) / 86400000);
   const utcH = d.getUTCHours() + d.getUTCMinutes() / 60 + d.getUTCSeconds() / 3600;
@@ -34,29 +22,10 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
   const [earthImg, setEarthImg] = useState<HTMLImageElement | null>(null);
   const [useFallback, setUseFallback] = useState(false);
   const [dayImg, setDayImg] = useState<HTMLImageElement | null>(null);
-  const [dayImg, setDayImg] = useState<HTMLImageElement | null>(null);
 
   const starsRef = useRef<{x: number; y: number; r: number; alpha: number; speed: number; phase: number; vx: number; vy: number;}[]>([]);
   const cometsRef = useRef<{x: number; y: number; vx: number; vy: number; alpha: number;}[]>([]);
-  const nextCometTimeRef = useRef(8);
-  const projCacheRef = useRef<HTMLCanvasElement | null>(null);
-  const lastRotRef = useRef(0);
-
-  useEffect(() => {
-    if (starsRef.current.length === 0) {
-      for (let i = 0; i < 500; i++) {
-        starsRef.current.push({
-          x: Math.random(), y: Math.random(),
-          r: 0.3 + Math.random() * 1.2,
-          alpha: 0.3 + Math.random() * 0.7,
-          speed: 0.5 + Math.random() * 2.0,
-          phase: Math.random() * Math.PI * 2,
-          vx: (Math.random() - 0.5) * 0.0005,
-          vy: (Math.random() - 0.5) * 0.0005
-        });
-      }
-    }
-  }, []);
+  const lastCometTimeRef = useRef(0);
 
   useEffect(() => {
     const img = new Image();
@@ -75,58 +44,18 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
   }, []);
 
   useEffect(() => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = "/storage/space/earth_day.jpg?v=" + Date.now();
-    img.onload = () => setDayImg(img);
-    img.onerror = () => setDayImg(null);
-  }, []);
-
-  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     let raf = 0;
-    let time = 0;
-
-    const resize = () => {
-      canvas.width = window.innerWidth * window.devicePixelRatio;
-      canvas.height = window.innerHeight * window.devicePixelRatio;
-      canvas.style.width = "100%";
-      canvas.style.height = "100%";
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    };
-    resize();
-    window.addEventListener("resize", resize);
+    const start = performance.now();
 
     const draw = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const dt = 0.016;
-      const base = Math.min(w, h);
-      
-      ctx.fillStyle = "#000000";
-      ctx.fillRect(0, 0, w, h);
-
-      for (const star of starsRef.current) {
-        star.x += star.vx * dt;
-        star.y += star.vy * dt;
-        if (star.x < 0) star.x = 1; if (star.x > 1) star.x = 0;
-        if (star.y < 0) star.y = 1; if (star.y > 1) star.y = 0;
-        
-        const twinkle = 0.6 + 0.4 * Math.sin(time * star.speed + star.phase);
-        ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha * twinkle})`;
-        ctx.beginPath();
-        ctx.arc(star.x * w, star.y * h, star.r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-
-
-      // Позиция солнца в реальном времени (для терминатора)
+      const w = canvas.width = window.innerWidth;
+      const h = canvas.height = window.innerHeight;
+      const time = (performance.now() - start) / 1000;
 
       // Позиция солнца в реальном времени (для терминатора)
       const sun = moon ? sunPos(new Date()) : null;
@@ -135,7 +64,16 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
       const R = base * 0.40; // весь глобус в кадре с воздухом вокруг
       const cx = w * 0.5;
       const cy = h * 0.5;
-      const surfaceRot = time * 0.005;
+
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, w, h);
+
+      // Звёзды
+      drawStars(ctx, w, h, time, starsRef);
+
+      // Кома
+      CometSystem.update(time, cometsRef, lastCometTimeRef);
+      CometSystem.draw(ctx, w, h, cometsRef);
 
       // Адаптивное внешнее свечение (ореол снаружи диска)
       const isMobile = w < 768;
@@ -162,7 +100,7 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
       for (let i = 0; i < 3; i++) {
         const ang = i * 2.094 + time * (0.05 + i * 0.017) + Math.sin(time * 0.11 + i * 2.1) * 0.6;
         const pulse = 0.5 + 0.5 * Math.sin(time * (0.23 + i * 0.11) + i * 2.4);
-        const a = glowBase * 0.3 * (0.2 + 0.8 * pulse) * breathe; // блики в 2 раза тусклее
+        const a = glowBase * 0.3 * (0.2 + 0.8 * pulse) * breathe;
         const px = cx + Math.cos(ang) * R * 0.94;
         const py = cy + Math.sin(ang) * R * 0.94;
         const pr = R * (0.30 + 0.18 * pulse);
@@ -182,6 +120,7 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
       ctx.clip();
 
       if (earthImg && !useFallback) {
+        const base = Math.min(w, h);
         const S = Math.min(2048, Math.max(1024, Math.round((R * 2) / 128) * 128));
         const proj = projectEarth(earthImg, surfaceRot + 0.35, S, 0.6, { dayTex: dayImg, sun, nightDim: 0.3 });
         ctx.save();
@@ -190,13 +129,14 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
         ctx.drawImage(proj, -R, -R, R * 2, R * 2);
         ctx.restore();
       } else {
-        const grad = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.3, R * 0.1, cx, cy, R);
-        grad.addColorStop(0, "#1a4d8f");
-        grad.addColorStop(0.5, "#0d2b5e");
-        grad.addColorStop(1, "#051530");
+        const grad = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.3, R * 0.2, cx, cy, R);
+        grad.addColorStop(0, "#1e40af");
+        grad.addColorStop(0.5, "#1e3a8a");
+        grad.addColorStop(1, "#0c1e3e");
         ctx.fillStyle = grad;
         ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
       }
+
       ctx.restore();
 
       // Тонкая светящаяся кромка ПО КРАЮ ДИСКА (только 96-100% радиуса)
@@ -212,16 +152,15 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
       ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
       ctx.restore();
 
-      time += dt;
       raf = requestAnimationFrame(draw);
     };
 
-    draw();
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
-    };
+    const base = Math.min(window.innerWidth, window.innerHeight);
+    const surfaceRot = time * 0.005;
+
+    raf = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(raf);
   }, [earthImg, useFallback, dayImg, moon]);
 
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
+  return <canvas ref={canvasRef} className="fixed inset-0 w-full h-full" />;
 }
