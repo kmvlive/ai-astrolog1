@@ -88,6 +88,19 @@ export default function EarthScene() {
       const cy = h * 0.5;
       const surfaceRot = time * 0.005;
 
+      // Адаптивное внешнее свечение (ореол снаружи диска)
+      const isMobile = w < 768;
+      const glowA = isMobile ? 0.22 : 0.40;
+      const glowReach = isMobile ? 1.06 : 1.12;
+      const halo = ctx.createRadialGradient(cx, cy, R * 0.99, cx, cy, R * glowReach);
+      halo.addColorStop(0, `rgba(100,180,255,${glowA})`);
+      halo.addColorStop(0.5, `rgba(80,150,255,${glowA * 0.35})`);
+      halo.addColorStop(1, "rgba(60,120,255,0)");
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R * glowReach, 0, Math.PI * 2);
+      ctx.fill();
+
       ctx.save();
       ctx.beginPath();
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
@@ -110,19 +123,6 @@ export default function EarthScene() {
         ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
       }
       ctx.restore();
-
-      // Адаптивное внешнее свечение (ореол снаружи диска)
-      const isMobile = w < 768;
-      const glowA = isMobile ? 0.22 : 0.40;
-      const glowReach = isMobile ? 1.06 : 1.12;
-      const halo = ctx.createRadialGradient(cx, cy, R * 0.99, cx, cy, R * glowReach);
-      halo.addColorStop(0, `rgba(100,180,255,${glowA})`);
-      halo.addColorStop(0.5, `rgba(80,150,255,${glowA * 0.35})`);
-      halo.addColorStop(1, "rgba(60,120,255,0)");
-      ctx.fillStyle = halo;
-      ctx.beginPath();
-      ctx.arc(cx, cy, R * glowReach, 0, Math.PI * 2);
-      ctx.fill();
 
       // Тонкая светящаяся кромка ПО КРАЮ ДИСКА (только 96-100% радиуса)
       ctx.save();
