@@ -159,7 +159,7 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
 
       if (earthImg && !useFallback) {
         const S = Math.min(2048, Math.max(1024, Math.round((R * 2) / 128) * 128));
-        const proj = projectEarth(earthImg, surfaceRot + 0.35, S, 0.6, { dayTex: dayImg, sun, nightDim: 0.3 });
+        const proj = projectEarth(earthImg, surfaceRot + 0.35, S, 0.45, { dayTex: dayImg, sun, nightDim: 0.3 }) // центр ~26N: полюс к кромке, больше огней в кадре;
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(-0.18); // лёгкий наклон оси — вид как с орбиты
