@@ -113,7 +113,7 @@ export default function EarthScene() {
       for (let i = 0; i < 3; i++) {
         const ang = i * 2.094 + time * (0.05 + i * 0.017) + Math.sin(time * 0.11 + i * 2.1) * 0.6;
         const pulse = 0.5 + 0.5 * Math.sin(time * (0.23 + i * 0.11) + i * 2.4);
-        const a = glowBase * 0.6 * (0.2 + 0.8 * pulse) * breathe;
+        const a = glowBase * 0.3 * (0.2 + 0.8 * pulse) * breathe; // блики в 2 раза тусклее
         const px = cx + Math.cos(ang) * R * 0.94;
         const py = cy + Math.sin(ang) * R * 0.94;
         const pr = R * (0.30 + 0.18 * pulse);
