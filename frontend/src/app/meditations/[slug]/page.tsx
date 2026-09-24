@@ -29,7 +29,8 @@ function Player() {
   const sp = useSearchParams();
   const slug = String(params.slug || "mountains");
   const dur = Number(sp.get("dur") || 10);
-  const sound = sp.get("sound") !== "0";
+  const soundParam = sp.get("sound") !== "0";
+  const [sound, setSound] = useState(soundParam);
   const moon = sp.get("moon") !== "0";
 
   const [left, setLeft] = useState(dur > 0 ? dur * 60 : -1);
@@ -153,6 +154,14 @@ function Player() {
         ) : (
           <>
             <div className="text-6xl font-extrabold tabular-nums mb-8 text-white/90">{left >= 0 ? fmt(left) : "∞"}</div>
+            {!sound && !finished && (
+              <button
+                onClick={() => setSound(true)}
+                className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 font-semibold transition mb-4 text-sm"
+              >
+                🔇 Звук выключен — включить
+              </button>
+            )}
             {sound && !audioStarted && (
               <button
                 onClick={startAudio}
