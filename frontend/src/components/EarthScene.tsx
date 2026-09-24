@@ -3,10 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 import { projectEarth } from "@/lib/earthProjection";
 
-export default function EarthScene() {
+// Позиция подсолнечной точки из реальной даты/времени
+function sunPos(d: Date) {
+  const rad = Math.PI / 180;
+  const N = Math.floor((Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - Date.UTC(d.getUTCFullYear(), 0, 0)) / 86400000);
+  const utcH = d.getUTCHours() + d.getUTCMinutes() / 60 + d.getUTCSeconds() / 3600;
+  const decl = -23.44 * Math.cos(rad * (360 / 365) * (N + 10));
+  const B = rad * (360 / 365) * (N - 81);
+  const eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+  let lonSub = -15 * (utcH - 12 + eot / 60);
+  lonSub = ((lonSub + 180) % 360 + 360) % 360 - 180;
+  return { decl: decl * rad, lonSub: lonSub * rad };
+}
+
+export default function EarthScene({ moon = true }: { moon?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [earthImg, setEarthImg] = useState<HTMLImageElement | null>(null);
   const [useFallback, setUseFallback] = useState(false);
+  const [dayImg, setDayImg] = useState<HTMLImageElement | null>(null);
 
   const starsRef = useRef<{x: number; y: number; r: number; alpha: number; speed: number; phase: number; vx: number; vy: number;}[]>([]);
   const cometsRef = useRef<{x: number; y: number; vx: number; vy: number; alpha: number;}[]>([]);
@@ -36,6 +50,14 @@ export default function EarthScene() {
     img.src = "/storage/space/earth_night.jpg?v=" + Date.now();
     img.onload = () => setEarthImg(img);
     img.onerror = () => setUseFallback(true);
+  }, []);
+
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = "/storage/space/earth_day.jpg?v=" + Date.now();
+    img.onload = () => setDayImg(img);
+    img.onerror = () => setDayImg(null);
   }, []);
 
   useEffect(() => {
@@ -81,6 +103,9 @@ export default function EarthScene() {
       }
 
 
+
+      // Позиция солнца в реальном времени (для терминатора)
+      const sun = moon ? sunPos(new Date()) : null;
 
       // Земля
       const R = base * 0.40; // весь глобус в кадре с воздухом вокруг
@@ -134,7 +159,7 @@ export default function EarthScene() {
 
       if (earthImg && !useFallback) {
         const S = Math.min(2048, Math.max(1024, Math.round((R * 2) / 128) * 128));
-        const proj = projectEarth(earthImg, surfaceRot + 0.35, S, 0.6);
+        const proj = projectEarth(earthImg, surfaceRot + 0.35, S, 0.6, { dayTex: dayImg, sun, nightDim: 0.3 });
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(-0.18); // лёгкий наклон оси — вид как с орбиты
@@ -172,7 +197,7 @@ export default function EarthScene() {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
     };
-  }, [earthImg, useFallback]);
+  }, [earthImg, useFallback, dayImg, moon]);
 
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 }

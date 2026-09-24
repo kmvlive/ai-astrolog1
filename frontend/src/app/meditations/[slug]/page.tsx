@@ -129,7 +129,7 @@ function Player() {
       ) : slug === "space" ? (
         <SpaceScene moonPhase={moon ? moonPhaseIndex(new Date()) : 4} />
       ) : slug === "earth" ? (
-        <EarthScene />
+        <EarthScene moon={moon} />
       ) : (
         <div className="star-layer" aria-hidden="true" />
       )}
