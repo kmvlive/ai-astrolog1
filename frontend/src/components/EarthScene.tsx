@@ -47,7 +47,7 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
   useEffect(() => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = "/storage/space/earth_night.jpg?v=" + Date.now();
+    img.src = "/storage/space/earth_night.jpg?v=2";
     img.onload = () => setEarthImg(img);
     img.onerror = () => setUseFallback(true);
   }, []);
@@ -55,7 +55,7 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
   useEffect(() => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = "/storage/space/earth_day.jpg?v=" + Date.now();
+    img.src = "/storage/space/earth_day.jpg?v=2";
     img.onload = () => setDayImg(img);
     img.onerror = () => setDayImg(null);
   }, []);
