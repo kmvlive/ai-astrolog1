@@ -90,8 +90,8 @@ export default function EarthScene() {
 
       // Адаптивное внешнее свечение (ореол снаружи диска)
       const isMobile = w < 768;
-      const glowA = isMobile ? 0.22 : 0.40;
-      const glowReach = isMobile ? 1.06 : 1.12;
+      const glowA = isMobile ? 0.11 : 0.40; // мобильный ореол в 2 раза тусклее
+      const glowReach = isMobile ? 1.03 : 1.12; // и в 2 раза ближе к краю
       const halo = ctx.createRadialGradient(cx, cy, R * 0.99, cx, cy, R * glowReach);
       halo.addColorStop(0, `rgba(100,180,255,${glowA})`);
       halo.addColorStop(0.5, `rgba(80,150,255,${glowA * 0.35})`);
