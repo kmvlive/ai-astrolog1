@@ -68,6 +68,7 @@ function Player() {
       audioRef.current = new AudioEngine();
     }
     await audioRef.current.start(slug as "mountains" | "sea" | "space", volume);
+    audioRef.current.setVolume(volume); // гарантированно ставим громкость сессии
     setAudioStarted(true);
   };
 
