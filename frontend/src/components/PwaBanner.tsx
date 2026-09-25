@@ -41,10 +41,21 @@ export default function PwaBanner() {
     }
     console.log("[PWA] Banner component mounted");
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").then(
-        () => console.log("[PWA] Service Worker registered"),
-        (err) => console.error("[PWA] SW registration failed:", err)
-      );
+      // Сначала unregistrим все старые SW (от предыдущих версий/сборок),
+      // затем регим новый — чтобы не было конфликтов scope
+      (async () => {
+        try {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (const r of regs) {
+            try { await r.unregister(); console.log("[PWA] unregistered old SW:", r.scope); }
+            catch (e) { console.warn("[PWA] unregister failed:", e); }
+          }
+          const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+          console.log("[PWA] SW registered:", reg.scope);
+        } catch (err) {
+          console.error("[PWA] SW registration failed:", err);
+        }
+      })();
     }
 
     // Принудительный показ для теста

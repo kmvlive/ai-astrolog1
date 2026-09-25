@@ -1,28 +1,40 @@
-const CACHE = "ai-astro-v2";
-const PRECACHE = [
-  "/offline.html",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
-  "/favicon.png",
-  "/manifest.webmanifest",
-];
+const CACHE = "ai-astro-v3";
 
-// Install: кэшируем критичные ресурсы + offline страницу
 self.addEventListener("install", (e) => {
-  console.log("[SW] install — precaching", PRECACHE.length, "files");
+  console.log("[SW] install");
+  // Не блокируем install если precache падает — SW всё равно запустится
   e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(PRECACHE))
+    caches.open(CACHE).then(async (c) => {
+      const urls = [
+        "/offline.html",
+        "/icons/icon-192.png",
+        "/icons/icon-512.png",
+        "/favicon.png",
+        "/manifest.webmanifest",
+      ];
+      // Precache по одному — если один упал, пишем ошибку и продолжаем
+      for (const url of urls) {
+        try {
+          await c.add(url);
+          console.log("[SW] precached:", url);
+        } catch (err) {
+          console.warn("[SW] precache failed for", url, err);
+        }
+      }
+    }).catch(err => console.warn("[SW] install cache error:", err))
   );
   self.skipWaiting();
 });
 
-// Activate: чистим старые кэши
 self.addEventListener("activate", (e) => {
-  console.log("[SW] activate — cleaning old caches");
+  console.log("[SW] activate");
   e.waitUntil(
     caches.keys().then((names) =>
       Promise.all(
-        names.filter((n) => n !== CACHE).map((n) => caches.delete(n))
+        names.filter((n) => n !== CACHE).map((n) => {
+          console.log("[SW] deleting old cache:", n);
+          return caches.delete(n);
+        })
       )
     )
   );
@@ -34,13 +46,13 @@ self.addEventListener("fetch", (e) => {
   const sameOrigin = url.origin === self.location.origin;
   if (!sameOrigin) return;
 
-  // 1. Navigation запросы (страницы): сеть + fallback на offline
+  // Навигация: сеть + fallback на offline
   if (e.request.mode === "navigate") {
     e.respondWith(
       fetch(e.request)
         .then((res) => {
           const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(e.request, copy));
+          caches.open(CACHE).then((c) => c.put(e.request, copy).catch(() => {}));
           return res;
         })
         .catch(() => caches.match("/offline.html"))
@@ -48,14 +60,14 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  // 2. Статика (_next/static, storage, icons, fonts) — кэш с сетевым fallback
+  // Статика: кэш с сетевым fallback
   if (
     url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/storage/") ||
     url.pathname.startsWith("/icons/") ||
     url.pathname.startsWith("/audio/") ||
     url.pathname.startsWith("/moon/") ||
-    /\.(png|jpg|jpeg|svg|woff2?|ttf)$/i.test(url.pathname)
+    /\.(png|jpg|jpeg|svg|woff2?|ttf|mp4)$/i.test(url.pathname)
   ) {
     e.respondWith(
       caches.match(e.request).then((cached) => {
@@ -63,11 +75,10 @@ self.addEventListener("fetch", (e) => {
         return fetch(e.request).then((res) => {
           if (res && res.ok && res.type === "basic") {
             const copy = res.clone();
-            caches.open(CACHE).then((c) => c.put(e.request, copy));
+            caches.open(CACHE).then((c) => c.put(e.request, copy).catch(() => {}));
           }
           return res;
         }).catch(() => {
-          // для картинок — прозрачный 1x1 пиксель чтобы не ломать layout
           if (/\.(png|jpg|jpeg)$/i.test(url.pathname)) {
             return new Response("", { headers: { "Content-Type": "image/png" } });
           }
@@ -76,6 +87,4 @@ self.addEventListener("fetch", (e) => {
     );
     return;
   }
-
-  // 3. API и всё остальное — только сеть
 });
