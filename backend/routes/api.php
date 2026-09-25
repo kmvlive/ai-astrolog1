@@ -753,3 +753,27 @@ Route::get('/widgets/{type}', [\App\Http\Controllers\Api\WidgetsController::clas
 
 // Загрузка файлов для админки (медитации, блоги)
 Route::post('/upload', [App\Http\Controllers\Api\UploadController::class, 'store'])->name('api.upload');
+
+// Отписка от рассылок в один клик
+Route::get('/unsubscribe/{userId}/{signature}', function ($userId, $signature) {
+    $expectedSig = hash_hmac('sha256', (string) $userId, config('app.key'));
+    
+    if (!hash_equals($expectedSig, $signature)) {
+        return response()->json(['error' => 'Invalid signature'], 403);
+    }
+    
+    $user = \App\Models\User::find($userId);
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+    
+    if (!$user->unsubscribed_at) {
+        $user->unsubscribed_at = now();
+        $user->save();
+    }
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'Вы отписаны от рассылок'
+    ]);
+})->name('api.unsubscribe');

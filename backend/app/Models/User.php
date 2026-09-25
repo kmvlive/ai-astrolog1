@@ -24,6 +24,7 @@ class User extends Authenticatable implements FilamentUser
      * @var list<string>
      */
     protected $fillable = [
+        'unsubscribed_at',
         'free_personal_enabled',
         'free_natal_chart_enabled',
         'popup_dismissed_ids',
