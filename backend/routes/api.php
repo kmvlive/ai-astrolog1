@@ -777,3 +777,7 @@ Route::get('/unsubscribe/{userId}/{signature}', function ($userId, $signature) {
         'message' => 'Вы отписаны от рассылок'
     ]);
 })->name('api.unsubscribe');
+
+// Видео для медитаций — signed URL
+Route::get('/video-url/{slug}', [App\Http\Controllers\Api\VideoController::class, 'getSignedUrl']);
+Route::get('/video/{slug}', [App\Http\Controllers\Api\VideoController::class, 'stream']);
