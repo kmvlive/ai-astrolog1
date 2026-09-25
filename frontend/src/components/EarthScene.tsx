@@ -105,13 +105,18 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
 
 
       // Позиция солнца в реальном времени (для терминатора)
-      const sun = moon ? sunPos(new Date()) : null;
+      const surfaceRot = time * 0.005;
+      const sunReal = moon ? sunPos(new Date()) : null;
+      // Солнце фиксировано в пространстве камеры: терминатор НЕ едет за вращением,
+      // а стоит на месте (как на снимках с солнечно-синхронных орбит),
+      // континенты вращаются внутри света/тени. Позиция тени — по реальному времени.
+      const sun = sunReal ? { decl: sunReal.decl, lonSub: sunReal.lonSub + surfaceRot } : null;
 
       // Земля
       const R = base * 0.40; // весь глобус в кадре с воздухом вокруг
       const cx = w * 0.5;
       const cy = h * 0.5;
-      const surfaceRot = time * 0.005;
+      
 
       // Адаптивное внешнее свечение (ореол снаружи диска)
       const isMobile = w < 768;
