@@ -53,7 +53,21 @@ class UniSenderService
                 return true;
             }
 
-            Log::error('UniSender Go error', [
+            // Проверяем, не отписался ли пользователь
+            $failedEmails = $data['failed_emails'] ?? [];
+            foreach ($failedEmails as $email => $reason) {
+                if ($reason === 'unsubscribed') {
+                    $user = \App\Models\User::where('email', $email)->first();
+                    if ($user && !$user->unsubscribed_at) {
+                        $user->unsubscribed_at = now();
+                        $user->save();
+                        \Log::info('User marked as unsubscribed', ['email' => $email, 'user_id' => $user->id]);
+                    }
+                }
+            }
+
+            // Логируем как INFO (не ERROR), так как отписка - нормальное событие
+            \Log::info('UniSender Go: delivery failed', [
                 'status' => $response->status(),
                 'response' => $data,
                 'to' => $to,
