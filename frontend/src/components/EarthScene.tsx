@@ -3,6 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { projectEarth } from "@/lib/earthProjection";
 
+// Детерминированный псевдослучайный номер из целого (для фаз сияния)
+function hash01(n: number): number {
+  const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+  return x - Math.floor(x);
+}
+
 // Позиция подсолнечной точки из реальной даты/времени
 function sunPos(d: Date) {
   const rad = Math.PI / 180;
@@ -201,9 +207,23 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
       ctx.globalCompositeOperation = "lighter";
       const poleY = cy - R * 0.90; // полюс у верхней кромки (центр проекции 26N)
       const auroraScale = isMobile ? 0.6 : 1.0;
+      // Сияние живёт вспышками: медленно разгорается, волнится, медленно гаснет;
+      // циклы ~150 сек со случайной длительностью, иногда сияния нет вовсе
+      const cycle = 150;
+      const idx = Math.floor(time / cycle);
+      const frac = time / cycle - idx;
+      const r1 = hash01(idx), r2 = hash01(idx * 7 + 3);
+      const skip = hash01(idx * 13 + 5) < 0.22;
+      const active = 0.45 + 0.45 * r1;
+      let env = 0;
+      if (!skip && frac < active) {
+        const u = frac / active;
+        env = Math.pow(Math.sin(Math.PI * Math.pow(u, 0.85)), 1.4);
+      }
+      env *= 0.8 + 0.2 * Math.sin(time * 0.21 + r2 * 6.283); // волны внутри вспышки
       // Базовое полярное свечение-купол
       const dome = ctx.createRadialGradient(cx, poleY + R * 0.08, 0, cx, poleY + R * 0.08, R * 0.45);
-      const domeA = 0.10 * auroraScale * (0.8 + 0.2 * Math.sin(time * 0.09));
+      const domeA = 0.10 * auroraScale * (0.8 + 0.2 * Math.sin(time * 0.09)) * env;
       dome.addColorStop(0, `rgba(90,255,180,${domeA})`);
       dome.addColorStop(0.6, `rgba(70,200,160,${domeA * 0.4})`);
       dome.addColorStop(1, "rgba(0,0,0,0)");
@@ -213,7 +233,7 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
         const baseY = poleY + R * (0.04 + b * 0.06); // ленты прижаты к шапке
         const thick = R * (0.10 + 0.02 * Math.sin(time * 0.11 + b));
         const hue = b === 2 ? "160,220,255" : b === 1 ? "110,255,190" : "80,255,160";
-        const aBase = (0.16 - b * 0.035) * auroraScale * (0.75 + 0.25 * Math.sin(time * 0.17 + b * 2.1));
+        const aBase = (0.16 - b * 0.035) * auroraScale * (0.75 + 0.25 * Math.sin(time * 0.17 + b * 2.1)) * env;
         const grad = ctx.createLinearGradient(0, baseY - thick, 0, baseY + thick * 1.6);
         grad.addColorStop(0, "rgba(0,0,0,0)");
         grad.addColorStop(0.35, `rgba(${hue},${aBase})`);
