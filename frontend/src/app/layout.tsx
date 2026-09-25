@@ -28,13 +28,6 @@ export const metadata: Metadata = {
   title: "AI Астролог — персональные гороскопы на основе натальной карты",
   description: "Бесплатные ежедневные и персональные гороскопы от AI. Точные прогнозы на основе вашей натальной карты и лунных циклов. Узнайте своё будущее!",
   keywords: ["персональный гороскоп", "натальная карта", "AI астролог", "бесплатный гороскоп", "прогноз на сегодня"],
-  icons: {
-    icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
-    ],
-    apple: { url: "/favicon.svg", type: "image/svg+xml" },
-  },
 };
 
 export const revalidate = 0;
