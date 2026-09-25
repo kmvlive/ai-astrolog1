@@ -5,16 +5,16 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class VideoController extends Controller
 {
     /**
      * Получить подписанный URL для видео
-     * Токен живёт 10 минут, привязан к IP пользователя
      */
     public function getSignedUrl(Request $request, string $slug)
     {
-        $validSlugs = ['koster']; // whitelist
+        $validSlugs = ['koster'];
         
         if (!in_array($slug, $validSlugs)) {
             return response()->json(['error' => 'Video not found'], 404);
@@ -25,8 +25,7 @@ class VideoController extends Controller
             return response()->json(['error' => 'Video file missing'], 404);
         }
         
-        // Генерируем токен
-        $expires = time() + 600; // 10 минут
+        $expires = time() + 600;
         $ip = $request->ip();
         $userId = $request->user()?->id ?? 0;
         
@@ -35,13 +34,6 @@ class VideoController extends Controller
         
         $url = "/api/video/{$slug}?token={$token}&expires={$expires}";
         
-        Log::info('Video signed URL generated', [
-            'slug' => $slug,
-            'ip' => $ip,
-            'user_id' => $userId,
-            'expires' => date('Y-m-d H:i:s', $expires)
-        ]);
-        
         return response()->json([
             'url' => $url,
             'expires' => $expires
@@ -49,7 +41,7 @@ class VideoController extends Controller
     }
     
     /**
-     * Отдача видео с проверкой токена
+     * Отдача видео с HTTP Range support для стриминга
      */
     public function stream(Request $request, string $slug)
     {
@@ -66,23 +58,16 @@ class VideoController extends Controller
             return response()->json(['error' => 'Missing token'], 401);
         }
         
-        // Проверяем срок действия
         if (time() > $expires) {
             return response()->json(['error' => 'Token expired'], 401);
         }
         
-        // Проверяем токен
         $ip = $request->ip();
         $userId = $request->user()?->id ?? 0;
         $payload = "{$slug}|{$expires}|{$ip}|{$userId}";
         $expectedToken = hash_hmac('sha256', $payload, config('app.key'));
         
         if (!hash_equals($expectedToken, $token)) {
-            Log::warning('Video token mismatch', [
-                'slug' => $slug,
-                'ip' => $ip,
-                'user_id' => $userId
-            ]);
             return response()->json(['error' => 'Invalid token'], 403);
         }
         
@@ -91,11 +76,58 @@ class VideoController extends Controller
             return response()->json(['error' => 'Video file missing'], 404);
         }
         
-        // Отдаём файл с правильными заголовками для стриминга
-        return response()->file($path, [
-            'Content-Type' => 'video/mp4',
-            'Accept-Ranges' => 'bytes',
-            'Cache-Control' => 'private, max-age=0, no-cache',
-        ]);
+        $fileSize = filesize($path);
+        $file = fopen($path, 'rb');
+        
+        if (!$file) {
+            return response()->json(['error' => 'Cannot open file'], 500);
+        }
+        
+        // HTTP Range request support для стриминга
+        $range = $request->header('Range');
+        $start = 0;
+        $end = $fileSize - 1;
+        $statusCode = 200;
+        
+        if ($range && preg_match('/bytes=(\d+)-(\d*)/', $range, $matches)) {
+            $start = intval($matches[1]);
+            $end = isset($matches[2]) && $matches[2] !== '' ? intval($matches[2]) : $fileSize - 1;
+            
+            if ($start > $end || $start >= $fileSize) {
+                fclose($file);
+                return response('', 416)
+                    ->header('Content-Range', "bytes */{$fileSize}");
+            }
+            
+            $statusCode = 206; // Partial Content
+            fseek($file, $start);
+        }
+        
+        $length = $end - $start + 1;
+        
+        $response = new StreamedResponse(function() use ($file, $length) {
+            $bufferSize = 8192;
+            $remaining = $length;
+            
+            while ($remaining > 0 && !feof($file)) {
+                $readSize = min($bufferSize, $remaining);
+                echo fread($file, $readSize);
+                $remaining -= $readSize;
+                flush();
+            }
+            
+            fclose($file);
+        }, $statusCode);
+        
+        $response->headers->set('Content-Type', 'video/mp4');
+        $response->headers->set('Accept-Ranges', 'bytes');
+        $response->headers->set('Content-Length', $length);
+        $response->headers->set('Cache-Control', 'private, max-age=0, no-cache');
+        
+        if ($statusCode === 206) {
+            $response->headers->set('Content-Range', "bytes {$start}-{$end}/{$fileSize}");
+        }
+        
+        return $response;
     }
 }
