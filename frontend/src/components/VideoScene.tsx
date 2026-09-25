@@ -29,12 +29,19 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
     fetchUrl();
   }, [slug]);
 
-  // Применяем громкость к видео
+  // Применяем громкость к видео и запускаем play
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.volume = volume;
+      // Явно запускаем play если ещё не играет
+      const playPromise = videoRef.current.play();
+      if (playPromise) {
+        playPromise.catch((err) => {
+          console.warn("[VideoScene] play failed:", err);
+        });
+      }
     }
-  }, [volume]);
+  }, [volume, videoUrl]);
 
   // Блокируем контекстное меню на видео
   const handleContextMenu = (e: React.MouseEvent) => {
