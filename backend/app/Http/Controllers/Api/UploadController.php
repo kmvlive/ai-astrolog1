@@ -20,8 +20,8 @@ class UploadController extends Controller
         }
 
         $request->validate([
-            'file' => 'required|file|max:20480', // до 20 МБ
-            'folder' => 'required|string|in:space,blog,avatars,interiors',
+            'file' => 'required|file|max:524288', // до 512 МБ
+            'folder' => 'required|string|in:space,blog,avatars,interiors,video',
         ]);
 
         $file = $request->file('file');
