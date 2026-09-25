@@ -50,7 +50,7 @@ export default function PwaBanner() {
             try { await r.unregister(); console.log("[PWA] unregistered old SW:", r.scope); }
             catch (e) { console.warn("[PWA] unregister failed:", e); }
           }
-          const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+          const reg = await navigator.serviceWorker.register("/sw.js?v=3", { scope: "/" });
           console.log("[PWA] SW registered:", reg.scope);
         } catch (err) {
           console.error("[PWA] SW registration failed:", err);
