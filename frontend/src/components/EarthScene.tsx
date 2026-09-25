@@ -209,12 +209,12 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
       const auroraScale = isMobile ? 0.6 : 1.0;
       // Сияние живёт вспышками: медленно разгорается, волнится, медленно гаснет;
       // циклы ~150 сек со случайной длительностью, иногда сияния нет вовсе
-      const cycle = 150;
+      const cycle = 300; // 5-минутный цикл: 1-2 вспышки на 10-минутную сессию
       const idx = Math.floor(time / cycle);
       const frac = time / cycle - idx;
       const r1 = hash01(idx), r2 = hash01(idx * 7 + 3);
       const skip = hash01(idx * 13 + 5) < 0.22;
-      const active = 0.45 + 0.45 * r1;
+      const active = 0.25 + 0.25 * r1; // вспышка 75-150 сек, остальное - пауза
       let env = 0;
       if (!skip && frac < active) {
         const u = frac / active;
