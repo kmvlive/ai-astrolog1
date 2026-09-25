@@ -202,7 +202,7 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
       const poleY = cy - R * 0.90; // полюс у верхней кромки (центр проекции 26N)
       const auroraScale = isMobile ? 0.6 : 1.0;
       // Базовое полярное свечение-купол
-      const dome = ctx.createRadialGradient(cx, poleY + R * 0.18, 0, cx, poleY + R * 0.18, R * 0.55);
+      const dome = ctx.createRadialGradient(cx, poleY + R * 0.08, 0, cx, poleY + R * 0.08, R * 0.45);
       const domeA = 0.10 * auroraScale * (0.8 + 0.2 * Math.sin(time * 0.09));
       dome.addColorStop(0, `rgba(90,255,180,${domeA})`);
       dome.addColorStop(0.6, `rgba(70,200,160,${domeA * 0.4})`);
@@ -210,7 +210,7 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
       ctx.fillStyle = dome;
       ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
       for (let b = 0; b < 3; b++) {
-        const baseY = poleY + R * (0.12 + b * 0.085);
+        const baseY = poleY + R * (0.04 + b * 0.06); // ленты прижаты к шапке
         const thick = R * (0.10 + 0.02 * Math.sin(time * 0.11 + b));
         const hue = b === 2 ? "160,220,255" : b === 1 ? "110,255,190" : "80,255,160";
         const aBase = (0.16 - b * 0.035) * auroraScale * (0.75 + 0.25 * Math.sin(time * 0.17 + b * 2.1));
