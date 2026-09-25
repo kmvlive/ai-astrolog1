@@ -193,6 +193,50 @@ export default function EarthScene({ moon = true }: { moon?: boolean }) {
       ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
       ctx.restore();
 
+      // Полярное сияние: мягкие волнистые занавесы над полярной зоной
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.globalCompositeOperation = "lighter";
+      const poleY = cy - R * 0.90; // полюс у верхней кромки (центр проекции 26N)
+      const auroraScale = isMobile ? 0.6 : 1.0;
+      for (let b = 0; b < 3; b++) {
+        const baseY = poleY + R * (0.12 + b * 0.085);
+        const thick = R * (0.10 + 0.02 * Math.sin(time * 0.11 + b));
+        const hue = b === 2 ? "160,220,255" : b === 1 ? "110,255,190" : "80,255,160";
+        const aBase = (0.055 - b * 0.012) * auroraScale * (0.75 + 0.25 * Math.sin(time * 0.17 + b * 2.1));
+        const grad = ctx.createLinearGradient(0, baseY - thick, 0, baseY + thick * 1.6);
+        grad.addColorStop(0, "rgba(0,0,0,0)");
+        grad.addColorStop(0.35, `rgba(${hue},${aBase})`);
+        grad.addColorStop(0.65, `rgba(${hue},${aBase * 0.8})`);
+        grad.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        const x0 = cx - R * 0.95, x1 = cx + R * 0.95;
+        const steps = 24;
+        for (let i = 0; i <= steps; i++) {
+          const xx = x0 + ((x1 - x0) * i) / steps;
+          const ph = (xx - cx) / R;
+          const yy = baseY
+            + Math.sin(ph * 2.2 + time * (0.21 + b * 0.05) + b * 1.3) * R * 0.035
+            + Math.sin(ph * 5.1 - time * 0.13 + b) * R * 0.015;
+          if (i === 0) ctx.moveTo(xx, yy - thick);
+          else ctx.lineTo(xx, yy - thick);
+        }
+        for (let i = steps; i >= 0; i--) {
+          const xx = x0 + ((x1 - x0) * i) / steps;
+          const ph = (xx - cx) / R;
+          const yy = baseY
+            + Math.sin(ph * 2.2 + time * (0.21 + b * 0.05) + b * 1.3) * R * 0.035
+            + Math.sin(ph * 5.1 - time * 0.13 + b) * R * 0.015;
+          ctx.lineTo(xx, yy + thick);
+        }
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+
       time += dt;
       raf = requestAnimationFrame(draw);
     };
