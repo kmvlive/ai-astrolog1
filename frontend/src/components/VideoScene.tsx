@@ -13,8 +13,12 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [quality, setQuality] = useState<string>("auto");
-  const [levels, setLevels] = useState<{ height: number; bitrate: number }[]>([]);
+  const [currentLevel, setCurrentLevel] = useState<number>(-1);
+  const [levels, setLevels] = useState<{ height: number; bitrate: number; index: number }[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [showControls, setShowControls] = useState<boolean>(true);
+  const [showQualityMenu, setShowQualityMenu] = useState<boolean>(false);
+  const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const videoUrl = `/storage/video/${slug}_hls/master.m3u8`;
 
@@ -28,7 +32,7 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
       const hls = new Hls({
         maxBufferLength: 30,
         maxMaxBufferLength: 60,
-        startLevel: -1, // auto
+        startLevel: -1,
         capLevelToPlayerSize: true,
         enableWorker: true,
         lowLatencyMode: false,
@@ -39,7 +43,13 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
 
       hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
         console.log("[HLS] manifest parsed, levels:", data.levels.length);
-        setLevels(data.levels.map((l) => ({ height: l.height, bitrate: l.bitrate })));
+        setLevels(
+          data.levels.map((l, idx) => ({ 
+            height: l.height, 
+            bitrate: l.bitrate,
+            index: idx 
+          }))
+        );
         
         video.play().catch((err) => {
           console.warn("[VideoScene] play failed:", err);
@@ -48,7 +58,9 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
 
       hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
         const level = hls.levels[data.level];
-        setQuality(`${level.height}p`);
+        const newQuality = `${level.height}p`;
+        setQuality(newQuality);
+        setCurrentLevel(data.level);
         console.log(`[HLS] switched to ${level.height}p (${Math.round(level.bitrate / 1000)} kbps)`);
       });
 
@@ -61,7 +73,6 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
 
       hlsRef.current = hls;
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      // Safari имеет нативную поддержку HLS
       video.src = videoUrl;
       video.addEventListener("loadedmetadata", () => {
         video.play().catch((err) => {
@@ -87,6 +98,42 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
     }
   }, [volume]);
 
+  // Автоскрытие контролов через 3 секунды бездействия
+  useEffect(() => {
+    const resetTimer = () => {
+      setShowControls(true);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = setTimeout(() => {
+        if (!showQualityMenu) setShowControls(false);
+      }, 3000);
+    };
+
+    window.addEventListener("mousemove", resetTimer);
+    window.addEventListener("touchstart", resetTimer);
+    resetTimer();
+
+    return () => {
+      window.removeEventListener("mousemove", resetTimer);
+      window.removeEventListener("touchstart", resetTimer);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
+  }, [showQualityMenu]);
+
+  // Ручное переключение качества
+  const handleQualityChange = (levelIndex: number) => {
+    if (hlsRef.current) {
+      hlsRef.current.currentLevel = levelIndex; // -1 = auto
+      setCurrentLevel(levelIndex);
+      if (levelIndex === -1) {
+        setQuality("auto");
+      } else {
+        const level = hlsRef.current.levels[levelIndex];
+        setQuality(`${level.height}p`);
+      }
+      setShowQualityMenu(false);
+    }
+  };
+
   // Блокируем контекстное меню
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -110,7 +157,11 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
   }
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-black overflow-hidden">
+    <div 
+      className="absolute inset-0 flex items-center justify-center bg-black overflow-hidden"
+      onMouseMove={() => { setShowControls(true); }}
+      onTouchStart={() => { setShowControls(true); }}
+    >
       {/* Блюр по бокам на десктопе */}
       <div className="absolute inset-0 hidden md:flex">
         <video
@@ -139,10 +190,76 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
         style={{ userSelect: "none", WebkitUserSelect: "none" }}
       />
 
-      {/* Индикатор качества */}
+      {/* Индикатор текущего качества — правый верхний угол */}
       {quality !== "auto" && (
-        <div className="absolute top-4 right-4 z-30 bg-black/60 backdrop-blur-sm px-3 py-1 rounded-lg text-xs text-white">
-          {quality}
+        <div 
+          className={`absolute top-4 right-4 z-40 px-3 py-1.5 rounded-lg text-sm font-semibold text-white backdrop-blur-md transition-opacity duration-500 ${
+            showControls ? "opacity-100" : "opacity-0"
+          }`}
+          style={{ 
+            background: "linear-gradient(135deg, rgba(139,92,246,0.8), rgba(168,85,247,0.8))",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.4)"
+          }}
+        >
+          🎥 {quality}
+        </div>
+      )}
+
+      {/* Кнопка настроек качества — правый нижний угол */}
+      {levels.length > 0 && (
+        <div className="absolute bottom-6 right-6 z-40">
+          <button
+            onClick={() => setShowQualityMenu(!showQualityMenu)}
+            className={`w-12 h-12 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-black/80 transition-all duration-300 ${
+              showControls ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+            aria-label="Настройки качества"
+            title="Качество видео"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </button>
+
+          {/* Меню выбора качества */}
+          {showQualityMenu && (
+            <div 
+              className="absolute bottom-16 right-0 bg-black/90 backdrop-blur-md border border-white/20 rounded-xl p-2 min-w-[180px]"
+              style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.6)" }}
+            >
+              <div className="text-xs text-slate-400 uppercase font-semibold px-3 py-1.5 border-b border-white/10 mb-1">
+                Качество видео
+              </div>
+              <button
+                onClick={() => handleQualityChange(-1)}
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between transition ${
+                  currentLevel === -1 
+                    ? "bg-violet-600/30 text-violet-200" 
+                    : "text-white hover:bg-white/10"
+                }`}
+              >
+                <span>Авто</span>
+                {currentLevel === -1 && <span className="text-violet-300">✓</span>}
+              </button>
+              {levels.map((level) => (
+                <button
+                  key={level.index}
+                  onClick={() => handleQualityChange(level.index)}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between transition ${
+                    currentLevel === level.index 
+                      ? "bg-violet-600/30 text-violet-200" 
+                      : "text-white hover:bg-white/10"
+                  }`}
+                >
+                  <span>{level.height}p</span>
+                  <span className="text-xs text-slate-400">
+                    {Math.round(level.bitrate / 1000)} kbps
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
