@@ -159,43 +159,35 @@ export default function VideoScene({ slug, volume, onEnded, uiVisible = true }: 
         style={{ userSelect: "none", WebkitUserSelect: "none" }}
       />
 
-      {/* Индикатор качества — плавное появление/исчезновение */}
-      <div 
-        className={`absolute top-4 right-4 z-40 transition-opacity duration-500 ${
-          uiVisible ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-      >
-        <div 
-          className="px-3 py-1.5 rounded-lg text-sm font-semibold text-white backdrop-blur-md"
-          style={{ 
-            background: "linear-gradient(135deg, rgba(139,92,246,0.8), rgba(168,85,247,0.8))",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.4)"
-          }}
-        >
-          🎥 {quality}
-        </div>
-      </div>
-
-      {/* Кнопка настроек качества + меню */}
+      {/* Кнопка качества + меню — правый верхний угол */}
       {levels.length > 0 && (
-        <div className="absolute bottom-6 right-6 z-40">
+        <div 
+          className={`absolute top-4 right-4 z-40 transition-all duration-500 ${
+            uiVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
+          }`}
+        >
+          {/* Кнопка показывает текущее качество */}
           <button
             onClick={() => setShowQualityMenu(!showQualityMenu)}
-            className={`w-12 h-12 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-black/80 transition-all duration-500 ${
-              uiVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
-            }`}
-            aria-label="Настройки качества"
-            title="Качество видео"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-white backdrop-blur-md transition hover:scale-105"
+            style={{ 
+              background: "linear-gradient(135deg, rgba(139,92,246,0.8), rgba(168,85,247,0.8))",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.4)"
+            }}
+            aria-label="Качество видео"
+            title="Выбрать качество"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="3" />
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
             </svg>
+            {quality === "auto" ? "Авто" : quality}
           </button>
 
+          {/* Меню выбора качества — открывается вниз */}
           {showQualityMenu && (
             <div 
-              className="absolute bottom-16 right-0 bg-black/90 backdrop-blur-md border border-white/20 rounded-xl p-2 min-w-[180px] animate-fade-in"
+              className="absolute top-12 right-0 bg-black/90 backdrop-blur-md border border-white/20 rounded-xl p-2 min-w-[180px]"
               style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.6)" }}
             >
               <div className="text-xs text-slate-400 uppercase font-semibold px-3 py-1.5 border-b border-white/10 mb-1">
