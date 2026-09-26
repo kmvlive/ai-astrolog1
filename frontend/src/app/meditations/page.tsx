@@ -14,7 +14,7 @@ const SCENES = [
 
 // Премиум-медитации: вертикальные (видео на весь экран на телефоне)
 const PREMIUM_VERTICAL = [
-  { slug: "koster", name: "Ночной костёр", emoji: "🔥", accent: "#f59e0b", desc: "Звуки ночного костра для глубокой медитации и спокойного сна", route: "/meditations/koster" },
+  { slug: "koster", name: "Ночной костёр", emoji: "🔥", accent: "#f59e0b", desc: "Звуки ночного костра для глубокой медитации и спокойного сна", route: "/meditations/koster", free: true },
 ];
 
 // Премиум-медитации: горизонтальные (для десктопа/планшета)
@@ -138,7 +138,7 @@ export default function MeditationsPage() {
 
             <div className="grid md:grid-cols-3 gap-5">
               {PREMIUM_VERTICAL.map((s) => {
-                const locked = !isSubscribed;
+                const locked = !s.free && !isSubscribed;
                 return (
                   <button
                     key={s.slug}
