@@ -773,20 +773,22 @@ PROMPT;
         return $out ?: null;
     }
 
-    public function generateCover(BlogPost $post): ?string
+    public function generateCover(BlogPost $post): ?array
     {
         $disk = \Illuminate\Support\Facades\Storage::disk('public');
         $disk->makeDirectory('blog-covers');
 
+        // Выбираем промпт ОДИН раз и сохраняем его для ротации
+        $prompt = $this->getRandomPrompt($post->title);
+
         // 0) Timeweb AI: быстрый Flux (4-10 сек)
         for ($i = 0; $i < 2; $i++) {
-            $prompt = $this->getRandomPrompt($post->title);
             $raw = $this->generateViaTimeweb($prompt);
             if ($raw && strlen($raw) > 30000) {
                 $suffix = substr(md5(time() . random_int(1000, 9999)), 0, 8);
                 $file = 'blog-covers/' . $post->slug . '-' . $suffix . '.jpg';
                 $disk->put($file, $raw);
-                return $file;
+                return ['path' => $file, 'subject' => $prompt];
             }
         }
 
@@ -800,7 +802,7 @@ PROMPT;
                 if ($resp->successful() && strlen($resp->body()) > 30000 && str_contains($ct, 'image')) {
                     $file = 'blog-covers/' . $post->slug . '.jpg';
                     $disk->put($file, $resp->body());
-                    return $file;
+                    return ['path' => $file, 'subject' => 'unsplash_fallback'];
                 }
             } catch (\Throwable $e) {}
         }
@@ -809,7 +811,7 @@ PROMPT;
         $suffix = substr(md5(time() . random_int(1000, 9999)), 0, 8);
         $file = 'blog-covers/' . $post->slug . '-' . $suffix . '.svg';
         $disk->put($file, $this->renderSvgCover($post));
-        return $file;
+        return ['path' => $file, 'subject' => 'svg_fallback'];
     }
 
     private function removeWatermark(string $imageData): string
@@ -1231,27 +1233,5 @@ PROMPT;
     /**
      * Извлекает мотив обложки для сохранения в cover_subject
      */
-    private function extractSubjectFromCover(\App\Models\BlogPost $post): ?string
-    {
-        // Берём случайный мотив из доступных (тот же что использовался в getRandomPrompt)
-        $recentSubjects = \App\Models\BlogPost::whereNotNull('cover_subject')
-            ->orderByDesc('published_at')
-            ->limit(45)
-            ->pluck('cover_subject')
-            ->toArray();
-        
-        // COVER_PROMPTS — плоский массив строк
-        $allPrompts = self::COVER_PROMPTS;
-        
-        $availablePrompts = array_filter($allPrompts, function($p) use ($recentSubjects) {
-            return !in_array($p, $recentSubjects);
-        });
-        
-        if (empty($availablePrompts)) {
-            $availablePrompts = $allPrompts;
-        }
-        
-        return $availablePrompts[array_rand($availablePrompts)] ?? null;
-    }
 
 }
