@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class VideoController extends Controller
 {
     /**
-     * Получить подписанный URL для видео
+     * Получить signed URL для MP4 видео
      */
     public function getSignedUrl(Request $request, string $slug)
     {
@@ -41,7 +41,40 @@ class VideoController extends Controller
     }
     
     /**
-     * Отдача видео с HTTP Range support для стриминга
+     * Получить signed URL для HLS (master.m3u8)
+     */
+    public function getHlsUrl(Request $request, string $slug)
+    {
+        $validSlugs = ['koster'];
+        
+        if (!in_array($slug, $validSlugs)) {
+            return response()->json(['error' => 'Video not found'], 404);
+        }
+        
+        $hlsPath = storage_path("app/public/video/{$slug}_hls/master.m3u8");
+        if (!file_exists($hlsPath)) {
+            return response()->json(['error' => 'HLS not available'], 404);
+        }
+        
+        $expires = time() + 600;
+        $ip = $request->ip();
+        $userId = $request->user()?->id ?? 0;
+        
+        $payload = "{$slug}|hls|{$expires}|{$ip}|{$userId}";
+        $token = hash_hmac('sha256', $payload, config('app.key'));
+        
+        // Возвращаем путь к HLS папке + токен
+        $url = "/storage/video/{$slug}_hls/master.m3u8?token={$token}&expires={$expires}";
+        
+        return response()->json([
+            'url' => $url,
+            'expires' => $expires,
+            'mode' => 'hls'
+        ]);
+    }
+    
+    /**
+     * Отдача MP4 с HTTP Range support
      */
     public function stream(Request $request, string $slug)
     {
@@ -83,7 +116,6 @@ class VideoController extends Controller
             return response()->json(['error' => 'Cannot open file'], 500);
         }
         
-        // HTTP Range request support для стриминга
         $range = $request->header('Range');
         $start = 0;
         $end = $fileSize - 1;
@@ -99,7 +131,7 @@ class VideoController extends Controller
                     ->header('Content-Range', "bytes */{$fileSize}");
             }
             
-            $statusCode = 206; // Partial Content
+            $statusCode = 206;
             fseek($file, $start);
         }
         
@@ -129,5 +161,36 @@ class VideoController extends Controller
         }
         
         return $response;
+    }
+    
+    /**
+     * Middleware для проверки HLS токена
+     */
+    public function validateHlsToken(Request $request)
+    {
+        $token = $request->query('token');
+        $expires = $request->query('expires');
+        
+        if (!$token || !$expires) {
+            return false;
+        }
+        
+        if (time() > $expires) {
+            return false;
+        }
+        
+        // Извлекаем slug из пути
+        $path = $request->path();
+        if (preg_match('/video\/([^\/]+)_hls\//', $path, $matches)) {
+            $slug = $matches[1];
+            $ip = $request->ip();
+            $userId = $request->user()?->id ?? 0;
+            $payload = "{$slug}|hls|{$expires}|{$ip}|{$userId}";
+            $expectedToken = hash_hmac('sha256', $payload, config('app.key'));
+            
+            return hash_equals($expectedToken, $token);
+        }
+        
+        return false;
     }
 }

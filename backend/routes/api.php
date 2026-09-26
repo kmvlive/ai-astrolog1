@@ -781,3 +781,6 @@ Route::get('/unsubscribe/{userId}/{signature}', function ($userId, $signature) {
 // Видео для медитаций — signed URL
 Route::get('/video-url/{slug}', [App\Http\Controllers\Api\VideoController::class, 'getSignedUrl']);
 Route::get('/video/{slug}', [App\Http\Controllers\Api\VideoController::class, 'stream']);
+
+// HLS видео
+Route::get('/video-hls-url/{slug}', [App\Http\Controllers\Api\VideoController::class, 'getHlsUrl']);
