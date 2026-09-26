@@ -12,6 +12,16 @@ const SCENES = [
   { slug: "earth",     name: "Земля из космоса", emoji: "🌍", free: true, accent: "#3b82f6", desc: "Вид на вращающуюся планету из глубокого космоса" },
 ];
 
+// Премиум-медитации: вертикальные (видео на весь экран на телефоне)
+const PREMIUM_VERTICAL = [
+  { slug: "koster", name: "Ночной костёр", emoji: "🔥", accent: "#f59e0b", desc: "Звуки ночного костра для глубокой медитации и спокойного сна", route: "/meditations/koster" },
+];
+
+// Премиум-медитации: горизонтальные (для десктопа/планшета)
+const PREMIUM_HORIZONTAL = [
+  // Добавим позже: горизонтальные видео-медитации
+];
+
 const DURATIONS = [
   { v: 5,  label: "5 мин" },
   { v: 10, label: "10 мин" },
@@ -44,7 +54,7 @@ export default function MeditationsPage() {
     }
     return true;
   });
-  const isSubscribed = false; // TODO раунд 6: entitlement с бэкенда
+  const isSubscribed = false;
 
   const start = () => {
     if (!sel) return;
@@ -55,6 +65,7 @@ export default function MeditationsPage() {
     <main className="min-h-screen text-white relative">
       <SiteHeader />
       <section className="max-w-5xl mx-auto px-4 py-12">
+        {/* Hero */}
         <div className="text-center mb-10">
           <div className="text-5xl mb-4">🧘</div>
           <h1 className="text-3xl md:text-4xl font-extrabold mb-3">Медитации под звёздами</h1>
@@ -64,7 +75,8 @@ export default function MeditationsPage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-5">
+        {/* === ОБЩАЯ КАТЕГОРИЯ (без подписи) === */}
+        <div className="grid md:grid-cols-3 gap-5 mb-16">
           {SCENES.map((s) => {
             const locked = !s.free && !isSubscribed;
             return (
@@ -93,8 +105,115 @@ export default function MeditationsPage() {
             );
           })}
         </div>
+
+        {/* === РАЗДЕЛИТЕЛЬ === */}
+        <div className="flex items-center gap-4 mb-10">
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
+          <div className="flex items-center gap-3">
+            <div className="h-px w-8 bg-amber-500/50" />
+            <span className="text-2xl">✨</span>
+            <div className="h-px w-8 bg-amber-500/50" />
+          </div>
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
+        </div>
+
+        {/* === ПРЕМИУМ === */}
+        <div className="text-center mb-8">
+          <h2 className="text-5xl md:text-6xl font-black tracking-wider mb-3 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(251,191,36,0.4)]">
+            ПРЕМИУМ
+          </h2>
+          <p className="text-slate-400 text-sm">
+            Эксклюзивные медитации с живым видео и звуком
+          </p>
+        </div>
+
+        {/* === ВЕРТИКАЛЬНЫЕ === */}
+        {PREMIUM_VERTICAL.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-1 h-6 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full" />
+              <h3 className="text-xl font-bold text-slate-200">Вертикальные</h3>
+              <span className="text-xs text-slate-500 font-medium">для телефона</span>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-5">
+              {PREMIUM_VERTICAL.map((s) => {
+                const locked = !isSubscribed;
+                return (
+                  <button
+                    key={s.slug}
+                    onClick={() => !locked && router.push(s.route)}
+                    disabled={locked}
+                    className={`premium-card relative rounded-2xl p-6 text-left border transition overflow-hidden group ${
+                      locked
+                        ? "border-amber-500/10 bg-slate-900/40 opacity-70 cursor-not-allowed"
+                        : "border-amber-500/30 bg-gradient-to-br from-amber-950/40 via-slate-900/70 to-slate-900/90 hover:border-amber-400/60 hover:-translate-y-1"
+                    }`}
+                  >
+                    {/* Бейдж Premium */}
+                    <div className="absolute top-3 right-3">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-100 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full px-2 py-0.5 shadow-lg shadow-amber-500/30">
+                        ⭐ Premium
+                      </span>
+                    </div>
+
+                    {/* Водяной знак */}
+                    <div className="absolute -right-4 -bottom-4 text-8xl opacity-5 group-hover:opacity-10 transition-opacity select-none pointer-events-none">
+                      {s.emoji}
+                    </div>
+
+                    <div className="text-5xl mb-4 drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">
+                      {s.emoji}
+                    </div>
+                    <h3 className="font-bold text-lg mb-2 text-white">{s.name}</h3>
+                    <p className="text-sm text-slate-300 mb-4 relative z-10">{s.desc}</p>
+
+                    {locked ? (
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-200 bg-amber-500/20 border border-amber-500/40 rounded-full px-3 py-1">
+                        🔒 По подписке
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-100 bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/40 rounded-full px-3 py-1">
+                        ▶ Открыть
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* === ГОРИЗОНТАЛЬНЫЕ (пусто — появится позже) === */}
+        {PREMIUM_HORIZONTAL.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-1 h-6 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full" />
+              <h3 className="text-xl font-bold text-slate-200">Горизонтальные</h3>
+              <span className="text-xs text-slate-500 font-medium">для десктопа</span>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-5">
+              {PREMIUM_HORIZONTAL.map((s) => (
+                <div key={s.slug} className="text-slate-500 italic">
+                  Скоро появится...
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {PREMIUM_HORIZONTAL.length === 0 && (
+          <div className="text-center py-8 border border-dashed border-amber-500/20 rounded-2xl bg-amber-500/5 mb-4">
+            <div className="text-3xl mb-2 opacity-50">📺</div>
+            <div className="text-sm text-slate-400">
+              <span className="font-semibold text-amber-300/80">Горизонтальные</span> медитации — в разработке
+            </div>
+          </div>
+        )}
       </section>
 
+      {/* Модалка настроек (только для обычных медитаций) */}
       {sel && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={() => setSel(null)}>
           <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
