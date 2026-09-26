@@ -5,6 +5,14 @@ import { useRouter } from "next/navigation";
 import VideoScene from "@/components/VideoScene";
 import { useAutoHideUI } from "@/hooks/useAutoHideUI";
 
+const DURATIONS = [
+  { v: 5,  label: "5 мин" },
+  { v: 10, label: "10 мин" },
+  { v: 15, label: "15 мин" },
+  { v: 20, label: "20 мин" },
+  { v: 0,  label: "Без лимита" },
+];
+
 export default function KosterMeditation() {
   const router = useRouter();
   const [audioStarted, setAudioStarted] = useState(false);
@@ -19,10 +27,10 @@ export default function KosterMeditation() {
   });
   const [duration, setDuration] = useState(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("meditation_duration");
-      return saved ? parseInt(saved) : 600;
+      const saved = localStorage.getItem("meditation_duration_koster");
+      return saved ? parseInt(saved) : 10; // минуты
     }
-    return 600;
+    return 10;
   });
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -33,11 +41,13 @@ export default function KosterMeditation() {
     enabled: audioStarted && !finished,
   });
 
+  // Сохраняем громкость и длительность
   useEffect(() => {
     localStorage.setItem("meditation_volume", String(volume));
-    localStorage.setItem("meditation_duration", String(duration));
+    localStorage.setItem("meditation_duration_koster", String(duration));
   }, [volume, duration]);
 
+  // Таймер сессии (только если не "без лимита")
   useEffect(() => {
     if (audioStarted && timeLeft !== null && timeLeft > 0) {
       timerRef.current = setInterval(() => {
@@ -49,6 +59,7 @@ export default function KosterMeditation() {
     }
   }, [audioStarted, timeLeft]);
 
+  // Завершение сессии
   useEffect(() => {
     if (timeLeft === 0 && audioStarted) {
       setFinished(true);
@@ -60,7 +71,8 @@ export default function KosterMeditation() {
 
   const startSession = () => {
     setAudioStarted(true);
-    setTimeLeft(duration);
+    // 0 = без лимита → таймер не запускается
+    setTimeLeft(duration === 0 ? null : duration * 60);
   };
 
   const stopSession = () => {
@@ -104,6 +116,9 @@ export default function KosterMeditation() {
                 {formatTime(timeLeft)}
               </div>
             )}
+            {audioStarted && duration === 0 && (
+              <div className="text-sm text-slate-300">∞ Без лимита</div>
+            )}
           </div>
           <div className="w-20" />
         </div>
@@ -118,25 +133,31 @@ export default function KosterMeditation() {
                 Звуки ночного костра для глубокой медитации и спокойного сна
               </p>
 
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-400 mb-2">
-                    Длительность: {Math.floor(duration / 60)} мин
+                  <label className="block text-sm font-semibold text-slate-400 mb-3">
+                    Длительность
                   </label>
-                  <input
-                    type="range"
-                    min="120"
-                    max="1800"
-                    step="60"
-                    value={duration}
-                    onChange={(e) => setDuration(parseInt(e.target.value))}
-                    className="w-full"
-                  />
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {DURATIONS.map((d) => (
+                      <button
+                        key={d.v}
+                        onClick={() => setDuration(d.v)}
+                        className={`px-4 py-2 rounded-xl text-sm font-semibold border transition ${
+                          duration === d.v
+                            ? "bg-amber-600 border-amber-500 text-white shadow-lg shadow-amber-500/30"
+                            : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
+                        }`}
+                      >
+                        {d.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <button
                   onClick={startSession}
-                  className="px-8 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:opacity-90 transition text-lg font-bold"
+                  className="px-8 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:opacity-90 transition text-lg font-bold shadow-lg shadow-amber-500/30"
                 >
                   ▶ Начать медитацию
                 </button>
