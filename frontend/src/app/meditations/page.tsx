@@ -58,6 +58,7 @@ export default function MeditationsPage() {
 
   const start = () => {
     if (!sel) return;
+    if (dur === null) return; // Защита: нельзя запустить без выбора
     router.push(`/meditations/${sel.slug}?dur=${dur}&sound=${sound ? 1 : 0}&moon=${moon ? 1 : 0}`);
   };
 
@@ -219,7 +220,10 @@ export default function MeditationsPage() {
                 {DURATIONS.map((d) => (
                   <button
                     key={d.v}
-                    onClick={() => setDur(d.v)}
+                    onClick={() => {
+                      setDur(d.v);
+                      localStorage.setItem("meditation_duration", String(d.v));
+                    }}
                     className={`px-3 py-1.5 rounded-lg text-sm font-semibold border transition ${
                       dur === d.v
                         ? "bg-violet-600 border-violet-500 text-white"
@@ -257,7 +261,17 @@ export default function MeditationsPage() {
 
             <div className="flex gap-3">
               <button onClick={() => setSel(null)} className="flex-1 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 font-semibold transition">Отмена</button>
-              <button onClick={start} className="flex-1 px-4 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 font-semibold transition">Начать →</button>
+              <button 
+                onClick={start} 
+                disabled={dur === null}
+                className={`flex-1 px-4 py-3 rounded-xl font-semibold transition ${
+                  dur === null
+                    ? "bg-slate-700/50 text-slate-500 cursor-not-allowed"
+                    : "bg-violet-600 hover:bg-violet-500"
+                }`}
+              >
+                {dur === null ? "Выберите время" : "Начать →"}
+              </button>
             </div>
           </div>
         </div>

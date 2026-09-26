@@ -70,6 +70,7 @@ export default function KosterMeditation() {
   }, [timeLeft, audioStarted, router]);
 
   const startSession = () => {
+    if (duration === null) return; // Защита: нельзя запустить без выбора
     setAudioStarted(true);
     // 0 = без лимита → таймер не запускается
     setTimeLeft(duration === 0 ? null : duration * 60);
@@ -157,9 +158,14 @@ export default function KosterMeditation() {
 
                 <button
                   onClick={startSession}
-                  className="px-8 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:opacity-90 transition text-lg font-bold shadow-lg shadow-amber-500/30"
+                  disabled={duration === null}
+                  className={`px-8 py-4 rounded-xl transition text-lg font-bold shadow-lg ${
+                    duration === null
+                      ? "bg-slate-700/50 text-slate-500 cursor-not-allowed shadow-none"
+                      : "bg-gradient-to-r from-amber-500 to-orange-600 hover:opacity-90 shadow-amber-500/30"
+                  }`}
                 >
-                  ▶ Начать медитацию
+                  {duration === null ? "Выберите длительность" : `▶ Начать (${duration === 0 ? "∞" : duration + " мин"})`}
                 </button>
               </div>
             </div>
