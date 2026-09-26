@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Hls from "hls.js";
 
 interface VideoSceneProps {
   slug: string;
@@ -10,46 +11,88 @@ interface VideoSceneProps {
 
 export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const hlsRef = useRef<Hls | null>(null);
+  const [quality, setQuality] = useState<string>("auto");
+  const [levels, setLevels] = useState<{ height: number; bitrate: number }[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // Загружаем signed URL
+  const videoUrl = `/storage/video/${slug}_hls/master.m3u8`;
+
+  // Инициализация HLS
   useEffect(() => {
-    const fetchUrl = async () => {
-      try {
-        const res = await fetch(`/api/video-url/${slug}`);
-        if (!res.ok) throw new Error("Failed to get video URL");
-        const data = await res.json();
-        setVideoUrl(data.url);
-      } catch (err) {
-        setError("Не удалось загрузить видео");
-        console.error("[VideoScene] fetch error:", err);
+    if (!videoRef.current) return;
+
+    const video = videoRef.current;
+
+    if (Hls.isSupported()) {
+      const hls = new Hls({
+        maxBufferLength: 30,
+        maxMaxBufferLength: 60,
+        startLevel: -1, // auto
+        capLevelToPlayerSize: true,
+        enableWorker: true,
+        lowLatencyMode: false,
+      });
+
+      hls.loadSource(videoUrl);
+      hls.attachMedia(video);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+        console.log("[HLS] manifest parsed, levels:", data.levels.length);
+        setLevels(data.levels.map((l) => ({ height: l.height, bitrate: l.bitrate })));
+        
+        video.play().catch((err) => {
+          console.warn("[VideoScene] play failed:", err);
+        });
+      });
+
+      hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
+        const level = hls.levels[data.level];
+        setQuality(`${level.height}p`);
+        console.log(`[HLS] switched to ${level.height}p (${Math.round(level.bitrate / 1000)} kbps)`);
+      });
+
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        if (data.fatal) {
+          console.error("[HLS] fatal error:", data);
+          setError("Ошибка воспроизведения");
+        }
+      });
+
+      hlsRef.current = hls;
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      // Safari имеет нативную поддержку HLS
+      video.src = videoUrl;
+      video.addEventListener("loadedmetadata", () => {
+        video.play().catch((err) => {
+          console.warn("[VideoScene] play failed:", err);
+        });
+      });
+    } else {
+      setError("Ваш браузер не поддерживает HLS");
+    }
+
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
       }
     };
-    fetchUrl();
-  }, [slug]);
+  }, [videoUrl]);
 
-  // Применяем громкость к видео и запускаем play
+  // Применяем громкость
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.volume = volume;
-      // Явно запускаем play если ещё не играет
-      const playPromise = videoRef.current.play();
-      if (playPromise) {
-        playPromise.catch((err) => {
-          console.warn("[VideoScene] play failed:", err);
-        });
-      }
     }
-  }, [volume, videoUrl]);
+  }, [volume]);
 
-  // Блокируем контекстное меню на видео
+  // Блокируем контекстное меню
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     return false;
   };
 
-  // Блокируем drag
   const handleDragStart = (e: React.DragEvent) => {
     e.preventDefault();
     return false;
@@ -66,17 +109,9 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
     );
   }
 
-  if (!videoUrl) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center bg-black text-white">
-        <div className="animate-pulse">Загрузка видео...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-black overflow-hidden">
-      {/* Блюр по бокам на десктопе (вертикальное видео не на весь экран) */}
+      {/* Блюр по бокам на десктопе */}
       <div className="absolute inset-0 hidden md:flex">
         <video
           src={videoUrl}
@@ -92,7 +127,6 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
       {/* Основное видео */}
       <video
         ref={videoRef}
-        src={videoUrl}
         autoPlay
         loop
         playsInline
@@ -105,7 +139,14 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
         style={{ userSelect: "none", WebkitUserSelect: "none" }}
       />
 
-      {/* Прозрачный оверлей поверх видео — блокирует правый клик и скачивание */}
+      {/* Индикатор качества */}
+      {quality !== "auto" && (
+        <div className="absolute top-4 right-4 z-30 bg-black/60 backdrop-blur-sm px-3 py-1 rounded-lg text-xs text-white">
+          {quality}
+        </div>
+      )}
+
+      {/* Прозрачный оверлей */}
       <div
         className="absolute inset-0 z-20"
         onContextMenu={handleContextMenu}
