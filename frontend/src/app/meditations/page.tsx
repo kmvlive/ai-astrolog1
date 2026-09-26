@@ -18,7 +18,7 @@ const PREMIUM_VERTICAL = [
 ];
 
 // Премиум-медитации: горизонтальные (для десктопа/планшета)
-const PREMIUM_HORIZONTAL = [
+const PREMIUM_HORIZONTAL: Array<{ slug: string; name: string; emoji: string; accent: string; desc: string; route: string }> = [
   // Добавим позже: горизонтальные видео-медитации
 ];
 
