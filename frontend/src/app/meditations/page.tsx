@@ -203,14 +203,7 @@ export default function MeditationsPage() {
           </div>
         )}
 
-        {PREMIUM_HORIZONTAL.length === 0 && (
-          <div className="text-center py-8 border border-dashed border-amber-500/20 rounded-2xl bg-amber-500/5 mb-4">
-            <div className="text-3xl mb-2 opacity-50">📺</div>
-            <div className="text-sm text-slate-400">
-              <span className="font-semibold text-amber-300/80">Горизонтальные</span> медитации — в разработке
-            </div>
-          </div>
-        )}
+
       </section>
 
       {/* Модалка настроек (только для обычных медитаций) */}
