@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import VideoScene from "@/components/VideoScene";
+import { useAutoHideUI } from "@/hooks/useAutoHideUI";
 
 export default function KosterMeditation() {
   const router = useRouter();
@@ -19,20 +20,24 @@ export default function KosterMeditation() {
   const [duration, setDuration] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("meditation_duration");
-      return saved ? parseInt(saved) : 600; // 10 минут по умолчанию
+      return saved ? parseInt(saved) : 600;
     }
     return 600;
   });
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Сохраняем громкость и длительность
+  // Immersive: UI автоскрывается после старта медитации
+  const { isVisible } = useAutoHideUI({
+    delay: 3000,
+    enabled: audioStarted && !finished,
+  });
+
   useEffect(() => {
     localStorage.setItem("meditation_volume", String(volume));
     localStorage.setItem("meditation_duration", String(duration));
   }, [volume, duration]);
 
-  // Таймер сессии
   useEffect(() => {
     if (audioStarted && timeLeft !== null && timeLeft > 0) {
       timerRef.current = setInterval(() => {
@@ -44,7 +49,6 @@ export default function KosterMeditation() {
     }
   }, [audioStarted, timeLeft]);
 
-  // Завершение сессии
   useEffect(() => {
     if (timeLeft === 0 && audioStarted) {
       setFinished(true);
@@ -72,14 +76,21 @@ export default function KosterMeditation() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Видео фон */}
-      {audioStarted && <VideoScene slug="koster" volume={volume} />}
+    <div 
+      className="min-h-screen bg-black text-white"
+      style={{ cursor: (audioStarted && !finished && !isVisible) ? "none" : "auto" }}
+    >
+      {audioStarted && <VideoScene slug="koster" volume={volume} uiVisible={isVisible} />}
 
-      {/* Оверлей UI */}
       <div className="relative z-30 min-h-screen flex flex-col">
-        {/* Шапка */}
-        <div className="flex items-center justify-between p-4 bg-black/40 backdrop-blur-sm">
+        {/* Шапка — плавное появление/исчезновение */}
+        <div 
+          className={`flex items-center justify-between p-4 bg-black/40 backdrop-blur-sm transition-all duration-500 ${
+            isVisible 
+              ? "opacity-100 translate-y-0" 
+              : "opacity-0 -translate-y-4 pointer-events-none"
+          }`}
+        >
           <button
             onClick={() => router.push("/meditations")}
             className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition text-sm"
@@ -134,7 +145,13 @@ export default function KosterMeditation() {
           )}
 
           {audioStarted && !finished && (
-            <div className="absolute bottom-24 left-0 right-0 px-4 space-y-4">
+            <div 
+              className={`absolute bottom-24 left-0 right-0 px-4 space-y-4 transition-all duration-500 ${
+                isVisible 
+                  ? "opacity-100 translate-y-0" 
+                  : "opacity-0 translate-y-4 pointer-events-none"
+              }`}
+            >
               <div className="bg-black/60 backdrop-blur-sm rounded-xl p-4 max-w-md mx-auto">
                 <label className="block text-sm font-semibold text-slate-300 mb-2">
                   🔊 Громкость: {Math.round(volume * 100)}%

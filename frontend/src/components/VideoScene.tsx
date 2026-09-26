@@ -7,22 +7,20 @@ interface VideoSceneProps {
   slug: string;
   volume: number;
   onEnded?: () => void;
+  uiVisible?: boolean;
 }
 
-export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
+export default function VideoScene({ slug, volume, onEnded, uiVisible = true }: VideoSceneProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [quality, setQuality] = useState<string>("auto");
   const [currentLevel, setCurrentLevel] = useState<number>(-1);
   const [levels, setLevels] = useState<{ height: number; bitrate: number; index: number }[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [showControls, setShowControls] = useState<boolean>(true);
   const [showQualityMenu, setShowQualityMenu] = useState<boolean>(false);
-  const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const videoUrl = `/storage/video/${slug}_hls/master.m3u8`;
 
-  // Инициализация HLS
   useEffect(() => {
     if (!videoRef.current) return;
 
@@ -61,7 +59,6 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
         const newQuality = `${level.height}p`;
         setQuality(newQuality);
         setCurrentLevel(data.level);
-        console.log(`[HLS] switched to ${level.height}p (${Math.round(level.bitrate / 1000)} kbps)`);
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
@@ -91,38 +88,15 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
     };
   }, [videoUrl]);
 
-  // Применяем громкость
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.volume = volume;
     }
   }, [volume]);
 
-  // Автоскрытие контролов через 3 секунды бездействия
-  useEffect(() => {
-    const resetTimer = () => {
-      setShowControls(true);
-      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-      hideTimerRef.current = setTimeout(() => {
-        if (!showQualityMenu) setShowControls(false);
-      }, 3000);
-    };
-
-    window.addEventListener("mousemove", resetTimer);
-    window.addEventListener("touchstart", resetTimer);
-    resetTimer();
-
-    return () => {
-      window.removeEventListener("mousemove", resetTimer);
-      window.removeEventListener("touchstart", resetTimer);
-      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-    };
-  }, [showQualityMenu]);
-
-  // Ручное переключение качества
   const handleQualityChange = (levelIndex: number) => {
     if (hlsRef.current) {
-      hlsRef.current.currentLevel = levelIndex; // -1 = auto
+      hlsRef.current.currentLevel = levelIndex;
       setCurrentLevel(levelIndex);
       if (levelIndex === -1) {
         setQuality("auto");
@@ -134,7 +108,6 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
     }
   };
 
-  // Блокируем контекстное меню
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     return false;
@@ -157,11 +130,7 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
   }
 
   return (
-    <div 
-      className="absolute inset-0 flex items-center justify-center bg-black overflow-hidden"
-      onMouseMove={() => { setShowControls(true); }}
-      onTouchStart={() => { setShowControls(true); }}
-    >
+    <div className="absolute inset-0 flex items-center justify-center bg-black overflow-hidden">
       {/* Блюр по бокам на десктопе */}
       <div className="absolute inset-0 hidden md:flex">
         <video
@@ -190,12 +159,14 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
         style={{ userSelect: "none", WebkitUserSelect: "none" }}
       />
 
-      {/* Индикатор текущего качества — правый верхний угол */}
-      {quality !== "auto" && (
+      {/* Индикатор качества — плавное появление/исчезновение */}
+      <div 
+        className={`absolute top-4 right-4 z-40 transition-opacity duration-500 ${
+          uiVisible ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      >
         <div 
-          className={`absolute top-4 right-4 z-40 px-3 py-1.5 rounded-lg text-sm font-semibold text-white backdrop-blur-md transition-opacity duration-500 ${
-            showControls ? "opacity-100" : "opacity-0"
-          }`}
+          className="px-3 py-1.5 rounded-lg text-sm font-semibold text-white backdrop-blur-md"
           style={{ 
             background: "linear-gradient(135deg, rgba(139,92,246,0.8), rgba(168,85,247,0.8))",
             boxShadow: "0 4px 12px rgba(0,0,0,0.4)"
@@ -203,15 +174,15 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
         >
           🎥 {quality}
         </div>
-      )}
+      </div>
 
-      {/* Кнопка настроек качества — правый нижний угол */}
+      {/* Кнопка настроек качества + меню */}
       {levels.length > 0 && (
         <div className="absolute bottom-6 right-6 z-40">
           <button
             onClick={() => setShowQualityMenu(!showQualityMenu)}
-            className={`w-12 h-12 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-black/80 transition-all duration-300 ${
-              showControls ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            className={`w-12 h-12 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-black/80 transition-all duration-500 ${
+              uiVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
             }`}
             aria-label="Настройки качества"
             title="Качество видео"
@@ -222,10 +193,9 @@ export default function VideoScene({ slug, volume, onEnded }: VideoSceneProps) {
             </svg>
           </button>
 
-          {/* Меню выбора качества */}
           {showQualityMenu && (
             <div 
-              className="absolute bottom-16 right-0 bg-black/90 backdrop-blur-md border border-white/20 rounded-xl p-2 min-w-[180px]"
+              className="absolute bottom-16 right-0 bg-black/90 backdrop-blur-md border border-white/20 rounded-xl p-2 min-w-[180px] animate-fade-in"
               style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.6)" }}
             >
               <div className="text-xs text-slate-400 uppercase font-semibold px-3 py-1.5 border-b border-white/10 mb-1">
