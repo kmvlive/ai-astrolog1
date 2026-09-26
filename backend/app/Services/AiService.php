@@ -424,6 +424,10 @@ PROMPT;
 
             $content = preg_replace('/^\s*#{1,6}\s+[^\n]+\n+/', '', trim($content), 1);
             $title = $this->extractTitle($content) ?: "Энергии дня: " . $today->translatedFormat('d F Y');
+            // Очистка заголовка от markdown-мусора (#, **, __)
+            $title = trim(preg_replace('/^#+\s*/u', '', $title));
+            $title = trim(preg_replace('/\s*#+$/u', '', $title));
+            $title = str_replace(['**', '__'], '', $title);
 
             // Защита от дублей заголовка (0 руб, без повторного AI)
             if (BlogPost::where('title', $title)->exists()) {
