@@ -25,12 +25,12 @@ export default function KosterMeditation() {
     }
     return 0.35;
   });
-  const [duration, setDuration] = useState(() => {
+  const [duration, setDuration] = useState<number>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("meditation_duration_koster");
-      return saved ? parseInt(saved) : 10; // минуты
+      if (saved !== null && saved !== "") return parseInt(saved, 10);
     }
-    return 10;
+    return 10; // 10 минут по умолчанию — всегда что-то выбрано
   });
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -140,19 +140,26 @@ export default function KosterMeditation() {
                     Длительность
                   </label>
                   <div className="flex flex-wrap justify-center gap-2">
-                    {DURATIONS.map((d) => (
-                      <button
-                        key={d.v}
-                        onClick={() => setDuration(d.v)}
-                        className={`px-4 py-2 rounded-xl text-sm font-semibold border transition ${
-                          duration === d.v
-                            ? "bg-amber-600 border-amber-500 text-white shadow-lg shadow-amber-500/30"
-                            : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
-                        }`}
-                      >
-                        {d.label}
-                      </button>
-                    ))}
+                    {DURATIONS.map((d) => {
+                      const isDefault = duration === null && d.v === 10;
+                      const isSelected = duration === d.v;
+                      return (
+                        <button
+                          key={d.v}
+                          onClick={() => setDuration(d.v)}
+                          className={`px-4 py-2 rounded-xl text-sm font-semibold border transition ${
+                            isSelected
+                              ? "bg-amber-600 border-amber-500 text-white shadow-lg shadow-amber-500/30"
+                              : isDefault
+                              ? "bg-amber-500/10 border-amber-400 border-dashed text-amber-200 hover:bg-amber-500/20"
+                              : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
+                          }`}
+                        >
+                          {d.label}
+                          {isDefault && <span className="ml-1 text-xs opacity-70">•</span>}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 

@@ -33,12 +33,12 @@ const DURATIONS = [
 export default function MeditationsPage() {
   const router = useRouter();
   const [sel, setSel] = useState<(typeof SCENES)[number] | null>(null);
-  const [dur, setDur] = useState(() => {
+  const [dur, setDur] = useState<number>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("meditation_duration");
-      return saved ? parseInt(saved, 10) : 10;
+      if (saved !== null && saved !== "") return parseInt(saved, 10);
     }
-    return 10;
+    return 10; // 10 минут по умолчанию — всегда что-то выбрано
   });
   const [sound, setSound] = useState(() => {
     if (typeof window !== "undefined") {
@@ -217,22 +217,29 @@ export default function MeditationsPage() {
             <div className="mb-5">
               <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2">Длительность</div>
               <div className="flex flex-wrap gap-2">
-                {DURATIONS.map((d) => (
-                  <button
-                    key={d.v}
-                    onClick={() => {
-                      setDur(d.v);
-                      localStorage.setItem("meditation_duration", String(d.v));
-                    }}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold border transition ${
-                      dur === d.v
-                        ? "bg-violet-600 border-violet-500 text-white"
-                        : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
-                    }`}
-                  >
-                    {d.label}
-                  </button>
-                ))}
+                {DURATIONS.map((d) => {
+                  const isDefault = dur === null && d.v === 10;
+                  const isSelected = dur === d.v;
+                  return (
+                    <button
+                      key={d.v}
+                      onClick={() => {
+                        setDur(d.v);
+                        localStorage.setItem("meditation_duration", String(d.v));
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold border transition ${
+                        isSelected
+                          ? "bg-violet-600 border-violet-500 text-white"
+                          : isDefault
+                          ? "bg-violet-500/10 border-violet-400 border-dashed text-violet-200 hover:bg-violet-500/20"
+                          : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
+                      }`}
+                    >
+                      {d.label}
+                      {isDefault && <span className="ml-1 text-xs opacity-70">•</span>}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
