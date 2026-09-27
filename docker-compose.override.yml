@@ -10,8 +10,8 @@ services:
       - DB_DATABASE=astro_neiro_db
       - DB_USERNAME=astro_neiro_user
       - DB_PASSWORD=N3ir0Astro_Secur3Pass_2024!
-      - REDIS_HOST=172.18.0.3
-      - REDIS_PORT=6379
+      - REDIS_HOST=127.0.0.1
+      - REDIS_PORT=6380
     volumes:
       - ./backend:/var/www/html
       - ./backend/docker/nginx/default.conf:/etc/nginx/sites-available/default.conf:ro
