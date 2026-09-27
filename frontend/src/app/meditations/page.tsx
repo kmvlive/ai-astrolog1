@@ -44,6 +44,20 @@ const [dur, setDur] = useState<number>(() => {
     }
     return 10; // 10 минут по умолчанию — ВСЕГДА что-то выбрано
   });
+
+  // Миграция: при загрузке страницы чистим мусор из localStorage
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem("meditation_duration");
+    if (saved) {
+      const v = parseInt(saved, 10);
+      if (Number.isNaN(v) || saved === "null" || saved === "undefined") {
+        console.log("[migration] Удалён мусор из localStorage:", saved);
+        localStorage.removeItem("meditation_duration");
+      }
+    }
+  }, []);
+
   const [sound, setSound] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("meditation_sound");
