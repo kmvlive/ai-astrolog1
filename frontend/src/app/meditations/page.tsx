@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -12,15 +12,11 @@ const SCENES = [
   { slug: "earth",     name: "Земля из космоса", emoji: "🌍", free: true, accent: "#3b82f6", desc: "Вид на вращающуюся планету из глубокого космоса" },
 ];
 
-// Премиум-медитации: вертикальные (видео на весь экран на телефоне)
 const PREMIUM_VERTICAL = [
   { slug: "koster", name: "Ночной костёр", emoji: "🔥", accent: "#f59e0b", desc: "Звуки ночного костра для глубокой медитации и спокойного сна", route: "/meditations/koster", free: true },
 ];
 
-// Премиум-медитации: горизонтальные (для десктопа/планшета)
-const PREMIUM_HORIZONTAL: Array<{ slug: string; name: string; emoji: string; accent: string; desc: string; route: string }> = [
-  // Добавим позже: горизонтальные видео-медитации
-];
+const PREMIUM_HORIZONTAL: Array<{ slug: string; name: string; emoji: string; accent: string; desc: string; route: string }> = [];
 
 const DURATIONS = [
   { v: 5,  label: "5 мин" },
@@ -33,30 +29,14 @@ const DURATIONS = [
 export default function MeditationsPage() {
   const router = useRouter();
   const [sel, setSel] = useState<(typeof SCENES)[number] | null>(null);
-const [dur, setDur] = useState<number>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("meditation_duration");
-      if (saved) {
-        const v = parseInt(saved, 10);
-        if (!Number.isNaN(v)) return v;
-        localStorage.removeItem("meditation_duration"); // чистим мусор ("null" и т.п.)
-      }
-    }
-    return 10; // 10 минут по умолчанию — ВСЕГДА что-то выбрано
-  });
-
-  // Миграция: при загрузке страницы чистим мусор из localStorage
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  
+  const [dur, setDur] = useState<number>(() => {
+    if (typeof window === "undefined") return 10;
     const saved = localStorage.getItem("meditation_duration");
-    if (saved) {
-      const v = parseInt(saved, 10);
-      if (Number.isNaN(v) || saved === "null" || saved === "undefined") {
-        console.log("[migration] Удалён мусор из localStorage:", saved);
-        localStorage.removeItem("meditation_duration");
-      }
-    }
-  }, []);
+    if (!saved) return 10;
+    const v = parseInt(saved, 10);
+    return Number.isNaN(v) ? 10 : v;
+  });
 
   const [sound, setSound] = useState(() => {
     if (typeof window !== "undefined") {
@@ -76,7 +56,6 @@ const [dur, setDur] = useState<number>(() => {
 
   const start = () => {
     if (!sel) return;
-    if (dur === null) return; // Защита: нельзя запустить без выбора
     router.push(`/meditations/${sel.slug}?dur=${dur}&sound=${sound ? 1 : 0}&moon=${moon ? 1 : 0}`);
   };
 
@@ -84,7 +63,6 @@ const [dur, setDur] = useState<number>(() => {
     <main className="min-h-screen text-white relative">
       <SiteHeader />
       <section className="max-w-5xl mx-auto px-4 py-12">
-        {/* Hero */}
         <div className="text-center mb-10">
           <div className="text-5xl mb-4">🧘</div>
           <h1 className="text-3xl md:text-4xl font-extrabold mb-3">Медитации под звёздами</h1>
@@ -94,7 +72,6 @@ const [dur, setDur] = useState<number>(() => {
           </p>
         </div>
 
-        {/* === ОБЩАЯ КАТЕГОРИЯ (без подписи) === */}
         <div className="grid md:grid-cols-3 gap-5 mb-16">
           {SCENES.map((s) => {
             const locked = !s.free && !isSubscribed;
@@ -125,7 +102,6 @@ const [dur, setDur] = useState<number>(() => {
           })}
         </div>
 
-        {/* === РАЗДЕЛИТЕЛЬ === */}
         <div className="flex items-center gap-4 mb-10">
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
           <div className="flex items-center gap-3">
@@ -136,17 +112,13 @@ const [dur, setDur] = useState<number>(() => {
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
         </div>
 
-        {/* === ПРЕМИУМ === */}
         <div className="text-center mb-8">
           <h2 className="text-5xl md:text-6xl font-black tracking-wider mb-3 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(251,191,36,0.4)]">
             ПРЕМИУМ
           </h2>
-          <p className="text-slate-400 text-sm">
-            Эксклюзивные медитации с живым видео и звуком
-          </p>
+          <p className="text-slate-400 text-sm">Эксклюзивные медитации с живым видео и звуком</p>
         </div>
 
-        {/* === ВЕРТИКАЛЬНЫЕ === */}
         {PREMIUM_VERTICAL.length > 0 && (
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-5">
@@ -169,14 +141,12 @@ const [dur, setDur] = useState<number>(() => {
                         : "border-amber-500/30 bg-gradient-to-br from-amber-950/40 via-slate-900/70 to-slate-900/90 hover:border-amber-400/60 hover:-translate-y-1"
                     }`}
                   >
-                    {/* Бейдж Premium */}
                     <div className="absolute top-3 right-3">
                       <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-100 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full px-2 py-0.5 shadow-lg shadow-amber-500/30">
                         ⭐ Premium
                       </span>
                     </div>
 
-                    {/* Водяной знак */}
                     <div className="absolute -right-4 -bottom-4 text-8xl opacity-5 group-hover:opacity-10 transition-opacity select-none pointer-events-none">
                       {s.emoji}
                     </div>
@@ -203,7 +173,6 @@ const [dur, setDur] = useState<number>(() => {
           </div>
         )}
 
-        {/* === ГОРИЗОНТАЛЬНЫЕ (пусто — появится позже) === */}
         {PREMIUM_HORIZONTAL.length > 0 && (
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-5">
@@ -221,11 +190,8 @@ const [dur, setDur] = useState<number>(() => {
             </div>
           </div>
         )}
-
-
       </section>
 
-      {/* Модалка настроек (только для обычных медитаций) */}
       {sel && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={() => setSel(null)}>
           <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
@@ -235,29 +201,22 @@ const [dur, setDur] = useState<number>(() => {
             <div className="mb-5">
               <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2">Длительность</div>
               <div className="flex flex-wrap gap-2">
-                {DURATIONS.map((d) => {
-                  const isDefault = dur === null && d.v === 10;
-                  const isSelected = dur === d.v;
-                  return (
-                    <button
-                      key={d.v}
-                      onClick={() => {
-                        setDur(d.v);
-                        localStorage.setItem("meditation_duration", String(d.v));
-                      }}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold border transition ${
-                        isSelected
-                          ? "bg-violet-600 border-violet-500 text-white"
-                          : isDefault
-                          ? "bg-violet-500/10 border-violet-400 border-dashed text-violet-200 hover:bg-violet-500/20"
-                          : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
-                      }`}
-                    >
-                      {d.label}
-                      {isDefault && <span className="ml-1 text-xs opacity-70">•</span>}
-                    </button>
-                  );
-                })}
+                {DURATIONS.map((d) => (
+                  <button
+                    key={d.v}
+                    onClick={() => {
+                      setDur(d.v);
+                      localStorage.setItem("meditation_duration", String(d.v));
+                    }}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold border transition ${
+                      dur === d.v
+                        ? "bg-violet-600 border-violet-500 text-white"
+                        : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
+                    }`}
+                  >
+                    {d.label}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -286,16 +245,11 @@ const [dur, setDur] = useState<number>(() => {
 
             <div className="flex gap-3">
               <button onClick={() => setSel(null)} className="flex-1 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 font-semibold transition">Отмена</button>
-              <button 
-                onClick={start} 
-                disabled={dur === null}
-                className={`flex-1 px-4 py-3 rounded-xl font-semibold transition ${
-                  dur === null
-                    ? "bg-slate-700/50 text-slate-500 cursor-not-allowed"
-                    : "bg-violet-600 hover:bg-violet-500"
-                }`}
+              <button
+                onClick={start}
+                className="flex-1 px-4 py-3 rounded-xl font-semibold transition bg-violet-600 hover:bg-violet-500"
               >
-                {dur === null ? "Выберите время" : "Начать →"}
+                Начать →
               </button>
             </div>
           </div>
