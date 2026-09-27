@@ -25,12 +25,16 @@ export default function KosterMeditation() {
     }
     return 0.35;
   });
-  const [duration, setDuration] = useState<number>(() => {
+const [duration, setDuration] = useState<number>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("meditation_duration_koster");
-      if (saved !== null && saved !== "") return parseInt(saved, 10);
+      if (saved) {
+        const v = parseInt(saved, 10);
+        if (!Number.isNaN(v)) return v;
+        localStorage.removeItem("meditation_duration_koster"); // чистим мусор
+      }
     }
-    return 10; // 10 минут по умолчанию — всегда что-то выбрано
+    return 10; // 10 минут по умолчанию — ВСЕГДА что-то выбрано
   });
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);

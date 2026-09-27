@@ -33,12 +33,16 @@ const DURATIONS = [
 export default function MeditationsPage() {
   const router = useRouter();
   const [sel, setSel] = useState<(typeof SCENES)[number] | null>(null);
-  const [dur, setDur] = useState<number>(() => {
+const [dur, setDur] = useState<number>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("meditation_duration");
-      if (saved !== null && saved !== "") return parseInt(saved, 10);
+      if (saved) {
+        const v = parseInt(saved, 10);
+        if (!Number.isNaN(v)) return v;
+        localStorage.removeItem("meditation_duration"); // чистим мусор ("null" и т.п.)
+      }
     }
-    return 10; // 10 минут по умолчанию — всегда что-то выбрано
+    return 10; // 10 минут по умолчанию — ВСЕГДА что-то выбрано
   });
   const [sound, setSound] = useState(() => {
     if (typeof window !== "undefined") {
