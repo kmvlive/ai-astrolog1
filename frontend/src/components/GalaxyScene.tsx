@@ -66,7 +66,7 @@ export default function GalaxyScene() {
 
     let raf = 0;
     let w = 0, h = 0;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
 
     let bgStars: BgStar[] = [];
     let brightStars: BrightStar[] = [];
@@ -131,7 +131,7 @@ export default function GalaxyScene() {
       };
 
       // === ЧАСТИЦЫ РУКАВОВ ===
-      const TOTAL = 3900; // больше частиц на 3 рукава
+      const TOTAL = Math.max(1600, Math.round(3900 * Math.min(1, (w * h) / (1280 * 800)))); // адаптивно: меньше частиц на телефонах
       for (let i = 0; i < TOTAL; i++) {
         const t = Math.pow(rnd(), 0.62);
         const r = galaxyR * (0.05 + 0.95 * t);
@@ -213,15 +213,19 @@ export default function GalaxyScene() {
     }
 
     const resize = () => {
-      w = window.innerWidth; h = window.innerHeight;
+      w = canvas.clientWidth || window.innerWidth;
+      h = canvas.clientHeight || window.innerHeight;
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       buildStars();
       buildGalaxy();
     };
     resize();
     window.addEventListener("resize", resize);
+    window.addEventListener("orientationchange", resize);
+    if (typeof ResizeObserver !== "undefined") {
+      new ResizeObserver(() => resize()).observe(canvas);
+    }
 
     let time = 0;
     let last = performance.now();
@@ -230,6 +234,10 @@ export default function GalaxyScene() {
       const now = performance.now();
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
+
+      // Мобильная страховка: размер мог измениться (URL-бар, поворот)
+      if (canvas.clientWidth !== w || canvas.clientHeight !== h) resize();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // чистый трансформ каждый кадр
 
       // === ФОН ===
       ctx.globalCompositeOperation = "source-over";
