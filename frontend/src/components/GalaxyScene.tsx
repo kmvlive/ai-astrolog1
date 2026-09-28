@@ -73,7 +73,7 @@ export default function GalaxyScene() {
         brightStars.push({
           x: hash(i * 13.7 + 1) * w,
           y: hash(i * 17.9 + 2) * h * 0.9,
-          r: 1.6 + hash(i * 19.1 + 3) * 1.6,
+          r: 2.4 + hash(i * 19.1 + 3) * 2.2,
           phase: hash(i * 23.3 + 4) * Math.PI * 2,
           cr: cRoll < 0.5 ? 255 : 190,
           cg: cRoll < 0.5 ? 240 : 215,
@@ -83,7 +83,7 @@ export default function GalaxyScene() {
     }
 
     function buildGalaxy() {
-      galaxyR = Math.min(w, h) * 0.62;
+      galaxyR = Math.min(w, h) * 0.42; // галактика подальше
       const S = Math.ceil(galaxyR * 2.15);
       layerHalf = S / 2;
       const C = S / 2;
@@ -191,7 +191,7 @@ export default function GalaxyScene() {
       // Яркие звёзды с дифракционными лучами
       ctx.globalCompositeOperation = "lighter";
       for (const b of brightStars) {
-        const tw = 0.7 + 0.3 * Math.sin(time * 0.8 + b.phase);
+        const tw = 0.45 + 0.55 * Math.sin(time * 0.5 + b.phase); // более заметное мерцание
         const R = b.r * 6 * tw;
         const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, R);
         grad.addColorStop(0, `rgba(${b.cr},${b.cg},${b.cb},${0.9 * tw})`);
@@ -199,12 +199,7 @@ export default function GalaxyScene() {
         grad.addColorStop(1, `rgba(${b.cr},${b.cg},${b.cb},0)`);
         ctx.fillStyle = grad;
         ctx.beginPath(); ctx.arc(b.x, b.y, R, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = `rgba(${b.cr},${b.cg},${b.cb},${0.5 * tw})`;
-        ctx.lineWidth = 0.8;
-        ctx.beginPath();
-        ctx.moveTo(b.x - R * 1.6, b.y); ctx.lineTo(b.x + R * 1.6, b.y);
-        ctx.moveTo(b.x, b.y - R * 1.6); ctx.lineTo(b.x, b.y + R * 1.6);
-        ctx.stroke();
+        // без крестов — только мягкое свечение
       }
 
       // Галактика: наклон диска + сжатие (вид под углом)
