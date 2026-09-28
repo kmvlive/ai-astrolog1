@@ -6,6 +6,7 @@ import MountainScene from "@/components/MountainScene";
 import SeaScene from "@/components/SeaScene";
 import SpaceScene from "@/components/SpaceScene";
 import EarthScene from "@/components/EarthScene";
+import GalaxyScene from "@/components/GalaxyScene";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 const NAMES: Record<string, { name: string; emoji: string }> = {
@@ -13,6 +14,7 @@ const NAMES: Record<string, { name: string; emoji: string }> = {
   sea: { name: "Ночь на море", emoji: "" },
   space: { name: "Полёт в корабле", emoji: "" },
   earth: { name: "Земля из космоса", emoji: "" },
+  galaxy: { name: "Галактика", emoji: "🌌" },
 };
 
 function moonPhaseIndex(d: Date): number {
@@ -67,7 +69,8 @@ function Player() {
     if (!audioRef.current) {
       audioRef.current = new AudioEngine();
     }
-    await audioRef.current.start(slug as "mountains" | "sea" | "space", volume);
+    const audioScene = (slug === "galaxy" ? "space" : slug) as "mountains" | "sea" | "space";
+    await audioRef.current.start(audioScene, volume);
     audioRef.current.setVolume(volume); // гарантированно ставим громкость сессии
     setAudioStarted(true);
   };
@@ -132,6 +135,8 @@ function Player() {
         <SpaceScene moonPhase={moon ? moonPhaseIndex(new Date()) : 4} />
       ) : slug === "earth" ? (
         <EarthScene moon={moon} />
+      ) : slug === "galaxy" ? (
+        <GalaxyScene />
       ) : (
         <div className="star-layer" aria-hidden="true" />
       )}
