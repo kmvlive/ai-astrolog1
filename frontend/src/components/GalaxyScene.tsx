@@ -235,6 +235,7 @@ export default function GalaxyScene() {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
 
+    try {
       // Мобильная страховка: размер мог измениться (URL-бар, поворот)
       if (canvas.clientWidth !== w || canvas.clientHeight !== h) resize();
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // чистый трансформ каждый кадр
@@ -329,7 +330,13 @@ export default function GalaxyScene() {
 
       time += dt;
       raf = requestAnimationFrame(draw);
-    };
+    } catch (err) {
+      console.error("[GalaxyScene] draw error:", err);
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = "#05050f";
+      ctx.fillRect(0, 0, w, h);
+    }
+  };
     draw();
 
     return () => {
@@ -338,5 +345,11 @@ export default function GalaxyScene() {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="fixed inset-0 -z-10" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 -z-10"
+      style={{ position: "fixed", inset: 0, zIndex: -10, background: "#05050f", display: "block", width: "100%", height: "100%" }}
+    />
+  );
 }
