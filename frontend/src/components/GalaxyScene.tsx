@@ -263,8 +263,8 @@ export default function GalaxyScene() {
       // === КРУПНЫЕ МОРГАЮЩИЕ ЗВЁЗДЫ (без крестов) ===
       ctx.globalCompositeOperation = "lighter";
       for (const b of brightStars) {
-        const tw = 0.45 + 0.55 * Math.sin(time * 0.5 + b.phase);
-        const R = b.r * 5 * tw;
+        const tw = 0.5 + 0.5 * Math.sin(time * 0.5 + b.phase); // 0..1 — без отрицательного радиуса
+        const R = Math.max(0.1, b.r * 5 * tw);
         const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, R);
         grad.addColorStop(0, `rgba(${b.cr},${b.cg},${b.cb},${0.95 * tw})`);
         grad.addColorStop(0.25, `rgba(${b.cr},${b.cg},${b.cb},${0.30 * tw})`);
