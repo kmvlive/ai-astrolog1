@@ -14,7 +14,7 @@ interface BrightStar {
   cr: number; cg: number; cb: number;
 }
 
-const ARMS = 2;
+const ARMS = 3; // три спиральных рукава
 const PITCH_B = 0.36; // тангенс угла наклона спирали
 
 // === ПЛАВНАЯ ПАЛИТРА как на референсе ===
@@ -131,7 +131,7 @@ export default function GalaxyScene() {
       };
 
       // === ЧАСТИЦЫ РУКАВОВ ===
-      const TOTAL = 3000;
+      const TOTAL = 3900; // больше частиц на 3 рукава
       for (let i = 0; i < TOTAL; i++) {
         const t = Math.pow(rnd(), 0.62);
         const r = galaxyR * (0.05 + 0.95 * t);
