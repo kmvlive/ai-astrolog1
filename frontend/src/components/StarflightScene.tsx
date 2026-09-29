@@ -162,10 +162,8 @@ export default function StarflightScene() {
           const s = Math.max(w / interior.width, h / interior.height);
           const dw = interior.width * s;
           const dh = interior.height * s;
-          // едва заметная вибрация корпуса на гиперзвуке
-          const shX = Math.sin(time * 13.7) * 0.6 + Math.sin(time * 7.3) * 0.4;
-          const shY = Math.cos(time * 11.1) * 0.5 + Math.sin(time * 5.9) * 0.4;
-          ctx.drawImage(interior, (w - dw) / 2 + shX, (h - dh) / 2 + shY, dw, dh);
+          // интерьер статичен — летят только звёзды за иллюминаторами
+          ctx.drawImage(interior, (w - dw) / 2, (h - dh) / 2, dw, dh);
         }
 
         time += dt;
