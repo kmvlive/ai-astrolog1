@@ -206,17 +206,17 @@ export default function RainScene() {
         ctx.beginPath(); ctx.arc(cx, cy, h * 0.16, 0, Math.PI * 2); ctx.fill();
 
         // Анимированный дымок над кружкой (кружка на фото ~68% ширины)
-        const cupX = w * 0.685, cupY = h * 0.875;
+        const cupX = w * 0.685, cupY = h * 0.905; // прямо у кромки кружки
         ctx.lineCap = "round";
         const wisps = isMobile ? 2 : 3;
         for (let i = 0; i < wisps; i++) {
           const phase = time * (0.7 + i * 0.23) + i * 2.1;
           ctx.strokeStyle = `rgba(255, 255, 255, ${0.05 - i * 0.008})`;
-          ctx.lineWidth = 3 + i * 1.5;
+          ctx.lineWidth = 2 + i; // тоньше
           ctx.beginPath();
           for (let t2 = 0; t2 <= 1; t2 += 0.08) {
-            const yy = cupY - t2 * h * 0.16;
-            const xx = cupX + (i - 1) * 6 + Math.sin(t2 * 5 + phase) * (4 + t2 * 10);
+            const yy = cupY - t2 * h * 0.09; // короче
+            const xx = cupX + (i - 1) * 4 + Math.sin(t2 * 5 + phase) * (2 + t2 * 5); // уже
             if (t2 === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
           }
           ctx.stroke();
