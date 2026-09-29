@@ -8,6 +8,7 @@ import SpaceScene from "@/components/SpaceScene";
 import EarthScene from "@/components/EarthScene";
 import GalaxyScene from "@/components/GalaxyScene";
 import StarflightScene from "@/components/StarflightScene";
+import RainScene from "@/components/RainScene";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 const NAMES: Record<string, { name: string; emoji: string }> = {
@@ -17,6 +18,7 @@ const NAMES: Record<string, { name: string; emoji: string }> = {
   earth: { name: "Земля из космоса", emoji: "" },
   galaxy: { name: "Галактика", emoji: "🌌" },
   starflight: { name: "Полёт сквозь звёзды", emoji: "💫" },
+  rain: { name: "Дождь за окном", emoji: "🌧️" },
 };
 
 function moonPhaseIndex(d: Date): number {
@@ -71,7 +73,7 @@ function Player() {
     if (!audioRef.current) {
       audioRef.current = new AudioEngine();
     }
-    const audioScene = (slug === "galaxy" || slug === "starflight" ? "space" : slug) as "mountains" | "sea" | "space";
+    const audioScene = (slug === "galaxy" || slug === "starflight" ? "space" : slug) as "mountains" | "sea" | "space" | "rain";
     await audioRef.current.start(audioScene, volume);
     audioRef.current.setVolume(volume); // гарантированно ставим громкость сессии
     setAudioStarted(true);
@@ -141,6 +143,8 @@ function Player() {
         <GalaxyScene />
       ) : slug === "starflight" ? (
         <StarflightScene />
+      ) : slug === "rain" ? (
+        <RainScene />
       ) : (
         <div className="star-layer" aria-hidden="true" />
       )}

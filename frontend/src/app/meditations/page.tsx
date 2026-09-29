@@ -18,7 +18,9 @@ const PREMIUM_VERTICAL = [
   { slug: "koster", name: "Ночной костёр", emoji: "🔥", accent: "#f59e0b", desc: "Звуки ночного костра для глубокой медитации и спокойного сна", route: "/meditations/koster", free: true },
 ];
 
-const PREMIUM_HORIZONTAL: Array<{ slug: string; name: string; emoji: string; accent: string; desc: string; route: string }> = [];
+const PREMIUM_HORIZONTAL: Array<{ slug: string; name: string; emoji: string; accent: string; desc: string; route: string; free: boolean }> = [
+  { slug: "rain", name: "Дождь за окном", emoji: "🌧️", accent: "#64748b", desc: "Капли стекают по стеклу, огни города тают в боке", route: "/meditations/rain", free: true },
+];
 
 const DURATIONS = [
   { v: 5,  label: "5 мин" },
@@ -184,11 +186,44 @@ export default function MeditationsPage() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-5">
-              {PREMIUM_HORIZONTAL.map((s) => (
-                <div key={s.slug} className="text-slate-500 italic">
-                  Скоро появится...
-                </div>
-              ))}
+              {PREMIUM_HORIZONTAL.map((s) => {
+                const locked = !s.free && !isSubscribed;
+                return (
+                  <button
+                    key={s.slug}
+                    onClick={() => !locked && router.push(s.route)}
+                    disabled={locked}
+                    className={`premium-card relative rounded-2xl p-6 text-left border transition overflow-hidden group ${
+                      locked
+                        ? "border-amber-500/10 bg-slate-900/40 opacity-70 cursor-not-allowed"
+                        : "border-amber-500/30 bg-gradient-to-br from-amber-950/40 via-slate-900/70 to-slate-900/90 hover:border-amber-400/60 hover:-translate-y-1"
+                    }`}
+                  >
+                    <div className="absolute top-3 right-3">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-100 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full px-2 py-0.5 shadow-lg shadow-amber-500/30">
+                        ⭐ Premium
+                      </span>
+                    </div>
+                    <div className="absolute -right-4 -bottom-4 text-8xl opacity-5 group-hover:opacity-10 transition-opacity select-none pointer-events-none">
+                      {s.emoji}
+                    </div>
+                    <div className="text-5xl mb-4 drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">
+                      {s.emoji}
+                    </div>
+                    <h3 className="font-bold text-lg mb-2 text-white">{s.name}</h3>
+                    <p className="text-sm text-slate-300 mb-4 relative z-10">{s.desc}</p>
+                    {locked ? (
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-200 bg-amber-500/20 border border-amber-500/40 rounded-full px-3 py-1">
+                        🔒 По подписке
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-100 bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/40 rounded-full px-3 py-1">
+                        ▶ Открыть
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
