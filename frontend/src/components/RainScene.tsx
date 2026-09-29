@@ -18,13 +18,15 @@ export default function RainScene() {
 
     let raf = 0;
     let w = 0, h = 0;
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+    const isMobile = typeof window !== "undefined" && (navigator.maxTouchPoints > 0 || window.innerWidth < 768);
+    const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 1.75);
 
     let bg: HTMLImageElement | null = null;
     let specks: HTMLCanvasElement | null = null;
     let drops: Drop[] = [];
     let trailSpecks: Speck[] = [];
     let streaks: Streak[] = [];
+    let af = 1; // фактор площади экрана (1 = десктоп)
 
     // Загрузка фона (твоя картинка)
     const urls = ["/storage/space/rain_window.jpg", "/storage/space/rain_window.png"];
@@ -59,7 +61,7 @@ export default function RainScene() {
       specks = document.createElement("canvas");
       specks.width = w; specks.height = h;
       const g = specks.getContext("2d")!;
-      const count = Math.round((w * h) / 4000);
+      const count = Math.round((w * h) / (af < 0.5 ? 7000 : 4500));
       for (let i = 0; i < count; i++) {
         const x = hash(i * 1.31) * w;
         const y = hash(i * 2.77) * h * 0.80;
@@ -80,8 +82,9 @@ export default function RainScene() {
       h = canvas.clientHeight || window.innerHeight;
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
+      af = Math.min(1, (w * h) / (1280 * 800));
       buildSpecks();
-      streaks = Array.from({ length: 50 }, () => {
+      streaks = Array.from({ length: Math.round(20 + 30 * af) }, () => {
         const x = Math.random() < 0.72 ? Math.random() * w * 0.68 : w * (0.80 + Math.random() * 0.19);
         return {
           x,
@@ -141,7 +144,7 @@ export default function RainScene() {
         }
 
         // Стекающие капли
-        if (drops.length < 26 && Math.random() < dt * 2.5) {
+        if (drops.length < (af < 0.5 ? 12 : 26) && Math.random() < dt * 2.5) {
           drops.push({
             x: randGlassX(),
             y: h * (0.04 + Math.random() * 0.45),
@@ -201,6 +204,23 @@ export default function RainScene() {
         glow.addColorStop(1, "rgba(255, 140, 60, 0)");
         ctx.fillStyle = glow;
         ctx.beginPath(); ctx.arc(cx, cy, h * 0.16, 0, Math.PI * 2); ctx.fill();
+
+        // Анимированный дымок над кружкой (кружка на фото ~68% ширины)
+        const cupX = w * 0.685, cupY = h * 0.875;
+        ctx.lineCap = "round";
+        const wisps = isMobile ? 2 : 3;
+        for (let i = 0; i < wisps; i++) {
+          const phase = time * (0.7 + i * 0.23) + i * 2.1;
+          ctx.strokeStyle = `rgba(255, 255, 255, ${0.05 - i * 0.008})`;
+          ctx.lineWidth = 3 + i * 1.5;
+          ctx.beginPath();
+          for (let t2 = 0; t2 <= 1; t2 += 0.08) {
+            const yy = cupY - t2 * h * 0.16;
+            const xx = cupX + (i - 1) * 6 + Math.sin(t2 * 5 + phase) * (4 + t2 * 10);
+            if (t2 === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+          }
+          ctx.stroke();
+        }
 
         time += dt;
         raf = requestAnimationFrame(draw);
