@@ -34,9 +34,9 @@ export default function MatrixScene() {
     let w = 0, h = 0;
     const isMobile = typeof window !== "undefined" && (navigator.maxTouchPoints > 0 || window.innerWidth < 768);
     const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 1.75);
-    const FS = isMobile ? 14 : 16;
-    const COLW = isMobile ? 22 : 26;
-    const ROWH = isMobile ? 20 : 22;
+    const FS = isMobile ? 12 : 13;   // символы мельче
+    const COLW = isMobile ? 17 : 20; // колонки плотнее
+    const ROWH = isMobile ? 17 : 18; // строк больше
     let cols: Col[] = [];
     let rows = 0;
 
