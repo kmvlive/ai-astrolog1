@@ -132,7 +132,7 @@ export default function RainScene() {
         // Тающие следы стекающих капель
         trailSpecks = trailSpecks.filter((t) => t.a > 0.01);
         for (const t of trailSpecks) {
-          t.a -= dt * 0.08;
+          t.a -= dt * 0.035;
           ctx.fillStyle = `rgba(225, 238, 255, ${Math.max(0, t.a)})`;
           ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2); ctx.fill();
         }
@@ -152,20 +152,28 @@ export default function RainScene() {
         drops = drops.filter((d) => inGlass(d.x, d.y));
         for (const d of drops) {
           if (d.stick > 0) {
+            // капля "прилипла" к стеклу — стоит
             d.stick -= dt;
+            d.vy = 0;
           } else {
-            d.vy += (25 + d.r * 40) * dt;
+            // медленное скатывание с трением: скорость ограничена размером
+            const vmax = 14 + d.r * 10;
+            d.vy += (80 + d.r * 60) * dt;
+            if (d.vy > vmax) d.vy = vmax;
             d.y += d.vy * dt;
-            d.x += Math.sin(time * 2.5 + d.wob) * 0.25;
+            // виляние по стеклу
+            d.x += Math.sin(time * 3.2 + d.wob) * 0.3 + (Math.random() - 0.5) * 0.3;
+            // stick-slip: случайно снова залипает
+            if (Math.random() < dt * 0.7) d.stick = 0.2 + Math.random() * 1.2;
             d.trail -= dt;
             if (d.trail <= 0) {
               trailSpecks.push({
-                x: d.x + (Math.random() - 0.5) * 1.5,
-                y: d.y - d.r,
-                r: d.r * (0.25 + Math.random() * 0.2),
-                a: 0.32,
+                x: d.x + (Math.random() - 0.5) * 1.2,
+                y: d.y - d.r * 1.2,
+                r: d.r * (0.3 + Math.random() * 0.25),
+                a: 0.45,
               });
-              d.trail = 0.06 + Math.random() * 0.12;
+              d.trail = 0.04 + Math.random() * 0.08;
             }
           }
           // Тело капли: преломление + блик
@@ -173,7 +181,7 @@ export default function RainScene() {
           ctx.strokeStyle = "rgba(255, 255, 255, 0.22)";
           ctx.lineWidth = 1;
           ctx.beginPath();
-          ctx.ellipse(d.x, d.y, d.r, d.r * 1.25, 0, 0, Math.PI * 2);
+          ctx.ellipse(d.x, d.y, d.r, d.r * (1.25 + Math.min(0.8, d.vy * 0.012)), 0, 0, Math.PI * 2);
           ctx.fill(); ctx.stroke();
           ctx.fillStyle = "rgba(255, 255, 255, 0.40)";
           ctx.beginPath();
