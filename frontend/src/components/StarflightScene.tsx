@@ -67,38 +67,41 @@ export default function StarflightScene() {
         }
         g.putImageData(d, 0, 0);
         
-        // Сглаживание границ иллюминаторов (feathering)
-        // Проходим по всем пикселям и размываем альфа-канал на краях
+        // СИЛЬНОЕ сглаживание: размытие альфа-канала (box blur, 2 прохода)
         const d2 = g.getImageData(0, 0, W, H);
         const px2 = d2.data;
-        const RADIUS = 4; // радиус размытия
-        for (let y = 0; y < H; y++) {
-          for (let x = 0; x < W; x++) {
-            const i = y * W + x;
-            if (px2[i * 4 + 3] === 0) continue; // пропускаем уже прозрачные
-            // Считаем сколько прозрачных соседей в радиусе
-            let transparentNeighbors = 0;
-            let totalNeighbors = 0;
-            for (let dy = -RADIUS; dy <= RADIUS; dy++) {
-              for (let dx = -RADIUS; dx <= RADIUS; dx++) {
-                if (dx === 0 && dy === 0) continue;
-                const nx = x + dx, ny = y + dy;
-                if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
-                totalNeighbors++;
-                const ni = ny * W + nx;
-                if (px2[ni * 4 + 3] === 0) transparentNeighbors++;
-              }
-            }
-            // Если есть прозрачные соседи — уменьшаем альфа (edge feathering)
-            if (transparentNeighbors > 0) {
-              const ratio = transparentNeighbors / totalNeighbors;
-              const feather = 1 - ratio * 0.9; // чем больше соседей прозрачных, тем прозрачнее
-              px2[i * 4 + 3] = Math.round(px2[i * 4 + 3] * feather);
+        const n2 = W * H;
+        let a0 = new Float32Array(n2);
+        let a1 = new Float32Array(n2);
+        for (let i = 0; i < n2; i++) a0[i] = px2[i * 4 + 3];
+        const R = 7; // радиус размытия — мягкий переход ~15px
+        const win = 2 * R + 1;
+        const blurH = (src: Float32Array, dst: Float32Array) => {
+          for (let y = 0; y < H; y++) {
+            let sum = 0;
+            const row = y * W;
+            for (let x = -R; x <= R; x++) sum += src[row + Math.min(W - 1, Math.max(0, x))];
+            for (let x = 0; x < W; x++) {
+              dst[row + x] = sum / win;
+              sum += src[row + Math.min(W - 1, x + R + 1)] - src[row + Math.max(0, x - R)];
             }
           }
-        }
+        };
+        const blurV = (src: Float32Array, dst: Float32Array) => {
+          for (let x = 0; x < W; x++) {
+            let sum = 0;
+            for (let y = -R; y <= R; y++) sum += src[Math.min(H - 1, Math.max(0, y)) * W + x];
+            for (let y = 0; y < H; y++) {
+              dst[y * W + x] = sum / win;
+              sum += src[Math.min(H - 1, y + R + 1) * W + x] - src[Math.max(0, y - R) * W + x];
+            }
+          }
+        };
+        blurH(a0, a1); blurV(a1, a0); // проход 1
+        blurH(a0, a1); blurV(a1, a0); // проход 2 — ещё мягче
+        for (let i = 0; i < n2; i++) px2[i * 4 + 3] = Math.round(a0[i]);
         g.putImageData(d2, 0, 0);
-        
+
         interior = c;
         console.log("[StarflightScene] вырезано иллюминаторов:", windows, "пикселей:", keyed);
       } catch (err) {
