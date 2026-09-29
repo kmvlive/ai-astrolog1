@@ -41,15 +41,18 @@ export default function RainScene() {
 
     // Зоны стёкол: исключаем подоконник и вертикальную раму
     const inGlass = (x: number, y: number) => {
-      if (y > h * 0.82) return false;               // подоконник
-      if (x > w * 0.70 && x < w * 0.78) return false; // рама
-      if (x > w * 0.84 && y > h * 0.42) return false; // цветок стоит ВНУТРИ комнаты
+      if (x < w * 0.02 || x > w * 0.98) return false;  // внешние боковые рамы
+      if (y < h * 0.02) return false;                  // верхняя планка
+      if (x > w * 0.68 && x < w * 0.80) return false;  // вертикальная стойка
+      if (x <= w * 0.68 && y > h * 0.84) return false; // левый подоконник
+      if (x >= w * 0.80 && y > h * 0.76) return false; // правый подоконник (выше из-за перспективы)
+      if (x > w * 0.84 && y > h * 0.42) return false;  // цветок ВНУТРИ комнаты
       return true;
     };
 
     const randGlassX = () => {
       const left = Math.random() < 0.72;
-      return left ? Math.random() * w * 0.68 : w * (0.80 + Math.random() * 0.19);
+      return left ? w * (0.03 + Math.random() * 0.63) : w * (0.82 + Math.random() * 0.15);
     };
 
     function buildSpecks() {
