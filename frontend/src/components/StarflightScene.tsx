@@ -34,21 +34,16 @@ export default function StarflightScene() {
         const d = g.getImageData(0, 0, c.width, c.height);
         const px = d.data;
         const W = c.width, H = c.height, n = W * H;
-        // Строгое условие — затравка; мягкое — рост (захватывает антиалиасинг кромки)
-        const isSeed = (i: number) => {
+        // Строгое условие: вырезаем ТОЛЬКО стекло иллюминаторов,
+        // розовые рамы (они темнее и менее насыщенные) не трогаем
+        const isWin = (i: number) => {
           const r = px[i * 4], gg = px[i * 4 + 1], b = px[i * 4 + 2];
           return r > 110 && r - gg > 50 && b - gg > 30;
         };
-        const isGrow = (i: number) => {
-          const r = px[i * 4], gg = px[i * 4 + 1], b = px[i * 4 + 2];
-          return r > 70 && r - gg > 25 && b - gg > 12;
-        };
-        // Flood-fill: вырезаем ТОЛЬКО большие связные области (иллюминаторы),
-        // мелкие розовые экранчики на пультах остаются
         const visited = new Uint8Array(n);
         let keyed = 0, windows = 0;
         for (let start = 0; start < n; start++) {
-          if (visited[start] || !isSeed(start)) continue;
+          if (visited[start] || !isWin(start)) continue;
           const stack = [start];
           visited[start] = 1;
           const comp: number[] = [];
@@ -60,37 +55,21 @@ export default function StarflightScene() {
               if (j < 0 || j >= n) continue;
               if (x === 0 && j === i - 1) continue;
               if (x === W - 1 && j === i + 1) continue;
-              if (!visited[j] && isGrow(j)) { visited[j] = 1; stack.push(j); }
+              if (!visited[j] && isWin(j)) { visited[j] = 1; stack.push(j); }
             }
           }
-          if (comp.length > 3000) { // это иллюминатор, а не экранчик
+          if (comp.length > 3000) {
             for (const i of comp) px[i * 4 + 3] = 0;
             keyed += comp.length;
             windows++;
           }
         }
-        // Дилатация прозрачности на 2px: съедаем розовую бахрому на кромках
-        const alpha0 = new Uint8ClampedArray(n);
-        for (let i = 0; i < n; i++) alpha0[i] = px[i * 4 + 3];
-        for (let y = 2; y < H - 2; y++) {
-          for (let x = 2; x < W - 2; x++) {
-            const i = y * W + x;
-            if (alpha0[i] === 0 || !isGrow(i)) continue;
-            let near = false;
-            for (let dy = -2; dy <= 2 && !near; dy++) {
-              for (let dx = -2; dx <= 2; dx++) {
-                if (alpha0[(y + dy) * W + (x + dx)] === 0) { near = true; break; }
-              }
-            }
-            if (near) px[i * 4 + 3] = 0;
-          }
-        }
         g.putImageData(d, 0, 0);
-        
-        // Мягкие края ТОЛЬКО внутрь иллюминатора — корпус корабля непрозрачен
+
+        // Мягкий градиент ТОЛЬКО внутрь окна — рамы не трогаем вообще
         const d2 = g.getImageData(0, 0, W, H);
         const px2 = d2.data;
-        const n2 = W * H;
+        const n2 = n;
         const origA = new Uint8ClampedArray(n2);
         for (let i = 0; i < n2; i++) origA[i] = px2[i * 4 + 3];
         let a0 = new Float32Array(n2);
@@ -123,9 +102,7 @@ export default function StarflightScene() {
         blurH(a0, a1, R); blurV(a1, a0, R);
         blurH(a0, a1, R); blurV(a1, a0, R);
         blurH(a0, a1, R); blurV(a1, a0, R);
-        // Корпус = 255 (непрозрачен), в дырках = плавный градиент внутрь иллюминатора
         for (let i = 0; i < n2; i++) px2[i * 4 + 3] = origA[i] > 0 ? 255 : Math.round(a0[i]);
-        // Финальный лёгкий блюр — смягчить ступеньку на самой кромке (всего ~4px)
         for (let i = 0; i < n2; i++) a0[i] = px2[i * 4 + 3];
         blurH(a0, a1, 4); blurV(a1, a0, 4);
         for (let i = 0; i < n2; i++) px2[i * 4 + 3] = Math.round(a0[i]);
