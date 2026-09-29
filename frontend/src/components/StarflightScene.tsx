@@ -74,7 +74,7 @@ export default function StarflightScene() {
         let a0 = new Float32Array(n2);
         let a1 = new Float32Array(n2);
         for (let i = 0; i < n2; i++) a0[i] = px2[i * 4 + 3];
-        const R = 7; // радиус размытия — мягкий переход ~15px
+        const R = 12; // радиус размытия — очень мягкий переход ~30px
         const win = 2 * R + 1;
         const blurH = (src: Float32Array, dst: Float32Array) => {
           for (let y = 0; y < H; y++) {
@@ -98,7 +98,8 @@ export default function StarflightScene() {
           }
         };
         blurH(a0, a1); blurV(a1, a0); // проход 1
-        blurH(a0, a1); blurV(a1, a0); // проход 2 — ещё мягче
+        blurH(a0, a1); blurV(a1, a0); // проход 2
+        blurH(a0, a1); blurV(a1, a0); // проход 3 — максимально мягко
         for (let i = 0; i < n2; i++) px2[i * 4 + 3] = Math.round(a0[i]);
         g.putImageData(d2, 0, 0);
 
