@@ -66,6 +66,39 @@ export default function StarflightScene() {
           }
         }
         g.putImageData(d, 0, 0);
+        
+        // Сглаживание границ иллюминаторов (feathering)
+        // Проходим по всем пикселям и размываем альфа-канал на краях
+        const d2 = g.getImageData(0, 0, W, H);
+        const px2 = d2.data;
+        const RADIUS = 4; // радиус размытия
+        for (let y = 0; y < H; y++) {
+          for (let x = 0; x < W; x++) {
+            const i = y * W + x;
+            if (px2[i * 4 + 3] === 0) continue; // пропускаем уже прозрачные
+            // Считаем сколько прозрачных соседей в радиусе
+            let transparentNeighbors = 0;
+            let totalNeighbors = 0;
+            for (let dy = -RADIUS; dy <= RADIUS; dy++) {
+              for (let dx = -RADIUS; dx <= RADIUS; dx++) {
+                if (dx === 0 && dy === 0) continue;
+                const nx = x + dx, ny = y + dy;
+                if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
+                totalNeighbors++;
+                const ni = ny * W + nx;
+                if (px2[ni * 4 + 3] === 0) transparentNeighbors++;
+              }
+            }
+            // Если есть прозрачные соседи — уменьшаем альфа (edge feathering)
+            if (transparentNeighbors > 0) {
+              const ratio = transparentNeighbors / totalNeighbors;
+              const feather = 1 - ratio * 0.9; // чем больше соседей прозрачных, тем прозрачнее
+              px2[i * 4 + 3] = Math.round(px2[i * 4 + 3] * feather);
+            }
+          }
+        }
+        g.putImageData(d2, 0, 0);
+        
         interior = c;
         console.log("[StarflightScene] вырезано иллюминаторов:", windows, "пикселей:", keyed);
       } catch (err) {
