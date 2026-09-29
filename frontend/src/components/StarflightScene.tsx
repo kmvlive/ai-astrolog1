@@ -33,14 +33,41 @@ export default function StarflightScene() {
         g.drawImage(img, 0, 0);
         const d = g.getImageData(0, 0, c.width, c.height);
         const px = d.data;
-        let keyed = 0;
-        for (let i = 0; i < px.length; i += 4) {
-          const r = px[i], gg = px[i + 1], b = px[i + 2];
-          if (r > 170 && gg < 115 && b > 170) { px[i + 3] = 0; keyed++; }
+        const W = c.width, H = c.height, n = W * H;
+        // Мягкое условие: пурпурный/розовый (r и b заметно выше g) — ловит и #FF00FF и #A62679
+        const isMagenta = (i: number) => {
+          const r = px[i * 4], gg = px[i * 4 + 1], b = px[i * 4 + 2];
+          return r > 110 && r - gg > 50 && b - gg > 30;
+        };
+        // Flood-fill: вырезаем ТОЛЬКО большие связные области (иллюминаторы),
+        // мелкие розовые экранчики на пультах остаются
+        const visited = new Uint8Array(n);
+        let keyed = 0, windows = 0;
+        for (let start = 0; start < n; start++) {
+          if (visited[start] || !isMagenta(start)) continue;
+          const stack = [start];
+          visited[start] = 1;
+          const comp: number[] = [];
+          while (stack.length) {
+            const i = stack.pop()!;
+            comp.push(i);
+            const x = i % W;
+            for (const j of [i - 1, i + 1, i - W, i + W]) {
+              if (j < 0 || j >= n) continue;
+              if (x === 0 && j === i - 1) continue;
+              if (x === W - 1 && j === i + 1) continue;
+              if (!visited[j] && isMagenta(j)) { visited[j] = 1; stack.push(j); }
+            }
+          }
+          if (comp.length > 3000) { // это иллюминатор, а не экранчик
+            for (const i of comp) px[i * 4 + 3] = 0;
+            keyed += comp.length;
+            windows++;
+          }
         }
         g.putImageData(d, 0, 0);
         interior = c;
-        console.log("[StarflightScene] интерьер загружен, вырезано пикселей:", keyed);
+        console.log("[StarflightScene] вырезано иллюминаторов:", windows, "пикселей:", keyed);
       } catch (err) {
         console.error("[StarflightScene] ошибка хромокея:", err);
       }
