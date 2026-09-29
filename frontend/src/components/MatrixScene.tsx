@@ -15,6 +15,7 @@ interface Col {
   flickT: number;
   tailMode: number; // 0 — хвост горит, 1 — медленно тухнет
   holdMode: number; // 0 — сразу новый проход, 1 — держит собранный ряд и гаснет
+  speed: number;    // индивидуальная скорость колонки (0.5x — 2x)
   state: "build" | "hold" | "dying" | "idle";
   stateT: number;
   fade: number;
@@ -41,20 +42,24 @@ export default function MatrixScene() {
 
     const rndCh = () => CHARS[Math.floor(Math.random() * CHARS.length)];
 
-    const newCol = (x: number): Col => ({
-      x,
-      head: 0,
-      cells: [],
-      timer: 0,
-      stepDur: 1.1 + Math.random() * 0.6,
-      flickCh: rndCh(),
-      flickT: 0,
-      tailMode: Math.random() < 0.5 ? 0 : 1,
-      holdMode: Math.random() < 0.5 ? 0 : 1,
-      state: "build",
-      stateT: 0,
-      fade: 1,
-    });
+    const newCol = (x: number): Col => {
+      const speed = 0.5 + Math.random() * 1.5; // у каждого ряда свой темп
+      return {
+        x,
+        head: 0,
+        cells: [],
+        timer: 0,
+        stepDur: (1.1 + Math.random() * 0.6) / speed,
+        flickCh: rndCh(),
+        flickT: 0,
+        tailMode: Math.random() < 0.5 ? 0 : 1,
+        holdMode: Math.random() < 0.5 ? 0 : 1,
+        state: "build",
+        stateT: 0,
+        fade: 1,
+        speed,
+      };
+    };
 
     const resize = () => {
       w = canvas.clientWidth || window.innerWidth;
@@ -92,7 +97,7 @@ export default function MatrixScene() {
               col.cells[col.head] = { ch: rndCh(), a: 1 };
               col.head++;
               col.timer = 0;
-              col.stepDur = 1.1 + Math.random() * 0.6;
+              col.stepDur = (1.1 + Math.random() * 0.6) / col.speed;
               if (col.head >= rows) {
                 col.state = col.holdMode === 1 ? "hold" : "idle";
                 col.stateT = col.holdMode === 1 ? 2 + Math.random() * 3 : 0.01;
