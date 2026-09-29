@@ -34,17 +34,21 @@ export default function StarflightScene() {
         const d = g.getImageData(0, 0, c.width, c.height);
         const px = d.data;
         const W = c.width, H = c.height, n = W * H;
-        // Мягкое условие: пурпурный/розовый (r и b заметно выше g) — ловит и #FF00FF и #A62679
-        const isMagenta = (i: number) => {
+        // Строгое условие — затравка; мягкое — рост (захватывает антиалиасинг кромки)
+        const isSeed = (i: number) => {
           const r = px[i * 4], gg = px[i * 4 + 1], b = px[i * 4 + 2];
           return r > 110 && r - gg > 50 && b - gg > 30;
+        };
+        const isGrow = (i: number) => {
+          const r = px[i * 4], gg = px[i * 4 + 1], b = px[i * 4 + 2];
+          return r > 70 && r - gg > 25 && b - gg > 12;
         };
         // Flood-fill: вырезаем ТОЛЬКО большие связные области (иллюминаторы),
         // мелкие розовые экранчики на пультах остаются
         const visited = new Uint8Array(n);
         let keyed = 0, windows = 0;
         for (let start = 0; start < n; start++) {
-          if (visited[start] || !isMagenta(start)) continue;
+          if (visited[start] || !isSeed(start)) continue;
           const stack = [start];
           visited[start] = 1;
           const comp: number[] = [];
@@ -56,13 +60,29 @@ export default function StarflightScene() {
               if (j < 0 || j >= n) continue;
               if (x === 0 && j === i - 1) continue;
               if (x === W - 1 && j === i + 1) continue;
-              if (!visited[j] && isMagenta(j)) { visited[j] = 1; stack.push(j); }
+              if (!visited[j] && isGrow(j)) { visited[j] = 1; stack.push(j); }
             }
           }
           if (comp.length > 3000) { // это иллюминатор, а не экранчик
             for (const i of comp) px[i * 4 + 3] = 0;
             keyed += comp.length;
             windows++;
+          }
+        }
+        // Дилатация прозрачности на 2px: съедаем розовую бахрому на кромках
+        const alpha0 = new Uint8ClampedArray(n);
+        for (let i = 0; i < n; i++) alpha0[i] = px[i * 4 + 3];
+        for (let y = 2; y < H - 2; y++) {
+          for (let x = 2; x < W - 2; x++) {
+            const i = y * W + x;
+            if (alpha0[i] === 0 || !isGrow(i)) continue;
+            let near = false;
+            for (let dy = -2; dy <= 2 && !near; dy++) {
+              for (let dx = -2; dx <= 2; dx++) {
+                if (alpha0[(y + dy) * W + (x + dx)] === 0) { near = true; break; }
+              }
+            }
+            if (near) px[i * 4 + 3] = 0;
           }
         }
         g.putImageData(d, 0, 0);
