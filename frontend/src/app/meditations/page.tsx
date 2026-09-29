@@ -12,6 +12,7 @@ const SCENES = [
   { slug: "earth",     name: "Земля из космоса", emoji: "🌍", free: true, accent: "#3b82f6", desc: "Вид на вращающуюся планету из глубокого космоса" },
   { slug: "galaxy",    name: "Галактика", emoji: "🌌", free: true, accent: "#8b5cf6", desc: "Вращающаяся спиральная галактика, мерцающие звёзды и кометы" },
   { slug: "starflight", name: "Полёт сквозь звёзды", emoji: "💫", free: true, accent: "#38bdf8", desc: "Гиперпрыжок: звёзды проносятся за иллюминаторами корабля" },
+  { slug: "matrix",     name: "Матрица", emoji: "💊", free: true, accent: "#22c55e", desc: "Медленный поток символов: цифры и буквы стекают в темноте" },
 ];
 
 const PREMIUM_VERTICAL = [
