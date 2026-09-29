@@ -67,39 +67,47 @@ export default function StarflightScene() {
         }
         g.putImageData(d, 0, 0);
         
-        // СИЛЬНОЕ сглаживание: размытие альфа-канала (box blur, 2 прохода)
+        // Мягкие края ТОЛЬКО внутрь иллюминатора — корпус корабля непрозрачен
         const d2 = g.getImageData(0, 0, W, H);
         const px2 = d2.data;
         const n2 = W * H;
+        const origA = new Uint8ClampedArray(n2);
+        for (let i = 0; i < n2; i++) origA[i] = px2[i * 4 + 3];
         let a0 = new Float32Array(n2);
         let a1 = new Float32Array(n2);
-        for (let i = 0; i < n2; i++) a0[i] = px2[i * 4 + 3];
-        const R = 12; // радиус размытия — очень мягкий переход ~30px
-        const win = 2 * R + 1;
-        const blurH = (src: Float32Array, dst: Float32Array) => {
+        for (let i = 0; i < n2; i++) a0[i] = origA[i];
+        const R = 12;
+        const blurH = (src: Float32Array, dst: Float32Array, rad: number) => {
+          const wn = 2 * rad + 1;
           for (let y = 0; y < H; y++) {
             let sum = 0;
             const row = y * W;
-            for (let x = -R; x <= R; x++) sum += src[row + Math.min(W - 1, Math.max(0, x))];
+            for (let x = -rad; x <= rad; x++) sum += src[row + Math.min(W - 1, Math.max(0, x))];
             for (let x = 0; x < W; x++) {
-              dst[row + x] = sum / win;
-              sum += src[row + Math.min(W - 1, x + R + 1)] - src[row + Math.max(0, x - R)];
+              dst[row + x] = sum / wn;
+              sum += src[row + Math.min(W - 1, x + rad + 1)] - src[row + Math.max(0, x - rad)];
             }
           }
         };
-        const blurV = (src: Float32Array, dst: Float32Array) => {
+        const blurV = (src: Float32Array, dst: Float32Array, rad: number) => {
+          const wn = 2 * rad + 1;
           for (let x = 0; x < W; x++) {
             let sum = 0;
-            for (let y = -R; y <= R; y++) sum += src[Math.min(H - 1, Math.max(0, y)) * W + x];
+            for (let y = -rad; y <= rad; y++) sum += src[Math.min(H - 1, Math.max(0, y)) * W + x];
             for (let y = 0; y < H; y++) {
-              dst[y * W + x] = sum / win;
-              sum += src[Math.min(H - 1, y + R + 1) * W + x] - src[Math.max(0, y - R) * W + x];
+              dst[y * W + x] = sum / wn;
+              sum += src[Math.min(H - 1, y + rad + 1) * W + x] - src[Math.max(0, y - rad) * W + x];
             }
           }
         };
-        blurH(a0, a1); blurV(a1, a0); // проход 1
-        blurH(a0, a1); blurV(a1, a0); // проход 2
-        blurH(a0, a1); blurV(a1, a0); // проход 3 — максимально мягко
+        blurH(a0, a1, R); blurV(a1, a0, R);
+        blurH(a0, a1, R); blurV(a1, a0, R);
+        blurH(a0, a1, R); blurV(a1, a0, R);
+        // Корпус = 255 (непрозрачен), в дырках = плавный градиент внутрь иллюминатора
+        for (let i = 0; i < n2; i++) px2[i * 4 + 3] = origA[i] > 0 ? 255 : Math.round(a0[i]);
+        // Финальный лёгкий блюр — смягчить ступеньку на самой кромке (всего ~4px)
+        for (let i = 0; i < n2; i++) a0[i] = px2[i * 4 + 3];
+        blurH(a0, a1, 4); blurV(a1, a0, 4);
         for (let i = 0; i < n2; i++) px2[i * 4 + 3] = Math.round(a0[i]);
         g.putImageData(d2, 0, 0);
 
@@ -160,7 +168,8 @@ export default function StarflightScene() {
         ctx.fillRect(0, 0, w, h);
 
         // === ВАРП-ЗВЁЗДЫ ===
-        const cx = w / 2, cy = h / 2;
+        const cx = Math.min(w * 0.85, w / 2 + 560); // источник звёзд смещён вправо ~15 см
+        const cy = h / 2;
         const k = Math.max(w, h) * 0.55;
         ctx.globalCompositeOperation = "lighter";
         ctx.lineCap = "round";
