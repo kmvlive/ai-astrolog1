@@ -41,8 +41,9 @@ export default function RainScene() {
 
     // Зоны стёкол: исключаем подоконник и вертикальную раму
     const inGlass = (x: number, y: number) => {
-      if (y > h * 0.82) return false;
-      if (x > w * 0.70 && x < w * 0.78) return false;
+      if (y > h * 0.82) return false;               // подоконник
+      if (x > w * 0.70 && x < w * 0.78) return false; // рама
+      if (x > w * 0.84 && y > h * 0.42) return false; // цветок стоит ВНУТРИ комнаты
       return true;
     };
 
@@ -116,7 +117,7 @@ export default function RainScene() {
         ctx.lineWidth = 1;
         for (const s of streaks) {
           s.y += s.v * dt;
-          if (s.y > h * 0.82) { s.y = -s.len; s.x = randGlassX(); }
+          if (s.y > h * 0.82 || !inGlass(s.x, s.y)) { s.y = -s.len; s.x = randGlassX(); }
           ctx.globalAlpha = s.a;
           ctx.beginPath();
           ctx.moveTo(s.x, s.y);
@@ -148,7 +149,7 @@ export default function RainScene() {
             trail: 0,
           });
         }
-        drops = drops.filter((d) => d.y < h * 0.82);
+        drops = drops.filter((d) => inGlass(d.x, d.y));
         for (const d of drops) {
           if (d.stick > 0) {
             d.stick -= dt;
