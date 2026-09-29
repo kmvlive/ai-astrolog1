@@ -41,7 +41,7 @@ export default function RainScene() {
 
     // Зоны стёкол: исключаем подоконник и вертикальную раму
     const inGlass = (x: number, y: number) => {
-      if (x < w * 0.02 || x > w * 0.98) return false;  // внешние боковые рамы
+      if (x < w * 0.02 || x > w * 0.96) return false;  // внешние боковые рамы (правая шире)
       if (y < h * 0.02) return false;                  // верхняя планка
       if (x > w * 0.68 && x < w * 0.80) return false;  // вертикальная стойка
       if (x <= w * 0.68 && y > h * 0.84) return false; // левый подоконник
@@ -52,7 +52,7 @@ export default function RainScene() {
 
     const randGlassX = () => {
       const left = Math.random() < 0.72;
-      return left ? w * (0.03 + Math.random() * 0.63) : w * (0.82 + Math.random() * 0.15);
+      return left ? w * (0.03 + Math.random() * 0.63) : w * (0.82 + Math.random() * 0.13);
     };
 
     function buildSpecks() {
