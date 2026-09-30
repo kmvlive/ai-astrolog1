@@ -13,6 +13,8 @@ import MatrixScene from "@/components/MatrixScene";
 import CodeScene from "@/components/CodeScene";
 import MandalaScene from "@/components/MandalaScene";
 import SacredGeometryScene from "@/components/SacredGeometryScene";
+import FireScene from "@/components/FireScene";
+import SnowScene from "@/components/SnowScene";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 const NAMES: Record<string, { name: string; emoji: string }> = {
@@ -27,6 +29,8 @@ const NAMES: Record<string, { name: string; emoji: string }> = {
   code: { name: "Успокаивающий код", emoji: "💻" },
   mandala: { name: "Мандала", emoji: "☸️" },
   sacred: { name: "Сакральная геометрия", emoji: "🕉️" },
+  fire: { name: "Костёр", emoji: "🔥" },
+  snow: { name: "Снегопад", emoji: "❄️" },
 };
 
 function moonPhaseIndex(d: Date): number {
@@ -81,7 +85,7 @@ function Player() {
     if (!audioRef.current) {
       audioRef.current = new AudioEngine();
     }
-    const audioScene = (slug === "galaxy" || slug === "starflight" || slug === "matrix" || slug === "code" || slug === "mandala" || slug === "sacred" ? "space" : slug) as "mountains" | "sea" | "space" | "rain";
+    const audioScene = (slug === "galaxy" || slug === "starflight" || slug === "matrix" || slug === "code" || slug === "mandala" || slug === "sacred" ? "space" : slug) as "mountains" | "sea" | "space" | "rain" | "fire" | "snow";
     await audioRef.current.start(audioScene, volume);
     audioRef.current.setVolume(volume); // гарантированно ставим громкость сессии
     setAudioStarted(true);
@@ -161,6 +165,10 @@ function Player() {
         <MandalaScene />
       ) : slug === "sacred" ? (
         <SacredGeometryScene />
+      ) : slug === "fire" ? (
+        <FireScene />
+      ) : slug === "snow" ? (
+        <SnowScene />
       ) : (
         <div className="star-layer" aria-hidden="true" />
       )}

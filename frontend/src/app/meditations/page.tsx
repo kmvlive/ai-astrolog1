@@ -16,6 +16,8 @@ const SCENES = [
   { slug: "code",       name: "Успокаивающий код", emoji: "💻", free: true, accent: "#61afef", desc: "Бесконечный набор кода с мягкой подсветкой синтаксиса" },
   { slug: "mandala",    name: "Мандала", emoji: "☸️", free: true, accent: "#c084fc", desc: "Вращающаяся симметрия: слои лепестков в медленном танце" },
   { slug: "sacred",     name: "Сакральная геометрия", emoji: "🕉️", free: true, accent: "#fbbf24", desc: "Цветок Жизни, куб Метатрона, спираль и икосаэдр" },
+  { slug: "fire",       name: "Костёр", emoji: "🔥", free: true, accent: "#f97316", desc: "Живое пламя, искры и потрескивание поленьев под звёздами" },
+  { slug: "snow",       name: "Снегопад", emoji: "❄️", free: true, accent: "#93c5fd", desc: "Тихий снег над ночным лесом, луна и мягкий ветер" },
 ];
 
 const PREMIUM_VERTICAL = [
