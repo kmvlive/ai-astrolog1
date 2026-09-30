@@ -14,6 +14,8 @@ const SCENES = [
   { slug: "starflight", name: "Полёт сквозь звёзды", emoji: "💫", free: true, accent: "#38bdf8", desc: "Гиперпрыжок: звёзды проносятся за иллюминаторами корабля" },
   { slug: "matrix",     name: "Матрица", emoji: "💊", free: true, accent: "#22c55e", desc: "Медленный поток символов: цифры и буквы стекают в темноте" },
   { slug: "code",       name: "Успокаивающий код", emoji: "💻", free: true, accent: "#61afef", desc: "Бесконечный набор кода с мягкой подсветкой синтаксиса" },
+  { slug: "mandala",    name: "Мандала", emoji: "☸️", free: true, accent: "#c084fc", desc: "Вращающаяся симметрия: слои лепестков в медленном танце" },
+  { slug: "sacred",     name: "Сакральная геометрия", emoji: "🕉️", free: true, accent: "#fbbf24", desc: "Цветок Жизни, куб Метатрона, спираль и икосаэдр" },
 ];
 
 const PREMIUM_VERTICAL = [
