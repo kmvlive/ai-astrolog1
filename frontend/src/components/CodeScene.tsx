@@ -19,6 +19,7 @@ const C = {
 const IDS = ["data", "state", "value", "result", "user", "config", "matrix", "signal", "pulse", "orbit", "quantum", "neuron", "stream", "cache", "index", "count", "level", "phase", "wave", "field"];
 const FNS = ["init", "parse", "render", "update", "compute", "normalize", "observe", "transform", "merge", "resolve", "breathe", "relax", "flow", "drift"];
 const MODS = ["core", "mind", "cosmos", "dream", "ether", "nova"];
+const WORDS = ["поток", "гармония", "тишина", "космос", "ритм", "дыхание", "покой", "свет", "волна", "орбита", "рассвет", "глубина"];
 const COMMENTS = ["все спокойно", "просто дыши", "здесь и сейчас", "гармония", "поток мысли", "тишина внутри", "расслабься", "момент покоя", "наблюдай", "отпусти суету"];
 
 const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
@@ -31,24 +32,25 @@ function genLine(): Line {
   const id = () => pick(IDS);
   const fn = () => pick(FNS);
   const num = () => String(Math.floor(Math.random() * 99));
-  if (r < 0.12) {
-    t.push({ t: "// " + pick(COMMENTS), c: C.com });
-  } else if (r < 0.30) {
-    t.push({ t: pick(["const", "let"]), c: C.kw }, { t: " ", c: C.plain }, { t: id(), c: C.id }, { t: " = ", c: C.op }, { t: num(), c: C.num }, { t: ";", c: C.plain });
-  } else if (r < 0.45) {
-    t.push({ t: "function ", c: C.kw }, { t: fn(), c: C.fn }, { t: "(", c: C.plain }, { t: id(), c: C.id }, { t: ") {", c: C.plain });
-  } else if (r < 0.58) {
-    t.push({ t: "if ", c: C.kw }, { t: "(", c: C.plain }, { t: id(), c: C.id }, { t: " > ", c: C.op }, { t: num(), c: C.num }, { t: ") {", c: C.plain });
-  } else if (r < 0.70) {
-    t.push({ t: "return ", c: C.kw }, { t: fn(), c: C.fn }, { t: "(", c: C.plain }, { t: id(), c: C.id }, { t: ");", c: C.plain });
-  } else if (r < 0.80) {
-    t.push({ t: "await ", c: C.kw }, { t: fn(), c: C.fn }, { t: "(", c: C.plain }, { t: `"${id()}"`, c: C.str }, { t: ");", c: C.plain });
-  } else if (r < 0.88) {
-    t.push({ t: "}", c: C.plain });
-  } else if (r < 0.94) {
-    t.push({ t: "import ", c: C.kw }, { t: "{ ", c: C.plain }, { t: id(), c: C.id }, { t: " } ", c: C.plain }, { t: "from ", c: C.kw }, { t: `'${pick(MODS)}'`, c: C.str }, { t: ";", c: C.plain });
+  const word = () => pick(WORDS);
+  if (r < 0.10) {
+    t.push({ t: "// " + pick(COMMENTS) + " — " + pick(COMMENTS), c: C.com });
+  } else if (r < 0.26) {
+    t.push({ t: pick(["const", "let"]), c: C.kw }, { t: " ", c: C.plain }, { t: id(), c: C.id }, { t: " = ", c: C.op }, { t: "await ", c: C.kw }, { t: fn(), c: C.fn }, { t: "(", c: C.plain }, { t: id(), c: C.id }, { t: ", ", c: C.plain }, { t: num(), c: C.num }, { t: `, "${word()}"`, c: C.str }, { t: ");", c: C.plain });
+  } else if (r < 0.40) {
+    t.push({ t: pick(["const", "let"]), c: C.kw }, { t: " ", c: C.plain }, { t: id(), c: C.id }, { t: " = ", c: C.op }, { t: id(), c: C.id }, { t: ".", c: C.plain }, { t: fn(), c: C.fn }, { t: "(", c: C.plain }, { t: num(), c: C.num }, { t: ") + ", c: C.plain }, { t: id(), c: C.id }, { t: ".", c: C.plain }, { t: fn(), c: C.fn }, { t: `("${word()}");`, c: C.str });
+  } else if (r < 0.52) {
+    t.push({ t: "function ", c: C.kw }, { t: fn(), c: C.fn }, { t: "(", c: C.plain }, { t: id(), c: C.id }, { t: ", ", c: C.plain }, { t: id(), c: C.id }, { t: ") { ", c: C.plain }, { t: "return ", c: C.kw }, { t: id(), c: C.id }, { t: ".", c: C.plain }, { t: fn(), c: C.fn }, { t: "(", c: C.plain }, { t: num(), c: C.num }, { t: `, "${word()}");`, c: C.str }, { t: " }", c: C.plain });
+  } else if (r < 0.64) {
+    t.push({ t: "if ", c: C.kw }, { t: "(", c: C.plain }, { t: id(), c: C.id }, { t: " > ", c: C.op }, { t: num(), c: C.num }, { t: " && ", c: C.op }, { t: id(), c: C.id }, { t: " !== ", c: C.op }, { t: `"${word()}"`, c: C.str }, { t: ") {", c: C.plain });
+  } else if (r < 0.74) {
+    t.push({ t: "for ", c: C.kw }, { t: "(let i = 0; i < ", c: C.plain }, { t: num(), c: C.num }, { t: "; i++) ", c: C.plain }, { t: id(), c: C.id }, { t: ".", c: C.plain }, { t: fn(), c: C.fn }, { t: "(i, ", c: C.plain }, { t: `"${word()}"`, c: C.str }, { t: ");", c: C.plain });
+  } else if (r < 0.84) {
+    t.push({ t: "await ", c: C.kw }, { t: fn(), c: C.fn }, { t: "({ ", c: C.plain }, { t: "id", c: C.id }, { t: ": ", c: C.plain }, { t: `"${word()}"`, c: C.str }, { t: ", ", c: C.plain }, { t: "level", c: C.id }, { t: ": ", c: C.plain }, { t: num(), c: C.num }, { t: ", ", c: C.plain }, { t: "phase", c: C.id }, { t: ": ", c: C.plain }, { t: `"${word()}"`, c: C.str }, { t: " });", c: C.plain });
+  } else if (r < 0.92) {
+    t.push({ t: "import ", c: C.kw }, { t: "{ ", c: C.plain }, { t: id(), c: C.id }, { t: ", ", c: C.plain }, { t: id(), c: C.id }, { t: ", ", c: C.plain }, { t: id(), c: C.id }, { t: " } ", c: C.plain }, { t: "from ", c: C.kw }, { t: `'${pick(MODS)}/${pick(MODS)}';`, c: C.str });
   } else {
-    t.push({ t: id(), c: C.id }, { t: ".", c: C.plain }, { t: fn(), c: C.fn }, { t: "(", c: C.plain }, { t: num(), c: C.num }, { t: ", ", c: C.plain }, { t: `"${id()}"`, c: C.str }, { t: ");", c: C.plain });
+    t.push({ t: id(), c: C.id }, { t: ".", c: C.plain }, { t: fn(), c: C.fn }, { t: "(", c: C.plain }, { t: num(), c: C.num }, { t: ", ", c: C.plain }, { t: `"${word()}"`, c: C.str }, { t: ").", c: C.plain }, { t: "then", c: C.fn }, { t: "((", c: C.plain }, { t: id(), c: C.id }, { t: ") => ", c: C.plain }, { t: id(), c: C.id }, { t: ".", c: C.plain }, { t: fn(), c: C.fn }, { t: "());", c: C.plain });
   }
   const len = t.reduce((s, x) => s + x.t.length, 0);
   return { tokens: t, len };
