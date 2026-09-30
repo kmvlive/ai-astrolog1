@@ -6,14 +6,14 @@ interface Tok { t: string; c: string; }
 interface Line { tokens: Tok[]; len: number; }
 
 const C = {
-  kw: "#c678dd",    // ключевые слова — фиолетовый
-  fn: "#61afef",    // функции — синий
-  str: "#98c379",   // строки — зелёный
-  num: "#d19a66",   // числа — оранжевый
-  com: "#5c6370",   // комментарии — серый
-  id: "#e06c75",    // идентификаторы — красный
-  plain: "#abb2bf", // скобки/точки — светлый
-  op: "#56b6c2",    // операторы — бирюзовый
+  kw: "#c678dd",
+  fn: "#61afef",
+  str: "#98c379",
+  num: "#d19a66",
+  com: "#5c6370",
+  id: "#e06c75",
+  plain: "#abb2bf",
+  op: "#56b6c2",
 };
 
 const IDS = ["data", "state", "value", "result", "user", "config", "matrix", "signal", "pulse", "orbit", "quantum", "neuron", "stream", "cache", "index", "count", "level", "phase", "wave", "field"];
@@ -78,7 +78,7 @@ export default function CodeScene() {
     let firstIndex = 1;
     let current: Line = genLine();
     let typed = 0;
-    let speed = 18 + Math.random() * 8; // символов в секунду
+    let speed = 18 + Math.random() * 8;
     let pause = 0;
     let scroll = 0;
     let cursorT = 0;
@@ -97,26 +97,34 @@ export default function CodeScene() {
 
     let last = performance.now();
 
-    const drawLine = (line: Line, y: number, maxChars: number | null, lineNo: number) => {
-      // номер строки
-      ctx.fillStyle = "#3a3f4a";
-      ctx.textAlign = "right";
-      ctx.fillText(String(lineNo), GUT - 10, y);
-      ctx.textAlign = "left";
-      // токены с подсветкой
-      let left = maxChars === null ? line.len : maxChars;
-      let x = GUT;
+    // Отрисовка фрагмента строки: skip — глобальный индекс начала, take — сколько символов
+    const drawSeg = (line: Line, y: number, skip: number, take: number, showNo: number | null) => {
+      if (showNo !== null) {
+        ctx.fillStyle = "#3a3f4a";
+        ctx.textAlign = "right";
+        ctx.fillText(String(showNo), GUT - 10, y);
+        ctx.textAlign = "left";
+      }
+      let consumed = 0;
       let drawn = 0;
+      let lastCh = "";
+      let lastX = GUT;
       for (const tok of line.tokens) {
-        if (left <= 0) break;
-        const part = tok.t.slice(0, left);
+        if (drawn >= take) break;
+        const tokStart = consumed;
+        consumed += tok.t.length;
+        if (tokStart + tok.t.length <= skip) continue;
+        const from = Math.max(0, skip - tokStart);
+        const partLen = Math.min(tok.t.length - from, take - drawn);
+        const part = tok.t.substr(from, partLen);
+        const x = GUT + (tokStart + from - skip) * charW;
         ctx.fillStyle = tok.c;
         ctx.fillText(part, x, y);
-        x += part.length * charW;
-        drawn += part.length;
-        left -= tok.t.length;
+        lastCh = part[partLen - 1];
+        lastX = x + (partLen - 1) * charW;
+        drawn += partLen;
       }
-      return drawn;
+      return { drawn, lastCh, lastX };
     };
 
     const draw = () => {
@@ -149,50 +157,70 @@ export default function CodeScene() {
           }
         }
 
-        // плавный автоскролл вниз
-        const totalH = (lines.length + 1) * LH + LH * 2;
+        // переносы: сколько символов влезает в одну визуальную строку
+        const mc = Math.max(20, Math.floor((w - GUT - 10) / charW));
+        const visOf = (l: Line) => Math.max(1, Math.ceil(l.len / mc));
+
+        // суммарная высота с учётом переносов
+        let totalVis = visOf(current);
+        for (const l of lines) totalVis += visOf(l);
+        const totalH = totalVis * LH + LH * 3;
         const target = Math.max(0, totalH - h);
         scroll += (target - scroll) * Math.min(1, dt * 3);
 
-        // убираем строки, ушедшие за верхний край
+        // убираем строки, ушедшие за верхний край (с учётом их переносов)
         while (scroll > LH * 2 && lines.length > 5) {
+          const v0 = visOf(lines[0]);
           lines.shift();
           firstIndex++;
-          scroll -= LH;
+          scroll -= v0 * LH;
         }
 
-        // готовые строки
+        // готовые строки с переносами
+        let yAcc = LH;
         for (let i = 0; i < lines.length; i++) {
-          const y = LH + i * LH - scroll;
-          if (y < -LH || y > h + LH) continue;
-          drawLine(lines[i], y, null, firstIndex + i);
+          const vis = visOf(lines[i]);
+          for (let v = 0; v < vis; v++) {
+            const y = yAcc - scroll;
+            if (y > -LH && y < h + LH) {
+              drawSeg(lines[i], y, v * mc, mc, v === 0 ? firstIndex + i : null);
+            }
+            yAcc += LH;
+          }
         }
 
-        // текущая строка + курсор
-        const yCur = LH + lines.length * LH - scroll;
-        const drawn = drawLine(current, yCur, Math.floor(typed), firstIndex + lines.length);
+        // текущая строка с переносами
+        const typedChars = Math.min(current.len, Math.floor(typed));
+        const visCur = visOf(current);
+        const vc = Math.min(visCur - 1, Math.floor(typedChars / mc));
+        let cursorX = GUT, cursorY = yAcc, flashCh = "", flashX = GUT;
+        for (let v = 0; v < visCur; v++) {
+          const y = yAcc - scroll;
+          const take = Math.max(0, Math.min(mc, typedChars - v * mc));
+          if (y > -LH && y < h + LH && take > 0) {
+            const info = drawSeg(current, y, v * mc, take, v === 0 ? firstIndex + lines.length : null);
+            if (v === vc) {
+              flashCh = info.lastCh;
+              flashX = info.lastX;
+            }
+          }
+          if (v === vc) {
+            cursorY = y;
+            cursorX = GUT + (typedChars - vc * mc) * charW;
+          }
+          yAcc += LH;
+        }
+
+        // мигающий курсор
         cursorT += dt;
         if (Math.sin(cursorT * 6) > -0.3) {
-          const cx = GUT + drawn * charW;
           ctx.fillStyle = "rgba(180, 255, 180, 0.85)";
-          ctx.fillRect(cx + 1, yCur - FS * 0.6, charW * 0.9, FS * 1.2);
+          ctx.fillRect(cursorX + 1, cursorY - FS * 0.6, charW * 0.9, FS * 1.2);
         }
         // последний вставленный символ вспыхивает белым
-        if (drawn > 0 && pause <= 0) {
-          let left = drawn;
-          let x = GUT;
-          let lastPart = "";
-          let lastX = GUT;
-          for (const tok of current.tokens) {
-            if (left <= 0) break;
-            const part = tok.t.slice(0, left);
-            lastPart = part[part.length - 1];
-            lastX = x + (part.length - 1) * charW;
-            x += part.length * charW;
-            left -= tok.t.length;
-          }
+        if (flashCh && pause <= 0) {
           ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
-          ctx.fillText(lastPart, lastX, yCur);
+          ctx.fillText(flashCh, flashX, cursorY);
         }
 
         raf = requestAnimationFrame(draw);
