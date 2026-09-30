@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-const CHARS = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЭЮЯабвгдежзиклмнопрстуфхцчшэюяABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const CHARS = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЭЮЯабвгдежзиклмнопрстуфхцчшэюяABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-=<>?/*%&|^~!@#()[]{}:;,.\\"";
 
 interface Cell { ch: string; a: number; }
 interface Col {
