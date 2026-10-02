@@ -19,15 +19,6 @@ services:
     depends_on:
       - db
       - redis
-    environment:
-      - DB_HOST=172.18.0.2
-      - REDIS_HOST=127.0.0.1
-      - TIMEWEB_AI_BASE_URL=https://api.timeweb.ai/v1
-      - TIMEWEB_AI_API_KEY=sk-PyIqBw7PvNPDaJp-kqv75w
-      - TIMEWEB_AI_MODEL=dashscope/qwen3.5-flash
-      - UNISENDER_API_KEY=6z7cio4yqpaws6gsyzx93p15id1xmhimzezgedfy
-      - UNISENDER_FROM_EMAIL=no-reply@my.neiro-astro.ru
-      - UNISENDER_FROM_NAME="AI Астролог"
 
   # Frontend (Next.js)
   frontend:
@@ -62,7 +53,7 @@ services:
     depends_on:
       - redis
     environment:
-      - REDIS_HOST=127.0.0.1
+      - REDIS_HOST=redis
       - TIMEWEB_AI_BASE_URL=https://api.timeweb.ai/v1
       - TIMEWEB_AI_API_KEY=sk-PyIqBw7PvNPDaJp-kqv75w
       - TIMEWEB_AI_MODEL=dashscope/qwen3.5-flash
@@ -115,7 +106,7 @@ services:
       - redis
     environment:
       - DB_HOST=172.18.0.2
-      - REDIS_HOST=127.0.0.1
+      - REDIS_HOST=redis
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}

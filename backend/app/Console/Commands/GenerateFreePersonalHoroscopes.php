@@ -17,9 +17,16 @@ class GenerateFreePersonalHoroscopes extends Command
     public function handle(AiService $ai): int
     {
         // Защита от параллельного запуска (race condition)
-        if (!cache()->add('horoscope_generate_personal_lock', true, now()->addMinutes(60))) {
-            $this->error("⚠ Команда уже запущена другим процессом");
-            return self::FAILURE;
+        try {
+            $hasLock = cache()->add('horoscope_generate_personal_lock', true, now()->addMinutes(60));
+            if (!$hasLock) {
+                $this->error("⚠ Команда уже запущена другим процессом");
+                return self::FAILURE;
+            }
+        } catch (\Throwable $e) {
+            $this->error("⚠ Кеш недоступен: " . $e->getMessage());
+            \Log::error('Horoscope lock failed', ['error' => $e->getMessage()]);
+            // продолжаем без блокировки
         }
 
         $today = now()->startOfDay();
@@ -78,7 +85,7 @@ class GenerateFreePersonalHoroscopes extends Command
 
             // Запрос к Python-сервису
             try {
-                $response = Http::timeout(30)->post('http://astro-neiro-python:8000/natal-chart', [
+                $response = Http::timeout(30)->post('http://172.18.0.3:8000/natal-chart', [
                     'name' => $user->name,
                     'birth_date' => $birthDate,
                     'birth_time' => $birthTime,
