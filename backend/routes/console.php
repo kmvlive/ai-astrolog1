@@ -45,3 +45,6 @@ Schedule::command('calendar:retry-failed')->cron('*/20 * * * *')->withoutOverlap
 
 // Генерация картинок
 Schedule::command('names:generate-images --limit=3')->everyTenMinutes()->withoutOverlapping();
+
+// Мониторинг здоровья системы — каждые 30 минут
+Schedule::command('system:health-check')->everyThirtyMinutes()->withoutOverlapping();
