@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Redis;
 
 class SendSystemAlerts extends Command
 {
-    protected $signature = 'system:health-check {--quiet : только лог, без Telegram}';
+    protected $signature = 'system:health-check {--no-telegram : только лог, без Telegram}';
     protected $description = 'Проверка здоровья: Redis, Python-сервис, рассылки. Алерт в Telegram при проблемах.';
 
     public function handle(): int
@@ -79,7 +79,7 @@ class SendSystemAlerts extends Command
         $this->warn($message);
         Log::error('System health check', ['problems' => $problems]);
 
-        if (!$this->option('quiet')) {
+        if (!$this->option('no-telegram')) {
             $this->sendTelegram($message);
         }
         return self::FAILURE;
