@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #05020f;
+  --text: #e9e4f5;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Звёздный фон */
+.starfield {
+  background-image: 
+    radial-gradient(1px 1px at 20px 30px, white, transparent),
+    radial-gradient(1px 1px at 40px 70px, white, transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 160px 120px, white, transparent),
+    radial-gradient(2px 2px at 200px 80px, rgba(192,132,252,0.8), transparent);
+  background-size: 250px 200px;
+  background-repeat: repeat;
+  animation: twinkle 8s linear infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+/* Градиентные кнопки */
+.btn-gradient {
+  background: linear-gradient(135deg, #c084fc 0%, #93c5fd 100%);
+  transition: all 0.3s ease;
+}
+.btn-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(192, 132, 252, 0.4);
+}
