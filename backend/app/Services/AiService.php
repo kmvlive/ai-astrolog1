@@ -26,7 +26,7 @@ class AiService
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])
-                ->post("{$baseUrl}/chat/completions", [
+                ->retry(3, 30000)->post("{$baseUrl}/chat/completions", [
                     'model' => $model,
                     'messages' => [
                         ['role' => 'user', 'content' => $prompt],
@@ -63,7 +63,7 @@ class AiService
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])
-                ->post("{$baseUrl}/chat/completions", [
+                ->retry(3, 30000)->post("{$baseUrl}/chat/completions", [
                     'model' => $model,
                     'messages' => [
                         ['role' => 'system', 'content' => $this->getSystemPrompt()],
@@ -105,7 +105,7 @@ class AiService
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])
-                ->post("{$baseUrl}/chat/completions", [
+                ->retry(3, 30000)->post("{$baseUrl}/chat/completions", [
                     'model' => $model,
                     'messages' => [
                         ['role' => 'system', 'content' => 'Ты — профессиональный астролог. Составляй гороскопы для знаков зодиака на русском языке. Тёплый, поддерживающий тон. Без заголовков, списков и эмодзи. Обращайся на "вы". СТРОГО ЗАПРЕЩЕНО: упоминать реальных людей (политиков, звёзд, учёных), конкретные даты событий, курсы валют, результаты матчей, выдумывать статистику и цитаты от реальных личностей. Используй только символические и психологические обобщения.'],
@@ -199,7 +199,7 @@ class AiService
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])
-                ->post("{$baseUrl}/chat/completions", [
+                ->retry(3, 30000)->post("{$baseUrl}/chat/completions", [
                     'model' => $model,
                     'messages' => [
                         ['role' => 'system', 'content' => $sysPrompt],
@@ -238,7 +238,7 @@ class AiService
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])
-                ->post("{$baseUrl}/chat/completions", [
+                ->retry(3, 30000)->post("{$baseUrl}/chat/completions", [
                     'model' => $model,
                     'messages' => [
                         ['role' => 'system', 'content' => 'Ты — астролог-эксперт по совместимости знаков. Тёплый, вдохновляющий тон. Обращайся на "вы". СТРОГО ЗАПРЕЩЕНО: упоминать реальных людей (политиков, звёзд, учёных), конкретные даты событий, курсы валют, результаты матчей, выдумывать статистику и цитаты от реальных личностей. Используй только символические и психологические обобщения.'],
@@ -403,7 +403,7 @@ PROMPT;
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])
-                ->post("{$baseUrl}/chat/completions", [
+                ->retry(3, 30000)->post("{$baseUrl}/chat/completions", [
                     'model' => $model,
                     'messages' => [
                         ['role' => 'system', 'content' => $systemPrompt],
@@ -726,7 +726,7 @@ PROMPT;
             $resp = Http::timeout(60)->withHeaders([
                 'Authorization' => "Bearer {$apiKey}",
                 'Content-Type' => 'application/json',
-            ])->post("{$baseUrl}/images/generations", [
+            ])->retry(3, 30000)->post("{$baseUrl}/images/generations", [
                 'model' => 'black_forest_labs/flux-2-klein-9b',
                 'prompt' => $prompt,
                 'size' => '1024x1024',
@@ -775,7 +775,7 @@ PROMPT;
         $headers = ['apikey' => $apikey, 'Client-Agent' => 'neiro-astro:1.0:admin'];
 
         try {
-            $resp = Http::timeout(30)->withHeaders($headers)->post("$base/generate/async", [
+            $resp = Http::timeout(30)->withHeaders($headers)->retry(3, 30000)->post("$base/generate/async", [
                 'prompt' => $prompt,
                 'params' => [
                     'width' => 1024,
@@ -977,7 +977,7 @@ SVG;
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])
-                ->post("{$baseUrl}/chat/completions", [
+                ->retry(3, 30000)->post("{$baseUrl}/chat/completions", [
                     'model' => $model,
                     'messages' => [
                         ['role' => 'system', 'content' => 'Ты — заботливый наставник по саморазвитию. Давай короткие (3-5 предложений) практические советы на день на основе биоритмов человека. Тёплый, поддерживающий тон на "ты". Без заголовков, списков и эмодзи. СТРОГО ЗАПРЕЩЕНО: упоминать реальных людей (политиков, звёзд, учёных), конкретные даты событий, курсы валют, результаты матчей, выдумывать статистику и цитаты от реальных личностей. Используй только символические и психологические обобщения.'],
@@ -1016,7 +1016,7 @@ SVG;
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])
-                ->post("{$baseUrl}/chat/completions", [
+                ->retry(3, 30000)->post("{$baseUrl}/chat/completions", [
                     'model' => $model,
                     'messages' => [
                         ['role' => 'system', 'content' => 'Ты — мудрый толкователь снов. Давай короткие (1-2 предложения) символические толкования на русском языке. СТРОГО ЗАПРЕЩЕНО упоминать учёных (Фрейд, Юнг), исследования, статистику. Без заголовков, списков и эмодзи.'],
@@ -1053,7 +1053,7 @@ SVG;
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])
-                ->post("{$baseUrl}/chat/completions", [
+                ->retry(3, 30000)->post("{$baseUrl}/chat/completions", [
                     'model' => $model,
                     'messages' => [
                         ['role' => 'system', 'content' => 'Ты — эксперт по ономастике и истории имён. Пиши тёплый, живой текст на русском языке. Без списков, без эмодзи, без заголовков. Пиши связными абзацами.'],
@@ -1089,7 +1089,7 @@ SVG;
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])
-                ->post("{$baseUrl}/chat/completions", [
+                ->retry(3, 30000)->post("{$baseUrl}/chat/completions", [
                     'model' => $model,
                     'messages' => [
                         ['role' => 'system', 'content' => 'Ты — эксперт по ономастике. Определяй происхождение имён. Отвечай ОДНИМ словом из списка: славянское, греческое, еврейское, латинское, германское, арабское, тюркское, скандинавское, кельтское, персидское, индийское.'],
@@ -1131,7 +1131,7 @@ SVG;
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])
-                ->post("{$baseUrl}/chat/completions", [
+                ->retry(3, 30000)->post("{$baseUrl}/chat/completions", [
                     'model' => $model,
                     'messages' => [
                         ['role' => 'system', 'content' => 'Ты — эксперт по ономастике и совместимости имён. Пиши тёплый, живой текст на русском языке. Без списков, без эмодзи, без заголовков. Пиши связными абзацами. СТРОГО ЗАПРЕЩЕНО: упоминать реальных людей (политиков, звёзд, учёных), конкретные даты событий, курсы валют, результаты матчей, выдумывать статистику и цитаты от реальных личностей. Используй только символические и психологические обобщения.'],
@@ -1234,7 +1234,7 @@ PROMPT;
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])
-                ->post("{$baseUrl}/chat/completions", [
+                ->retry(3, 30000)->post("{$baseUrl}/chat/completions", [
                     'model' => $model,
                     'messages' => [
                         ['role' => 'system', 'content' => $systemPrompt],
