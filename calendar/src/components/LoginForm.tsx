@@ -1,14 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 export default function LoginForm() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/dashboard'
-  
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -30,14 +25,15 @@ export default function LoginForm() {
 
       if (!res.ok) {
         setError(data.error || 'Неверный email или пароль')
+        setLoading(false)
         return
       }
 
-      router.push(redirect)
-      router.refresh()
+      // Используем window.location вместо router.push
+      // Это гарантирует что cookie будет установлен ДО перезагрузки страницы
+      window.location.href = '/dashboard'
     } catch (err) {
       setError('Ошибка подключения к серверу')
-    } finally {
       setLoading(false)
     }
   }
