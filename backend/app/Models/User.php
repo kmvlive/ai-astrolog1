@@ -26,6 +26,7 @@ class User extends Authenticatable implements FilamentUser
     protected $fillable = [
         'unsubscribed_at',
         'free_personal_enabled',
+        'calendar_pro_enabled',
         'free_natal_chart_enabled',
         'popup_dismissed_ids',
         'welcome_popup_shown',

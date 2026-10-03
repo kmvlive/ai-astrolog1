@@ -33,6 +33,10 @@ class UserResource extends Resource
                         Forms\Components\Placeholder::make('opt_in_info')
                             ->label('Согласен на email-рассылку')
                             ->content(fn ($record) => $record?->email_opt_in ? '✅ Да' : '❌ Нет — переключается кнопкой 📧 в списке'),
+                        Forms\Components\Toggle::make('calendar_pro_enabled')
+                            ->label('PRO в календарях')
+                            ->helperText('Дать пользователю тариф PRO в сервисе календарей')
+                            ->default(false),
                         Forms\Components\Toggle::make('free_personal_enabled')
                             ->label('🎁 Бесплатный персональный гороскоп')
                             ->helperText('Получает персональный прогноз ежедневно в 9:00'),
@@ -73,6 +77,9 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('profile.city')->label('Город')->placeholder('—'),
                 Tables\Columns\IconColumn::make('is_admin')->label('Админ')->boolean(),
                 Tables\Columns\IconColumn::make('email_opt_in')->label('📧')->boolean(),
+                Tables\Columns\ToggleColumn::make('calendar_pro_enabled')
+                    ->label('PRO в календарях')
+                    ->tooltip('Кликни, чтобы включить/выключить PRO в календарях'),
                 Tables\Columns\IconColumn::make('free_personal_enabled')->label('🎁 Гороскоп')->boolean(),
                 Tables\Columns\IconColumn::make('free_natal_chart_enabled')->label('🌟 Карта')->boolean(),
                 Tables\Columns\TextColumn::make('subscription.status')
