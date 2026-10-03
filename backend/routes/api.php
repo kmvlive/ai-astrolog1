@@ -784,3 +784,10 @@ Route::get('/video/{slug}', [App\Http\Controllers\Api\VideoController::class, 's
 
 // HLS видео
 Route::get('/video-hls-url/{slug}', [App\Http\Controllers\Api\VideoController::class, 'getHlsUrl']);
+
+// ============================================
+// Calendar API (изолированно, не трогаем существующие роуты)
+// ============================================
+Route::middleware('auth:sanctum')->prefix('calendar')->group(function () {
+    Route::get('/me', [\App\Http\Controllers\Api\CalendarApiController::class, 'me']);
+});
