@@ -18,7 +18,7 @@ export default function Footer() {
         <div>
           <div className="text-sm font-semibold mb-3">Продукт</div>
           <ul className="space-y-2 text-sm text-white/60">
-            <li><a href="#pricing" className="hover:text-white transition">Тарифы</a></li>
+            <li><Link href="/pricing" className="hover:text-white transition">Тарифы</Link></li>
             <li><Link href="/features" className="hover:text-white transition">Возможности</Link></li>
             <li><Link href="/integrations" className="hover:text-white transition">Интеграции</Link></li>
           </ul>

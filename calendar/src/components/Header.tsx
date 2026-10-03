@@ -14,6 +14,9 @@ export default function Header() {
           </div>
         </Link>
         <div className="flex items-center gap-6">
+          <Link href="/pricing" className="text-sm text-white/80 hover:text-white transition">
+            Тарифы
+          </Link>
           <a href="https://my.neiro-astro.ru" className="text-sm text-white/60 hover:text-white transition">
             ← Астролог
           </a>
