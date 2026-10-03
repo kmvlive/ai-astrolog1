@@ -788,6 +788,12 @@ Route::get('/video-hls-url/{slug}', [App\Http\Controllers\Api\VideoController::c
 // ============================================
 // Calendar API (изолированно, не трогаем существующие роуты)
 // ============================================
-Route::middleware('auth:sanctum')->prefix('calendar')->group(function () {
-    Route::get('/me', [\App\Http\Controllers\Api\CalendarApiController::class, 'me']);
+Route::prefix('calendar')->group(function () {
+    // Публичный: логин для календаря (без verification email)
+    Route::post('/login', [\App\Http\Controllers\Api\CalendarAuthController::class, 'login']);
+
+    // Защищённый: текущий пользователь
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/me', [\App\Http\Controllers\Api\CalendarApiController::class, 'me']);
+    });
 });

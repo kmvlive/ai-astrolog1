@@ -6,7 +6,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
-    const response = await fetch(`${LARAVEL_API}/login`, {
+    // Используем отдельный эндпоинт для календаря (не трогает основной /api/login)
+    const response = await fetch(`${LARAVEL_API}/calendar/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -21,18 +22,16 @@ export async function POST(request: NextRequest) {
     const data = await response.json()
 
     if (!response.ok) {
-      return NextResponse.json(
-        { error: data.message || 'Ошибка авторизации' },
-        { status: response.status }
-      )
+      const errorMsg = data.errors?.email?.[0] || data.message || 'Ошибка авторизации'
+      return NextResponse.json({ error: errorMsg }, { status: response.status })
     }
 
-    const res = NextResponse.json({ success: true })
+    const res = NextResponse.json({ success: true, user: data.user })
     res.cookies.set('cal_token', data.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: 60 * 60 * 24 * 7, // 7 дней
       path: '/',
     })
 
