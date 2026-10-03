@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import LogoutButton from './LogoutButton'
 
 export default function Header() {
   return (
@@ -23,9 +24,10 @@ export default function Header() {
           <Link href="/login" className="text-sm text-white/80 hover:text-white transition">
             Войти
           </Link>
-          <Link href="/signup" className="btn-gradient px-5 py-2 rounded-lg text-sm font-medium text-white">
-            Попробовать
+          <Link href="/dashboard" className="btn-gradient px-5 py-2 rounded-lg text-sm font-medium text-white">
+            Мой кабинет
           </Link>
+          <LogoutButton />
         </div>
       </nav>
     </header>
