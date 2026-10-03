@@ -1,0 +1,31 @@
+services:
+  calendar-frontend:
+    build:
+      context: ./calendar
+      dockerfile: Dockerfile
+    container_name: calendar-frontend
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+    networks:
+      - astro-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3002/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+networks:
+  astro-net:
+    external: true
+    name: ai-astrolog1_astro-net
