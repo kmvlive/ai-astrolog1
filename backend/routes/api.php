@@ -797,8 +797,20 @@ Route::prefix('calendar')->group(function () {
         ->middleware('auth:sanctum');
     Route::post('/sso/exchange', [\App\Http\Controllers\Api\CalendarSsoController::class, 'exchange']);
 
-    // Защищённый: текущий пользователь
+    // Защищённые роуты календаря
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [\App\Http\Controllers\Api\CalendarApiController::class, 'me']);
+
+        // Календари (CRUD)
+        Route::get('/calendars', [\App\Http\Controllers\Api\CalendarCrudController::class, 'calendars']);
+        Route::post('/calendars', [\App\Http\Controllers\Api\CalendarCrudController::class, 'createCalendar']);
+        Route::put('/calendars/{id}', [\App\Http\Controllers\Api\CalendarCrudController::class, 'updateCalendar']);
+        Route::delete('/calendars/{id}', [\App\Http\Controllers\Api\CalendarCrudController::class, 'deleteCalendar']);
+
+        // События (CRUD)
+        Route::get('/events', [\App\Http\Controllers\Api\CalendarCrudController::class, 'events']);
+        Route::post('/events', [\App\Http\Controllers\Api\CalendarCrudController::class, 'createEvent']);
+        Route::put('/events/{id}', [\App\Http\Controllers\Api\CalendarCrudController::class, 'updateEvent']);
+        Route::delete('/events/{id}', [\App\Http\Controllers\Api\CalendarCrudController::class, 'deleteEvent']);
     });
 });
