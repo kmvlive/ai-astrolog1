@@ -26,10 +26,12 @@ const localizer = dateFnsLocalizer({
   locales,
 })
 
-interface CalendarEvent extends Omit<RBCEvent, 'title'> {
+interface CalendarEvent extends Omit<RBCEvent, 'title' | 'start' | 'end'> {
   id: number
   calendar_id: number
-  title: string  // явно строка (мы сами задаём через форму)
+  title: string
+  start: Date  // обязательные даты (RBC вызывает с валидным событием)
+  end: Date
   description?: string | null
   location?: string | null
   allDay?: boolean
@@ -124,7 +126,7 @@ export default function CalendarView({ calendarId }: { calendarId: number }) {
       setFormEnd(event.end ? format(event.end, 'yyyy-MM-dd') : '')
     } else {
       setFormStart(formatDateTimeLocal(event.start))
-      setFormEnd(formatDateTimeLocal(event.end!))
+      setFormEnd(formatDateTimeLocal(event.end))
     }
     setModal({ open: true, mode: 'edit', event })
   }
