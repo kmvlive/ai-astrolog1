@@ -51,7 +51,7 @@ export default function SiteHeader({ showAuth = true }: { showAuth?: boolean }) 
         </Link>
 
         {/* Десктоп-меню */}
-        <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
+        <nav className="hidden md:flex items-center gap-4 text-sm text-slate-300">
           {navLinks.map((l) => (
             l.external ? (
               l.sso ? (
@@ -84,7 +84,7 @@ export default function SiteHeader({ showAuth = true }: { showAuth?: boolean }) 
                       alert("Ошибка подключения к серверу");
                     }
                   }}
-                  className="hover:text-white transition text-left"
+                  className="whitespace-nowrap shrink-0 px-2.5 py-1 rounded-full bg-gradient-to-r from-violet-600 to-blue-600 text-white text-xs font-semibold hover:from-violet-500 hover:to-blue-500 transition shadow shadow-violet-600/30"
                 >
                   {l.label}
                 </button>
@@ -103,7 +103,7 @@ export default function SiteHeader({ showAuth = true }: { showAuth?: boolean }) 
               <Link
                 key={l.href}
                 href={l.href}
-                className={`hover:text-white transition ${pathname?.startsWith(l.href) ? "text-violet-400 font-semibold" : ""}`}
+                className={`whitespace-nowrap hover:text-white transition ${pathname?.startsWith(l.href) ? "text-violet-400 font-semibold" : ""}`}
               >
                 {l.label}
             </Link>
