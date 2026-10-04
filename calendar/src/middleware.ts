@@ -4,16 +4,18 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
 
-  // 🔒 Принудительный HTTPS — если пришёл HTTP, редиректим на HTTPS
-  // Это критично для SSO flow: редирект с основного сайта мог придти по http
-  if (url.protocol === 'http:' && !url.hostname.startsWith('localhost') && !url.hostname.startsWith('127.0.0.1')) {
+  // 🔒 Принудительный HTTPS.
+  // ВАЖНО: за nginx Next.js получает запросы по http, поэтому смотрим
+  // на заголовок x-forwarded-proto от nginx, а не на url.protocol —
+  // иначе возникнет бесконечный редирект.
+  const proto = request.headers.get('x-forwarded-proto')
+  if (proto === 'http' && !url.hostname.startsWith('localhost') && !url.hostname.startsWith('127.0.0.1')) {
     url.protocol = 'https:'
-    return NextResponse.redirect(url, 308) // 308 сохраняет POST body если был
+    return NextResponse.redirect(url, 308)
   }
 
   const token = request.cookies.get('cal_token')?.value
 
-  // Защищённые роуты
   const protectedPaths = ['/dashboard', '/calendar']
   const isProtectedPath = protectedPaths.some(path =>
     url.pathname.startsWith(path)
