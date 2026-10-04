@@ -26,9 +26,10 @@ const localizer = dateFnsLocalizer({
   locales,
 })
 
-interface CalendarEvent extends RBCEvent {
+interface CalendarEvent extends Omit<RBCEvent, 'title'> {
   id: number
   calendar_id: number
+  title: string  // явно строка (мы сами задаём через форму)
   description?: string | null
   location?: string | null
   allDay?: boolean
