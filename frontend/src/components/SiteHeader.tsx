@@ -36,10 +36,11 @@ export default function SiteHeader({ showAuth = true }: { showAuth?: boolean }) 
   const navLinks = [
     { href: "/horoscopes", label: "Гороскопы" },
     { href: "/divinations", label: "Гадания" },
-  { href: "/calendars", label: "Календари" },
+    { href: "/calendars", label: "Календари" },
     { href: "/crystal-ball", label: "Хрустальный шар" },
     { href: "/blog", label: "Блог" },
     { href: "/pricing", label: "Тарифы" },
+    { href: "https://calendar.neiro-astro.ru", label: "📅 AI Календарь", external: true, sso: true },
   ];
 
   return (
@@ -52,13 +53,61 @@ export default function SiteHeader({ showAuth = true }: { showAuth?: boolean }) 
         {/* Десктоп-меню */}
         <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
           {navLinks.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className={`hover:text-white transition ${pathname?.startsWith(l.href) ? "text-violet-400 font-semibold" : ""}`}
-            >
-              {l.label}
+            l.external ? (
+              l.sso ? (
+                <button
+                  key={l.href}
+                  onClick={async () => {
+                    const token = localStorage.getItem("auth_token");
+                    if (!token) {
+                      router.push("/login");
+                      return;
+                    }
+                    
+                    try {
+                      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/calendar/sso/issue`, {
+                        method: "POST",
+                        headers: {
+                          "Authorization": `Bearer ${token}`,
+                          "Accept": "application/json",
+                        },
+                      });
+                      
+                      const data = await res.json();
+                      
+                      if (data.success && data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                      } else {
+                        alert("Ошибка SSO: " + (data.message || "Не удалось создать код"));
+                      }
+                    } catch (err) {
+                      alert("Ошибка подключения к серверу");
+                    }
+                  }}
+                  className="hover:text-white transition text-left"
+                >
+                  {l.label}
+                </button>
+              ) : (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition"
+                >
+                  {l.label}
+                </a>
+              )
+            ) : (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`hover:text-white transition ${pathname?.startsWith(l.href) ? "text-violet-400 font-semibold" : ""}`}
+              >
+                {l.label}
             </Link>
+            )
           ))}
           {isLoggedIn && (
             <>
