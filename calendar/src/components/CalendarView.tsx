@@ -322,6 +322,10 @@ export default function CalendarView({ calendarId }: { calendarId: number }) {
           selectable
           popup
           culture="ru"
+          formats={{
+            weekdayFormat: 'EEEE',  // полное название дня (Понедельник вместо Пн)
+            dayFormat: 'd EEEE',    // "7 Понедельник" в week view
+          }}
           components={{
             toolbar: CustomToolbar,
           }}
