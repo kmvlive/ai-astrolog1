@@ -49,7 +49,7 @@ export default async function DashboardPage() {
         <div className="grid md:grid-cols-2 gap-6 mt-8">
           <div className="p-6 rounded-2xl border border-white/10 bg-white/[0.02]">
             <div className="text-3xl mb-3">📅</div>
-            <h2 className="text-xl font-semibold mb-2">Мои календари</h2>
+            <h2 className="text-xl font-semibold mb-2"><a href="/calendars" className="hover:text-astro-purple transition">Мои календари →</a></h2>
             <p className="text-white/60 text-sm mb-4">
               {user.calendar_pro_enabled 
                 ? 'У вас тариф PRO — создавайте неограниченное количество календарей' 

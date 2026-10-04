@@ -1,7 +1,28 @@
 import Link from 'next/link'
-import LogoutButton from './LogoutButton'
+import { cookies } from 'next/headers'
 
-export default function Header() {
+export default async function Header() {
+  const cookieStore = await cookies()
+  const token = cookieStore.get('cal_token')?.value
+  const isLoggedIn = !!token
+
+  let userName = ''
+  if (isLoggedIn) {
+    try {
+      const res = await fetch('http://172.17.0.1:8002/api/calendar/me', {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        },
+        cache: 'no-store',
+      })
+      if (res.ok) {
+        const data = await res.json()
+        userName = data.user?.name || ''
+      }
+    } catch {}
+  }
+
   return (
     <header className="relative z-10 border-b border-white/5 backdrop-blur-sm bg-astro-darker/50">
       <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -14,20 +35,44 @@ export default function Header() {
             <div className="text-xs text-white/40 -mt-0.5">от AI Астролога</div>
           </div>
         </Link>
+        
         <div className="flex items-center gap-6">
-          <Link href="/calendars">Мои календари</a><a href="/pricing" className="text-sm text-white/80 hover:text-white transition">
-            Тарифы
-          </Link>
-          <a href="https://my.neiro-astro.ru" className="text-sm text-white/60 hover:text-white transition">
+          {isLoggedIn && (
+            <>
+              <Link href="/calendars" className="text-sm text-white/80 hover:text-white transition">
+                Мои календари
+              </Link>
+              <Link href="/pricing" className="text-sm text-white/80 hover:text-white transition">
+                Тарифы
+              </Link>
+            </>
+          )}
+          
+          <Link href="https://my.neiro-astro.ru" className="text-sm text-white/60 hover:text-white transition">
             ← Астролог
-          </a>
-          <Link href="/login" className="text-sm text-white/80 hover:text-white transition">
-            Войти
           </Link>
-          <Link href="/dashboard" className="btn-gradient px-5 py-2 rounded-lg text-sm font-medium text-white">
-            Мой кабинет
-          </Link>
-          <LogoutButton />
+          
+          {isLoggedIn ? (
+            <>
+              <Link href="/dashboard" className="btn-gradient px-5 py-2 rounded-lg text-sm font-medium text-white">
+                {userName || 'Мой кабинет'}
+              </Link>
+              <form action="/api/auth/logout" method="POST" className="inline">
+                <button type="submit" className="text-sm text-white/60 hover:text-white transition">
+                  Выйти
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="text-sm text-white/80 hover:text-white transition">
+                Войти
+              </Link>
+              <Link href="/dashboard" className="btn-gradient px-5 py-2 rounded-lg text-sm font-medium text-white">
+                Мой кабинет
+              </Link>
+            </>
+          )}
         </div>
       </nav>
     </header>
