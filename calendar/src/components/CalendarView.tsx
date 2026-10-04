@@ -3,9 +3,11 @@
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { Calendar, dateFnsLocalizer, Event as RBCEvent } from 'react-big-calendar'
+import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 import { format, parse, startOfWeek, getDay } from 'date-fns'
 import { ru } from 'date-fns/locale/ru'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
+import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
 import {
   getCalendars,
   getEvents,
@@ -30,13 +32,16 @@ interface CalendarEvent extends Omit<RBCEvent, 'title' | 'start' | 'end'> {
   id: number
   calendar_id: number
   title: string
-  start: Date  // обязательные даты (RBC вызывает с валидным событием)
+  start: Date
   end: Date
   description?: string | null
   location?: string | null
   allDay?: boolean
   color?: string
 }
+
+// Оборачиваем Calendar в DnD HOC
+const DnDCalendar = withDragAndDrop<CalendarEvent>(Calendar)
 
 interface ModalState {
   open: boolean
@@ -295,7 +300,7 @@ export default function CalendarView({ calendarId }: { calendarId: number }) {
 
       {/* Календарь */}
       <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-4 calendar-dark">
-        <Calendar
+        <DnDCalendar
           localizer={localizer}
           events={events}
           startAccessor="start"
@@ -509,6 +514,16 @@ export default function CalendarView({ calendarId }: { calendarId: number }) {
           background: #0f172a;
           border: 1px solid rgba(255,255,255,0.1);
           color: white;
+        }
+        /* DnD стили */
+        .rbc-addons-dnd .rbc-event {
+          cursor: grab;
+        }
+        .rbc-addons-dnd .rbc-event:active {
+          cursor: grabbing;
+        }
+        .rbc-addons-dnd-drag-preview {
+          opacity: 0.7;
         }
       `}</style>
     </div>
