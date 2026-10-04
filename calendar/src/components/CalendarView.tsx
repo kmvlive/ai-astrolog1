@@ -198,11 +198,14 @@ export default function CalendarView({ calendarId }: { calendarId: number }) {
   }
 
   // Drag-and-drop (перенос события)
-  const handleEventDrop = async ({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
+  // RBC передаёт start/end как string | Date — конвертируем
+  const handleEventDrop = async ({ event, start, end }: { event: CalendarEvent; start: string | Date; end: string | Date }) => {
+    const startDate = new Date(start)
+    const endDate = new Date(end)
     try {
       await updateEvent(event.id, {
-        start: start.toISOString(),
-        end: event.allDay ? null : end.toISOString(),
+        start: startDate.toISOString(),
+        end: event.allDay ? null : endDate.toISOString(),
       })
       await loadData(currentDate)
     } catch (e: any) {
