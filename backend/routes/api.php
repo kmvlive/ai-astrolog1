@@ -792,6 +792,11 @@ Route::prefix('calendar')->group(function () {
     // Публичный: логин для календаря (без verification email)
     Route::post('/login', [\App\Http\Controllers\Api\CalendarAuthController::class, 'login']);
 
+    // SSO: одноразовые коды
+    Route::post('/sso/issue', [\App\Http\Controllers\Api\CalendarSsoController::class, 'issue'])
+        ->middleware('auth:sanctum');
+    Route::post('/sso/exchange', [\App\Http\Controllers\Api\CalendarSsoController::class, 'exchange']);
+
     // Защищённый: текущий пользователь
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [\App\Http\Controllers\Api\CalendarApiController::class, 'me']);
