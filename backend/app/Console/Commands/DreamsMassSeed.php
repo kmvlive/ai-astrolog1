@@ -366,13 +366,13 @@ class DreamsMassSeed extends Command
                 'max_tokens' => 3500,
                 'enable_thinking' => false,
             ]);
-            if (!$resp->successful()) { $this->warn("Батч {$tag}: HTTP {$resp->status()}"); return; }
+            if (!$resp->successful()) { $this->warn("Батч {$tag}: HTTP {$resp->status()}"); return 0; }
 
             $text = trim($resp->json('choices.0.message.content'));
             $s = strpos($text, '{'); $e = strrpos($text, '}');
             if ($s !== false && $e !== false) $text = substr($text, $s, $e - $s + 1);
             $data = json_decode($text, true);
-            if (!is_array($data)) { $this->warn("Батч {$tag}: JSON не распознан"); return; }
+            if (!is_array($data)) { $this->warn("Батч {$tag}: JSON не распознан"); return 0; }
 
             $chunkNorm = array_map(fn($x) => $this->norm($x), $chunk);
             $saved = 0;
@@ -393,6 +393,7 @@ class DreamsMassSeed extends Command
             return $saved;
         } catch (\Throwable $e) {
             $this->warn("Батч {$tag}: " . $e->getMessage());
+            return 0;
         }
     }
 }
