@@ -379,15 +379,20 @@ class DreamsMassSeed extends Command
             foreach ($data as $kw => $interp) {
                 $n = $this->norm((string) $kw);
                 if (!in_array($n, $chunkNorm, true)) continue; // битые/левые ключи мимо
+                if (!mb_check_encoding($n, 'UTF-8')) continue; // двойная страховка от битых байт
                 if ($n === '' || !is_string($interp) || mb_strlen(trim($interp)) < 10) continue;
-                if (DreamSymbol::where('keyword', $n)->exists()) continue;
-                DreamSymbol::create([
-                    'keyword' => $n,
-                    'interpretation' => trim($interp),
-                    'ai_generated' => true,
-                    'approved' => true,
-                ]);
-                $saved++;
+                try {
+                    if (DreamSymbol::where('keyword', $n)->exists()) continue;
+                    DreamSymbol::create([
+                        'keyword' => $n,
+                        'interpretation' => trim($interp),
+                        'ai_generated' => true,
+                        'approved' => true,
+                    ]);
+                    $saved++;
+                } catch (\Throwable $e) {
+                    $this->warn("Батч {$tag}: пропускаю ключ («{$n}»): " . mb_substr($e->getMessage(), 0, 80));
+                }
             }
             $this->info("Батч {$tag}: сохранено {$saved}");
             return $saved;
