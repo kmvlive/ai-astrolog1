@@ -5,17 +5,14 @@ namespace App\Console\Commands;
 use App\Models\DreamSymbol;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 
 class DreamsMassSeed extends Command
 {
-    protected $signature = 'dreams:mass-seed 
+    protected $signature = 'dreams:mass-seed
         {action : generate-pool | interpret-pool}
         {--pool-size=15000}
-        {--batch-size=500}
         {--categories=}';
-        
-    protected $description = 'Двухэтапная фабрика сонника: generate-pool создаёт пул слов, interpret-pool генерит толкования из пула';
+    protected $description = 'Фабрика сонника: generate-pool — пул слов, interpret-pool — толкования из пула';
 
     private const CATEGORIES = [
         'домашние животные и скот' => 200,
@@ -76,21 +73,16 @@ class DreamsMassSeed extends Command
         'окна и лестницы' => 80,
     ];
 
-    private array $seen = [];
-
     public function handle(): int
     {
         $action = $this->argument('action');
-        
-        if ($action === 'generate-pool') {
-            return $this->generatePool();
-        } elseif ($action === 'interpret-pool') {
-            return $this->interpretPool();
-        }
-        
-        $this->error("Неизвестное действие: {$action}. Используйте generate-pool или interpret-pool");
+        if ($action === 'generate-pool') return $this->generatePool();
+        if ($action === 'interpret-pool') return $this->interpretPool();
+        $this->error('Неизвестное действие: ' . $action);
         return self::FAILURE;
     }
+
+    // ---------- ЭТАП 1: ПУЛ СЛОВ ----------
 
     private function generatePool(): int
     {
@@ -100,63 +92,48 @@ class DreamsMassSeed extends Command
         if (!$apiKey) { $this->error('Нет TIMEWEB_AI_API_KEY'); return self::FAILURE; }
 
         $poolSize = (int) $this->option('pool-size');
-        $categories = $this->option('categories') ? explode(',', $this->option('categories')) : array_keys(self::CATEGORIES);
+        $cats = $this->option('categories')
+            ? array_map('trim', explode(',', $this->option('categories')))
+            : array_keys(self::CATEGORIES);
 
-        // Загружаем существующие слова
-        foreach (DreamSymbol::pluck('keyword') as $kw) {
-            $this->seen[$this->norm($kw)] = true;
-        }
-        $this->info("Загружено существующих: " . count($this->seen));
+        $seen = [];
+        foreach (DreamSymbol::pluck('keyword') as $kw) $seen[$this->norm($kw)] = true;
+        $this->info('Существующих в БД: ' . count($seen));
 
-        // Загружаем уже сгенерённый пул (если есть)
         $poolFile = storage_path('app/dreams-pool.json');
         $pool = [];
         if (file_exists($poolFile)) {
             $pool = json_decode(file_get_contents($poolFile), true) ?: [];
-            $this->info("Загружено из пула: " . count($pool));
-            foreach ($pool as $w) $this->seen[$this->norm($w)] = true;
+            foreach ($pool as $w) $seen[$this->norm($w)] = true;
+            $this->info('Уже в пуле: ' . count($pool));
         }
 
-        $totalAdded = 0;
-        
-        foreach ($categories as $cat) {
-            if (!isset(self::CATEGORIES[$cat])) {
-                $this->warn("Неизвестная категория: {$cat}");
-                continue;
-            }
-            
-            $quota = self::CATEGORIES[$cat];
-            $this->info("Категория «{$cat}»: квота {$quota}");
+        foreach ($cats as $cat) {
+            if (!isset(self::CATEGORIES[$cat])) { $this->warn("Неизвестная категория: {$cat}"); continue; }
+            if (count($pool) >= $poolSize) break;
 
-            $words = $this->generateWords($baseUrl, $apiKey, $model, $cat, $quota * 2); // запас x2
-            
+            $before = count($pool);
+            $words = $this->generateWords($baseUrl, $apiKey, $model, $cat, self::CATEGORIES[$cat] * 2);
             foreach ($words as $w) {
                 if (!is_string($w)) continue;
                 $n = $this->norm($w);
-                if ($n === '' || isset($this->seen[$n])) continue;
+                if ($n === '' || isset($seen[$n])) continue;
                 if (!preg_match('/^[а-яе][а-яе\s\-]*$/u', $n)) continue;
                 if (mb_strlen($n) < 2 || mb_strlen($n) > 40) continue;
-                
-                $this->seen[$n] = true;
+                $seen[$n] = true;
                 $pool[] = $n;
-                $totalAdded++;
-                
-                if (count($pool) >= $poolSize) {
-                    $this->info("Достигнут размер пула: {$poolSize}");
-                    break 2;
-                }
+                if (count($pool) >= $poolSize) break;
             }
-            
-            $this->info("Добавлено в пул: " . count($pool));
-            sleep(2);
+            $this->info("«{$cat}»: +" . (count($pool) - $before) . " (в пуле: " . count($pool) . ")");
+            sleep(1);
         }
 
-        // Сохраняем пул
         file_put_contents($poolFile, json_encode($pool, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        $this->info("Пуль сохранён: {$poolFile} (всего слов: " . count($pool) . ")");
-        
+        $this->info("ПУЛ СОХРАНЁН: {$poolFile}, слов: " . count($pool));
         return self::SUCCESS;
     }
+
+    // ---------- ЭТАП 2: ТОЛКОВАНИЯ ИЗ ПУЛА ----------
 
     private function interpretPool(): int
     {
@@ -165,44 +142,36 @@ class DreamsMassSeed extends Command
         $model = env('TIMEWEB_AI_MODEL', 'dashscope/qwen3.5-flash');
         if (!$apiKey) { $this->error('Нет TIMEWEB_AI_API_KEY'); return self::FAILURE; }
 
-        $batchSize = (int) $this->option('batch-size');
         $poolFile = storage_path('app/dreams-pool.json');
-        
         if (!file_exists($poolFile)) {
-            $this->error("Пуль не найден. Сначала запустите: dreams:mass-seed generate-pool");
+            $this->error('Пул не найден. Сначала: dreams:mass-seed generate-pool');
             return self::FAILURE;
         }
-
         $pool = json_decode(file_get_contents($poolFile), true) ?: [];
-        $this->info("Загружено из пула: " . count($pool) . " слов");
+        $this->info('В пуле: ' . count($pool));
 
-        // Загружаем существующие
-        $existing = DreamSymbol::pluck('keyword')->map(fn($k) => $this->norm($k))->flip();
-        
-        // Фильтруем уже обработанные
-        $todo = array_values(array_filter($pool, fn($w) => !isset($existing[$this->norm($w)])));
-        $this->info("К обработке: " . count($todo) . " (из пула " . count($pool) . ", уже есть " . count($existing) . ")");
+        $iter = 0;
+        while (true) {
+            $existing = DreamSymbol::pluck('keyword')->map(fn($k) => $this->norm($k))->flip()->all();
+            $todo = array_values(array_filter($pool, fn($w) => !isset($existing[$this->norm($w)])));
+            if (empty($todo)) break;
 
-        $processed = 0;
-        foreach (array_chunk($todo, $batchSize) as $chunkNum => $chunk) {
-            $this->info("Батч " . ($chunkNum + 1) . ": " . count($chunk) . " слов");
-            
-            foreach (array_chunk($chunk, 30) as $i => $subChunk) {
-                $this->interpretChunk($baseUrl, $apiKey, $model, $subChunk, "{$chunkNum}.{$i}");
-                $processed += count($subChunk);
-                sleep(1);
-            }
-            
-            $this->info("Прогресс: {$processed} / " . count($todo));
-            
-            // Сохраняем прогресс (удаляем обработанные из пула)
-            $remaining = array_slice($pool, $processed);
-            file_put_contents($poolFile, json_encode($remaining, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+            $chunk = array_slice($todo, 0, 30);
+            $this->interpretChunk($baseUrl, $apiKey, $model, $chunk, (string) ++$iter);
+
+            // сохраняем прогресс: убираем из пула всё, что уже в БД
+            $existing = DreamSymbol::pluck('keyword')->map(fn($k) => $this->norm($k))->flip()->all();
+            $pool = array_values(array_filter($pool, fn($w) => !isset($existing[$this->norm($w)])));
+            file_put_contents($poolFile, json_encode($pool, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+            $this->info('Прогресс: осталось в пуле ' . count($pool) . ' | всего в БД: ' . DreamSymbol::count());
+            sleep(1);
         }
 
-        $this->info("ГОТОВО! Обработано: {$processed}, всего записей: " . DreamSymbol::count());
+        $this->info('ГОТОВО! Всего записей: ' . DreamSymbol::count());
         return self::SUCCESS;
     }
+
+    // ---------- ХЕЛПЕРЫ ----------
 
     private function norm(string $s): string
     {
@@ -234,7 +203,7 @@ class DreamsMassSeed extends Command
             if ($s !== false && $e !== false) $text = substr($text, $s, $e - $s + 1);
             $data = json_decode($text, true);
             if (!is_array($data)) return [];
-            return array_values(array_map(fn($v, $k) => is_string($v) && $v !== '' ? $v : (string) $k, $data, array_keys($data)));
+            return array_values($data);
         } catch (\Throwable $e) {
             $this->warn("Слова «{$category}»: " . $e->getMessage());
             return [];
