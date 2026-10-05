@@ -1,3 +1,4 @@
+#!/opt/dreams-tools/bin/python3
 import json
 import pymorphy2
 
