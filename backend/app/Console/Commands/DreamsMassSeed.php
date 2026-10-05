@@ -277,6 +277,36 @@ class DreamsMassSeed extends Command
         'i' => 'и', 'l' => 'л', 'n' => 'н', 'u' => 'у', 's' => 'с', 'z' => 'з',
     ];
 
+    private function mbLev(string $a, string $b): int
+    {
+        $ca = preg_split('//u', $a, -1, PREG_SPLIT_NO_EMPTY);
+        $cb = preg_split('//u', $b, -1, PREG_SPLIT_NO_EMPTY);
+        $la = count($ca); $lb = count($cb);
+        if (abs($la - $lb) > 1) return 2;
+        $prev = range(0, $lb);
+        for ($i = 1; $i <= $la; $i++) {
+            $curr = [$i];
+            for ($j = 1; $j <= $lb; $j++) {
+                $curr[$j] = min($prev[$j] + 1, $curr[$j - 1] + 1, $prev[$j - 1] + ($ca[$i - 1] === $cb[$j - 1] ? 0 : 1));
+            }
+            $prev = $curr;
+        }
+        return $prev[$lb];
+    }
+
+    private function matchChunk(string $n, array $chunkNorm): ?string
+    {
+        if (in_array($n, $chunkNorm, true)) return $n;
+        $ns = str_replace(['-', ' '], '', $n);
+        foreach ($chunkNorm as $cn) {
+            if (str_replace(['-', ' '], '', $cn) === $ns) return $cn;
+        }
+        foreach ($chunkNorm as $cn) {
+            if ($this->mbLev($n, $cn) <= 1) return $cn;
+        }
+        return null;
+    }
+
     private function norm(string $s): string
     {
         $s = @iconv('UTF-8', 'UTF-8//IGNORE', $s) ?: $s;
@@ -375,16 +405,20 @@ class DreamsMassSeed extends Command
             if (!is_array($data)) { $this->warn("Батч {$tag}: JSON не распознан"); return 0; }
 
             $chunkNorm = array_map(fn($x) => $this->norm($x), $chunk);
+            $returned = is_array($data) ? count($data) : 0;
+            $matched = 0;
             $saved = 0;
             foreach ($data as $kw => $interp) {
                 $n = $this->norm((string) $kw);
-                if (!in_array($n, $chunkNorm, true)) continue; // битые/левые ключи мимо
-                if (!mb_check_encoding($n, 'UTF-8')) continue; // двойная страховка от битых байт
-                if ($n === '' || !is_string($interp) || mb_strlen(trim($interp)) < 10) continue;
+                if ($n === '' || !mb_check_encoding($n, 'UTF-8')) continue;
+                $match = $this->matchChunk($n, $chunkNorm);
+                if (!$match) continue; // битые/левые ключи мимо
+                $matched++;
+                if (!is_string($interp) || mb_strlen(trim($interp)) < 10) continue;
                 try {
-                    if (DreamSymbol::where('keyword', $n)->exists()) continue;
+                    if (DreamSymbol::where('keyword', $match)->exists()) continue;
                     DreamSymbol::create([
-                        'keyword' => $n,
+                        'keyword' => $match,
                         'interpretation' => trim($interp),
                         'ai_generated' => true,
                         'approved' => true,
@@ -394,7 +428,7 @@ class DreamsMassSeed extends Command
                     $this->warn("Батч {$tag}: пропускаю ключ («{$n}»): " . mb_substr($e->getMessage(), 0, 80));
                 }
             }
-            $this->info("Батч {$tag}: сохранено {$saved}");
+            $this->info("Батч {$tag}: модель вернула {$returned}, совпало {$matched}, сохранено {$saved}");
             return $saved;
         } catch (\Throwable $e) {
             $this->warn("Батч {$tag}: " . $e->getMessage());
