@@ -132,18 +132,30 @@ class DreamsMassSeed extends Command
                 $tries++;
                 sleep(1);
             }
+            $rej = ['dup' => 0, 'regex' => 0, 'garbage' => 0, 'other' => 0];
+            $rejSamples = [];
             foreach ($words as $w) {
-                if (!is_string($w)) continue;
+                if (!is_string($w)) { $rej['other']++; continue; }
                 $n = $this->norm($w);
-                if ($n === '' || isset($seen[$n])) continue;
-                if (!preg_match('/^[а-яе][а-яе\s\-]*$/u', $n)) continue;
-                if (mb_strlen($n) < 2 || mb_strlen($n) > 40) continue;
-                if ($this->isGarbage($n)) continue;
+                if ($n === '') { $rej['other']++; continue; }
+                if (isset($seen[$n])) { $rej['dup']++; continue; }
+                if (!preg_match('/^[а-яе][а-яе\s\-]*$/u', $n)) {
+                    $rej['regex']++;
+                    if (count($rejSamples) < 8) $rejSamples[] = 'REGEX: [' . $n . ']';
+                    continue;
+                }
+                if (mb_strlen($n) < 2 || mb_strlen($n) > 40) { $rej['regex']++; continue; }
+                if ($this->isGarbage($n)) {
+                    $rej['garbage']++;
+                    if (count($rejSamples) < 8) $rejSamples[] = 'GARBAGE: [' . $n . ']';
+                    continue;
+                }
                 $seen[$n] = true;
                 $pool[] = $n;
                 if (count($pool) >= $poolSize) break;
             }
-            $this->info("«{$cat}»: +" . (count($pool) - $before) . " (в пуле: " . count($pool) . ")");
+            $this->info("«{$cat}»: +" . (count($pool) - $before) . " (в пуле: " . count($pool) . ") | получено от модели: " . count($words) . " | отсеяно => дубли: {$rej['dup']}, regex: {$rej['regex']}, мусор: {$rej['garbage']}, прочее: {$rej['other']}");
+            foreach ($rejSamples as $s) $this->line('     пример отсева: ' . $s);
             sleep(1);
         }
 
