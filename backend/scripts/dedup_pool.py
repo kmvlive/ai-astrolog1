@@ -1,19 +1,23 @@
-#!/opt/dreams-tools/bin/python3
 import json
 import pymorphy2
 
 morph = pymorphy2.MorphAnalyzer()
+PUNCT = ' \t\n\r,.!?;:«»"\'()[]{}'
+
+def clean(s):
+    return s.strip(PUNCT).lower().replace('ё', 'е')
 
 def lemma(s):
     parts = []
     for w in s.split():
+        w = w.strip(PUNCT)
         p = morph.parse(w)
         parts.append(p[0].normal_form if p else w)
     return ' '.join(parts).replace('ё', 'е')
 
 db = set()
 for line in open('/tmp/db_keywords.txt', encoding='utf-8'):
-    k = line.strip().lower()
+    k = clean(line)
     if k:
         db.add(lemma(k))
 
@@ -22,8 +26,8 @@ pool = json.load(open(path, encoding='utf-8'))
 
 out, seen, dropped = [], set(), []
 for w in pool:
-    L = lemma(w.lower())
-    if L in db or L in seen:
+    L = lemma(clean(w))
+    if not L or L in db or L in seen:
         dropped.append(f'{w} -> {L}')
         continue
     seen.add(L)

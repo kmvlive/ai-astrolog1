@@ -242,12 +242,19 @@ class DreamsMassSeed extends Command
         return false;
     }
 
+    private const HOMOGLYPHS = [
+        'a' => 'а', 'e' => 'е', 'o' => 'о', 'p' => 'р', 'c' => 'с', 'y' => 'у',
+        'x' => 'х', 'k' => 'к', 'm' => 'м', 't' => 'т', 'b' => 'в', 'g' => 'г',
+        'i' => 'и', 'l' => 'л', 'n' => 'н', 'u' => 'у', 's' => 'с', 'z' => 'з',
+    ];
+
     private function norm(string $s): string
     {
         $s = mb_strtolower(trim($s));
+        $s = strtr($s, self::HOMOGLYPHS);
         $s = str_replace('ё', 'е', $s);
         $s = preg_replace('/\s+/u', ' ', $s);
-        return trim($s);
+        return trim($s, " \t\n\r,.!?;:«»\"'()[]{}");
     }
 
     private function generateWords(string $baseUrl, string $apiKey, string $model, string $category, int $count, array $exclude = []): array
