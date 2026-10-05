@@ -212,23 +212,21 @@ class DreamsMassSeed extends Command
             if (empty($todo)) break;
 
             $chunk = array_slice($todo, 0, 30);
-            $saved = $this->interpretChunk($baseUrl, $apiKey, $model, $chunk, (string) ++$iter);
+            [$saved, $returned] = $this->interpretChunk($baseUrl, $apiKey, $model, $chunk, (string) ++$iter);
 
-            if ($saved === 0) {
+            if ($returned > 0) {
+                // модель ответила — чанк обработан, убираем из пула безусловно
+                $pool = array_values(array_diff($pool, $chunk));
+                $emptyStreak = 0;
+            } else {
                 $emptyStreak++;
                 if ($emptyStreak >= 3) {
-                    $poison = $todo[0];
-                    $pool = array_values(array_filter($pool, fn($w) => $w !== $poison));
-                    $this->warn("3 пустых батча подряд — принудительно пропускаю «{$poison}»");
+                    $poison = $chunk[0] ?? null;
+                    if ($poison) $pool = array_values(array_filter($pool, fn($w) => $w !== $poison));
+                    $this->warn("3 сбоя подряд — принудительно пропускаю «{$poison}»");
                     $emptyStreak = 0;
                 }
-            } else {
-                $emptyStreak = 0;
             }
-
-            // сохраняем прогресс: убираем из пула всё, что уже в БД
-            $existing = DreamSymbol::pluck('keyword')->map(fn($k) => $this->norm($k))->flip()->all();
-            $pool = array_values(array_filter($pool, fn($w) => !isset($existing[$this->norm($w)])));
             file_put_contents($poolFile, json_encode($pool, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
             $this->info('Прогресс: осталось в пуле ' . count($pool) . ' | всего в БД: ' . DreamSymbol::count());
             sleep(1);
@@ -412,7 +410,14 @@ class DreamsMassSeed extends Command
                 $n = $this->norm((string) $kw);
                 if ($n === '' || !mb_check_encoding($n, 'UTF-8')) continue;
                 $match = $this->matchChunk($n, $chunkNorm);
-                if (!$match) continue; // битые/левые ключи мимо
+                if (!$match) {
+                    // модель перефразировала — принимаем её форму, если чистая
+                    if (preg_match('/^[а-яе][а-яе\s\-]*$/u', $n) && mb_strlen($n) >= 2 && mb_strlen($n) <= 40 && !$this->isGarbage($n)) {
+                        $match = $n;
+                    } else {
+                        continue;
+                    }
+                }
                 $matched++;
                 if (!is_string($interp) || mb_strlen(trim($interp)) < 10) continue;
                 try {
@@ -429,7 +434,7 @@ class DreamsMassSeed extends Command
                 }
             }
             $this->info("Батч {$tag}: модель вернула {$returned}, совпало {$matched}, сохранено {$saved}");
-            return $saved;
+            return [$saved, $returned];
         } catch (\Throwable $e) {
             $this->warn("Батч {$tag}: " . $e->getMessage());
             return 0;
