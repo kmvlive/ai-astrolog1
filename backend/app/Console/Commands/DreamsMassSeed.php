@@ -125,10 +125,17 @@ class DreamsMassSeed extends Command
 
             $before = count($pool);
             $quota = (int) (self::CATEGORIES[$cat] * (int) $this->option('mult'));
+            $excludeArr = [];
             $words = [];
             $tries = 0;
             while (count($words) < $quota && $tries < 4) {
-                $words = array_merge($words, $this->generateWords($baseUrl, $apiKey, $model, $cat, min(150, $quota)));
+                $batch = $this->generateWords($baseUrl, $apiKey, $model, $cat, min(150, $quota), $excludeArr);
+                foreach ($batch as $w) {
+                    $n = is_string($w) ? $this->norm($w) : '';
+                    if ($n !== '' && isset($seen[$n]) && !in_array($n, $excludeArr)) $excludeArr[] = $n;
+                }
+                $excludeArr = array_slice($excludeArr, 0, 400);
+                $words = array_merge($words, $batch);
                 $tries++;
                 sleep(1);
             }
@@ -243,7 +250,7 @@ class DreamsMassSeed extends Command
         return trim($s);
     }
 
-    private function generateWords(string $baseUrl, string $apiKey, string $model, string $category, int $count): array
+    private function generateWords(string $baseUrl, string $apiKey, string $model, string $category, int $count, array $exclude = []): array
     {
         $prompt = "Ты — составитель сонника. Верни СТРОГО JSON-массив без markdown из {$count} русских слов для категории «{$category}».
 
@@ -259,6 +266,9 @@ class DreamsMassSeed extends Command
 Пример НЕПРАВИЛЬНОГО: [\"чёрная кошка\", \"собачий лай\", \"источник страха\"]
 
 Слова:";
+        if (!empty($exclude)) {
+            $prompt .= "\nЗАПРЕЩЕНО возвращать эти слова (они уже заняты): " . implode(', ', $exclude);
+        }
 
         try {
             $resp = Http::timeout(120)->withHeaders([
