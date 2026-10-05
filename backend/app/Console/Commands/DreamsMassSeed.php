@@ -11,7 +11,8 @@ class DreamsMassSeed extends Command
     protected $signature = 'dreams:mass-seed
         {action : generate-pool | interpret-pool}
         {--pool-size=15000}
-        {--categories=}';
+        {--categories=}
+        {--mult=2 : множитель квот категорий}';
     protected $description = 'Фабрика сонника: generate-pool — пул слов, interpret-pool — толкования из пула';
 
     private const CATEGORIES = [
@@ -71,6 +72,16 @@ class DreamsMassSeed extends Command
         'свет и тьма' => 60,
         'двери, замки и ключи' => 80,
         'окна и лестницы' => 80,
+        'цвет + животное (чёрная кошка, белый пёс)' => 400,
+        'действия животных (кусает, гонится, царапает)' => 300,
+        'бытовые ситуации (опоздать, потерять, найти)' => 300,
+        'состояния одежды (рваная, грязная, новая)' => 200,
+        'погодные условия (ливень, снегопад, туман, град)' => 200,
+        'денежные ситуации (долг, зарплата, потеря денег)' => 200,
+        'транспортные ситуации (опоздать на поезд, авария)' => 200,
+        'природные катастрофы (наводнение, ураган, пожар)' => 200,
+        'еда и готовка (есть, готовить, угощать)' => 250,
+        'праздники и обряды (день рождения, крестины)' => 200,
     ];
 
     public function handle(): int
@@ -113,7 +124,8 @@ class DreamsMassSeed extends Command
             if (count($pool) >= $poolSize) break;
 
             $before = count($pool);
-            $words = $this->generateWords($baseUrl, $apiKey, $model, $cat, self::CATEGORIES[$cat] * 2);
+            $quota = (int) (self::CATEGORIES[$cat] * (int) $this->option('mult'));
+            $words = $this->generateWords($baseUrl, $apiKey, $model, $cat, $quota);
             foreach ($words as $w) {
                 if (!is_string($w)) continue;
                 $n = $this->norm($w);
