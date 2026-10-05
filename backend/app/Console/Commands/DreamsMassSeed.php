@@ -205,13 +205,26 @@ class DreamsMassSeed extends Command
         $this->info('В пуле: ' . count($pool));
 
         $iter = 0;
+        $emptyStreak = 0;
         while (true) {
             $existing = DreamSymbol::pluck('keyword')->map(fn($k) => $this->norm($k))->flip()->all();
             $todo = array_values(array_filter($pool, fn($w) => !isset($existing[$this->norm($w)])));
             if (empty($todo)) break;
 
             $chunk = array_slice($todo, 0, 30);
-            $this->interpretChunk($baseUrl, $apiKey, $model, $chunk, (string) ++$iter);
+            $saved = $this->interpretChunk($baseUrl, $apiKey, $model, $chunk, (string) ++$iter);
+
+            if ($saved === 0) {
+                $emptyStreak++;
+                if ($emptyStreak >= 3) {
+                    $poison = $todo[0];
+                    $pool = array_values(array_filter($pool, fn($w) => $w !== $poison));
+                    $this->warn("3 пустых батча подряд — принудительно пропускаю «{$poison}»");
+                    $emptyStreak = 0;
+                }
+            } else {
+                $emptyStreak = 0;
+            }
 
             // сохраняем прогресс: убираем из пула всё, что уже в БД
             $existing = DreamSymbol::pluck('keyword')->map(fn($k) => $this->norm($k))->flip()->all();
@@ -266,6 +279,7 @@ class DreamsMassSeed extends Command
 
     private function norm(string $s): string
     {
+        $s = @iconv('UTF-8', 'UTF-8//IGNORE', $s) ?: $s;
         $s = mb_strtolower(trim($s));
         $s = strtr($s, self::HOMOGLYPHS);
         $s = str_replace('ё', 'е', $s);
@@ -337,7 +351,7 @@ class DreamsMassSeed extends Command
         }
     }
 
-    private function interpretChunk(string $baseUrl, string $apiKey, string $model, array $chunk, string $tag): void
+    private function interpretChunk(string $baseUrl, string $apiKey, string $model, array $chunk, string $tag): int
     {
         $prompt = "Ты — сонник. Верни СТРОГО JSON-объект без markdown: ключ — слово, значение — толкование сна на русском (1-2 предложения, тёплый тон). Слова: " . implode(', ', $chunk);
 
@@ -360,9 +374,11 @@ class DreamsMassSeed extends Command
             $data = json_decode($text, true);
             if (!is_array($data)) { $this->warn("Батч {$tag}: JSON не распознан"); return; }
 
+            $chunkNorm = array_map(fn($x) => $this->norm($x), $chunk);
             $saved = 0;
             foreach ($data as $kw => $interp) {
                 $n = $this->norm((string) $kw);
+                if (!in_array($n, $chunkNorm, true)) continue; // битые/левые ключи мимо
                 if ($n === '' || !is_string($interp) || mb_strlen(trim($interp)) < 10) continue;
                 if (DreamSymbol::where('keyword', $n)->exists()) continue;
                 DreamSymbol::create([
@@ -374,6 +390,7 @@ class DreamsMassSeed extends Command
                 $saved++;
             }
             $this->info("Батч {$tag}: сохранено {$saved}");
+            return $saved;
         } catch (\Throwable $e) {
             $this->warn("Батч {$tag}: " . $e->getMessage());
         }
