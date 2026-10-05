@@ -125,13 +125,20 @@ class DreamsMassSeed extends Command
 
             $before = count($pool);
             $quota = (int) (self::CATEGORIES[$cat] * (int) $this->option('mult'));
-            $words = $this->generateWords($baseUrl, $apiKey, $model, $cat, $quota);
+            $words = [];
+            $tries = 0;
+            while (count($words) < $quota && $tries < 4) {
+                $words = array_merge($words, $this->generateWords($baseUrl, $apiKey, $model, $cat, min(150, $quota)));
+                $tries++;
+                sleep(1);
+            }
             foreach ($words as $w) {
                 if (!is_string($w)) continue;
                 $n = $this->norm($w);
                 if ($n === '' || isset($seen[$n])) continue;
                 if (!preg_match('/^[а-яе][а-яе\s\-]*$/u', $n)) continue;
                 if (mb_strlen($n) < 2 || mb_strlen($n) > 40) continue;
+                if ($this->isGarbage($n)) continue;
                 $seen[$n] = true;
                 $pool[] = $n;
                 if (count($pool) >= $poolSize) break;
@@ -184,6 +191,23 @@ class DreamsMassSeed extends Command
     }
 
     // ---------- ХЕЛПЕРЫ ----------
+
+    private const STOP_TAILS = [
+        'тайна', 'загадка', 'проблема', 'сложность', 'трудность', 'затруднение',
+        'операция', 'действие', 'поступок', 'решение', 'явление', 'понятие',
+        'суть', 'смысл', 'тема', 'вопрос', 'ответ', 'идея', 'мысль', 'процесс',
+        'результат', 'итог', 'цель', 'задача', 'план', 'способ', 'метод',
+        'прием', 'средство', 'символ', 'знак', 'значение', 'толкование',
+    ];
+
+    private function isGarbage(string $n): bool
+    {
+        $parts = explode(' ', $n);
+        if (count($parts) >= 2 && in_array(end($parts), self::STOP_TAILS, true)) {
+            return true;
+        }
+        return false;
+    }
 
     private function norm(string $s): string
     {
