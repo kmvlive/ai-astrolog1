@@ -379,7 +379,7 @@ class DreamsMassSeed extends Command
         }
     }
 
-    private function interpretChunk(string $baseUrl, string $apiKey, string $model, array $chunk, string $tag): int
+    private function interpretChunk(string $baseUrl, string $apiKey, string $model, array $chunk, string $tag): array
     {
         $prompt = "Ты — сонник. Верни СТРОГО JSON-объект без markdown: ключ — слово, значение — толкование сна на русском (1-2 предложения, тёплый тон). Слова: " . implode(', ', $chunk);
 
@@ -402,42 +402,47 @@ class DreamsMassSeed extends Command
             $data = json_decode($text, true);
             if (!is_array($data)) { $this->warn("Батч {$tag}: JSON не распознан"); return 0; }
 
-            $chunkNorm = array_map(fn($x) => $this->norm($x), $chunk);
             $returned = is_array($data) ? count($data) : 0;
-            $matched = 0;
-            $saved = 0;
-            foreach ($data as $kw => $interp) {
-                $n = $this->norm((string) $kw);
-                if ($n === '' || !mb_check_encoding($n, 'UTF-8')) continue;
-                $match = $this->matchChunk($n, $chunkNorm);
-                if (!$match) {
-                    // модель перефразировала — принимаем её форму, если чистая
-                    if (preg_match('/^[а-яе][а-яе\s\-]*$/u', $n) && mb_strlen($n) >= 2 && mb_strlen($n) <= 40 && !$this->isGarbage($n)) {
-                        $match = $n;
-                    } else {
-                        continue;
+            $matches = [];
+            if (is_array($data)) {
+                // план A: точное/мягкое совпадение ключей
+                foreach ($data as $kw => $interp) {
+                    $n = $this->norm((string) $kw);
+                    if ($n === '' || !mb_check_encoding($n, 'UTF-8')) continue;
+                    $m = $this->matchChunk($n, array_map(fn($x) => $this->norm($x), $chunk));
+                    if ($m && !isset($matches[$m]) && is_string($interp)) $matches[$m] = $interp;
+                }
+                // план B: совпало меньше половины — zip по порядку списка
+                if (count($matches) < count($chunk) / 2) {
+                    $vals = array_values(array_filter($data, 'is_string'));
+                    $matches = [];
+                    foreach ($chunk as $i => $w) {
+                        if (isset($vals[$i])) $matches[$w] = $vals[$i];
                     }
                 }
-                $matched++;
+            }
+            $matched = count($matches);
+            $saved = 0;
+            foreach ($matches as $word => $interp) {
                 if (!is_string($interp) || mb_strlen(trim($interp)) < 10) continue;
                 try {
-                    if (DreamSymbol::where('keyword', $match)->exists()) continue;
+                    if (DreamSymbol::where('keyword', $word)->exists()) continue;
                     DreamSymbol::create([
-                        'keyword' => $match,
+                        'keyword' => $word,
                         'interpretation' => trim($interp),
                         'ai_generated' => true,
                         'approved' => true,
                     ]);
                     $saved++;
                 } catch (\Throwable $e) {
-                    $this->warn("Батч {$tag}: пропускаю ключ («{$n}»): " . mb_substr($e->getMessage(), 0, 80));
+                    $this->warn("Батч {$tag}: ошибка записи («{$word}»): " . mb_substr($e->getMessage(), 0, 80));
                 }
             }
-            $this->info("Батч {$tag}: модель вернула {$returned}, совпало {$matched}, сохранено {$saved}");
+            $this->info("Батч {$tag}: модель вернула {$returned}, сопоставлено {$matched}, сохранено {$saved}");
             return [$saved, $returned];
         } catch (\Throwable $e) {
             $this->warn("Батч {$tag}: " . $e->getMessage());
-            return 0;
+            return [0, 0];
         }
     }
 }
