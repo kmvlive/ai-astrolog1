@@ -198,11 +198,30 @@ class DreamsMassSeed extends Command
             ]);
             if (!$resp->successful()) { $this->warn("Слова «{$category}»: HTTP {$resp->status()}"); return []; }
 
-            $text = trim($resp->json('choices.0.message.content'));
+            $raw = trim($resp->json('choices.0.message.content'));
+            $text = $raw;
             $s = strpos($text, '['); $e = strrpos($text, ']');
             if ($s !== false && $e !== false) $text = substr($text, $s, $e - $s + 1);
             $data = json_decode($text, true);
-            if (!is_array($data)) return [];
+
+            if (!is_array($data)) {
+                // fallback 1: вытаскиваем строки в кавычках
+                if (preg_match_all('/"([^"\n]{2,60})"/u', $raw, $m) && count($m[1]) > 0) {
+                    $data = $m[1];
+                    $this->warn("«{$category}»: JSON не строгий — спас fallback (кавычки), слов: " . count($data));
+                } else {
+                    // fallback 2: список без кавычек — режем по запятым/строкам
+                    $inner = trim($raw, "[] \n\t");
+                    $parts = preg_split('/[,\n;]+/u', $inner);
+                    $data = array_map(fn($x) => trim($x, " \t\"«»'"), $parts);
+                    $this->warn("«{$category}»: JSON не строгий — спас fallback (split), слов: " . count($data));
+                }
+            }
+
+            if (!is_array($data) || empty($data)) {
+                $this->warn("«{$category}»: ПУСТО. Начало ответа: " . mb_substr($raw, 0, 300));
+                return [];
+            }
             return array_values($data);
         } catch (\Throwable $e) {
             $this->warn("Слова «{$category}»: " . $e->getMessage());
