@@ -34,13 +34,24 @@ const detransliterate = (text: string): string => {
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-async function getSymbol(kw: string) {
+async function getSymbol(rawKw: string) {
   try {
-    // params.keyword уже декодирован Next.js (App Router)
+    // Next.js App Router НЕ декодирует params — делаем сами
+    let kw = rawKw;
+    try { kw = decodeURIComponent(rawKw); } catch {}
+    kw = kw.trim().toLowerCase();
     const r = await fetch(`${API_URL}/api/dreams?q=${encodeURIComponent(kw)}`, { next: { revalidate: 60 } });
     const d = await r.json();
-    const found = d.symbols?.find((s: any) => s.keyword.toLowerCase() === kw.toLowerCase());
-    return found || null;
+    const found = d.symbols?.find((s: any) => s.keyword.toLowerCase() === kw);
+    if (found) return found;
+    // legacy: латинский slug -> детранслит
+    const det = detransliterate(rawKw.toLowerCase());
+    if (det !== kw) {
+      const r2 = await fetch(`${API_URL}/api/dreams?q=${encodeURIComponent(det)}`, { next: { revalidate: 60 } });
+      const d2 = await r2.json();
+      return d2.symbols?.find((s: any) => s.keyword.toLowerCase() === det) || null;
+    }
+    return null;
   } catch {
     return null;
   }
