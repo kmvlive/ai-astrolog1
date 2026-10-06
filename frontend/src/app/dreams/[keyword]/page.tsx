@@ -32,10 +32,12 @@ const detransliterate = (text: string): string => {
   return result;
 };
 
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
 async function getSymbol(kw: string) {
   try {
     // Пробуем как кириллицу, потом как транслит
-    const searches = [kw, detransliterate(kw)];
+    const searches = [kw, deencodeURIComponent(kw)];
     for (const search of searches) {
       const r = await fetch(`${API_URL}/api/dreams?q=${encodeURIComponent(search)}`, { next: { revalidate: 60 } });
       const d = await r.json();
@@ -62,10 +64,10 @@ export async function generateMetadata({ params }: { params: { keyword: string }
   const sym = await getSymbol(params.keyword);
   if (!sym) return { title: "Символ не найден — Сонник | AI Астролог" };
   return {
-    title: `К чему снится ${sym.keyword} — толкование сна | Сонник AI`,
+    title: `К чему снится ${cap(sym.keyword)} — толкование сна | Сонник AI`,
     description: sym.interpretation,
     openGraph: {
-      title: `🌙 К чему снится ${sym.keyword}`,
+      title: `🌙 К чему снится ${cap(sym.keyword)}`,
       description: sym.interpretation,
       type: "article",
     },
@@ -85,12 +87,12 @@ export default async function DreamSymbolPage({ params }: { params: { keyword: s
         <div className="text-sm text-slate-400 mb-6">
           <Link href="/dreams" className="hover:text-violet-400">🌙 Сонник</Link>
           <span className="mx-2">/</span>
-          <span className="text-white capitalize">{sym.keyword}</span>
+          <span className="text-white">{cap(sym.keyword)}</span>
         </div>
 
         <div className="bg-gradient-to-br from-indigo-900/40 to-slate-900 border border-violet-500/30 rounded-3xl p-8 sm:p-12 shadow-2xl mb-8">
           <div className="text-6xl mb-4">🌙</div>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-6 capitalize">К чему снится {sym.keyword}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-6">К чему снится {cap(sym.keyword)}</h1>
           <p className="text-lg text-slate-200 leading-relaxed mb-8">{sym.interpretation}</p>
           {sym.ai_generated && (
             <span className="inline-block px-3 py-1 bg-violet-600/30 border border-violet-500/40 rounded-full text-xs font-semibold mb-6">
@@ -98,7 +100,7 @@ export default async function DreamSymbolPage({ params }: { params: { keyword: s
             </span>
           )}
           <div className="pt-6 border-t border-white/10">
-            <ShareButtonsClient title={`К чему снится ${sym.keyword}. ${sym.interpretation.slice(0, 100)}...`} />
+            <ShareButtonsClient title={`К чему снится ${cap(sym.keyword)}. ${sym.interpretation.slice(0, 100)}...`} />
           </div>
         </div>
 
@@ -109,8 +111,8 @@ export default async function DreamSymbolPage({ params }: { params: { keyword: s
               {related.map((s: any) => (
                 <Link
                   key={s.id}
-                  href={`/dreams/${transliterate(s.keyword)}`}
-                  className="px-4 py-2 bg-slate-800 hover:bg-violet-900/40 border border-white/10 hover:border-violet-500/40 rounded-full text-sm capitalize transition"
+                  href={`/dreams/${encodeURIComponent(s.keyword)}`}
+                  className="px-4 py-2 bg-slate-800 hover:bg-violet-900/40 border border-white/10 hover:border-violet-500/40 rounded-full text-sm transition"
                 >
                   {s.keyword}
                 </Link>

@@ -117,7 +117,7 @@ export default function DreamsPage() {
                 results.map(r => (
                   <Link
                     key={r.id || r.keyword}
-                    href={`/dreams/${transliterate(r.keyword)}`}
+                    href={`/dreams/${encodeURIComponent(r.keyword)}`}
                     className="w-full text-left px-5 py-3 bg-slate-800/50 hover:bg-violet-900/30 border border-white/5 hover:border-violet-500/30 rounded-xl transition flex items-center justify-between group"
                   >
                     <span className="font-semibold capitalize group-hover:text-violet-300">{r.keyword}</span>
@@ -148,7 +148,7 @@ export default function DreamsPage() {
               {random.map((s, i) => (
                 <Link
                   key={i}
-                  href={`/dreams/${transliterate(s.keyword)}`}
+                  href={`/dreams/${encodeURIComponent(s.keyword)}`}
                   className="dash-chip capitalize"
                 >
                   {s.keyword}

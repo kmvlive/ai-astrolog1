@@ -29,7 +29,7 @@ Route::get('/sitemap-dreams.xml', function () {
     $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
     $xml .= '  <url><loc>https://my.neiro-astro.ru/dreams</loc><changefreq>daily</changefreq><priority>0.8</priority></url>' . "\n";
     foreach ($symbols as $kw) {
-        $slug = $tr($kw);
+        $slug = rawurlencode($kw);
         $xml .= '  <url><loc>https://my.neiro-astro.ru/dreams/' . $slug . '</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>' . "\n";
     }
     $xml .= '</urlset>';
