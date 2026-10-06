@@ -36,15 +36,11 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 async function getSymbol(kw: string) {
   try {
-    // Пробуем как кириллицу, потом как транслит
-    const searches = [kw, deencodeURIComponent(kw)];
-    for (const search of searches) {
-      const r = await fetch(`${API_URL}/api/dreams?q=${encodeURIComponent(search)}`, { next: { revalidate: 60 } });
-      const d = await r.json();
-      const found = d.symbols?.find((s: any) => s.keyword.toLowerCase() === search.toLowerCase());
-      if (found) return found;
-    }
-    return null;
+    // params.keyword уже декодирован Next.js (App Router)
+    const r = await fetch(`${API_URL}/api/dreams?q=${encodeURIComponent(kw)}`, { next: { revalidate: 60 } });
+    const d = await r.json();
+    const found = d.symbols?.find((s: any) => s.keyword.toLowerCase() === kw.toLowerCase());
+    return found || null;
   } catch {
     return null;
   }
