@@ -18,6 +18,7 @@ Schedule::command('horoscope:generate-all --period=month')->monthlyOn(1, '04:00'
 Schedule::command('horoscope:generate-all --period=year')->yearlyOn(1, 1, '05:00')->timezone('Europe/Moscow');
 
 // Рассылки — сдвинуты на 00:30-03:40 (рано утром, до пробуждения людей)
+// КРИТИЧНО: генерация гороскопов ДО отправки!
 Schedule::command('magazine:generate')->dailyAt('00:30')->withoutOverlapping();
 Schedule::command('magazine:send')->dailyAt('00:35')->withoutOverlapping();
 Schedule::command('calendar:send-daily-emails')->dailyAt('00:40')->timezone('Europe/Moscow')->withoutOverlapping(120);
@@ -26,14 +27,18 @@ Schedule::command('calendar:send-daily-max')->dailyAt('00:50')->timezone('Europe
 Schedule::command('affirmation:send-daily')->dailyAt('01:00')->withoutOverlapping(30);
 Schedule::command('subscriptions:auto-renew')->dailyAt('01:30')->timezone('Europe/Moscow');
 Schedule::command('subscriptions:expiry-reminders')->dailyAt('01:45')->timezone('Europe/Moscow');
+// 02:30 — генерация общих гороскопов на сегодня (если generate-all не успел)
+Schedule::command('horoscope:generate-free')->dailyAt('02:30')->timezone('Europe/Moscow')->withoutOverlapping(60);
+// 02:45 — генерация ПЕРСОНАЛЬНЫХ (до отправки!)
+Schedule::command('horoscope:generate-personal-free')->dailyAt('02:45')->timezone('Europe/Moscow')->withoutOverlapping(60);
+// 03:00 — отправка ОБЩИХ
 Schedule::command('horoscope:send-daily-emails')->dailyAt('03:00')->timezone('Europe/Moscow')->withoutOverlapping(120);
 Schedule::command('horoscope:send-daily-telegram')->dailyAt('03:05')->timezone('Europe/Moscow')->withoutOverlapping(30);
-Schedule::command('horoscope:generate-free')->dailyAt('03:30')->timezone('Europe/Moscow')->withoutOverlapping(60);
+// 03:35 — отправка ПЕРСОНАЛЬНЫХ (теперь гороскопы уже сгенерированы)
 Schedule::command('horoscope:send-personal-emails')->dailyAt('03:35')->timezone('Europe/Moscow')->withoutOverlapping(120);
 Schedule::command('horoscope:send-personal-telegram')->dailyAt('03:40')->timezone('Europe/Moscow')->withoutOverlapping(30);
 Schedule::command('horoscope:generate-compatibility')->dailyAt('04:00')->timezone('Europe/Moscow')->withoutOverlapping(60);
 Schedule::command('horoscope:delivery-audit')->dailyAt('04:15')->timezone('Europe/Moscow');
-Schedule::command('horoscope:generate-personal-free')->dailyAt('05:00')->timezone('Europe/Moscow');
 
 // Подписки
 Schedule::command('blog:clean-covers')->dailyAt('04:30');
