@@ -237,6 +237,12 @@ class TelegramWebhookController extends Controller
 
         if ($sub) {
             $sub->update(['is_active' => false]);
+            Log::info('Telegram subscriber deactivated', [
+                'chat_id' => $sub->chat_id,
+                'user_id' => $sub->user_id,
+                'reason' => 'telegram_error_or_unsubscribe',
+                'context' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3),
+            ]);
         }
 
         $telegram->sendMessage($chatId, "❌ Вы отписались от рассылки.\n\nЧтобы подписаться снова — нажмите «Подключить Telegram» в кабинете.");
