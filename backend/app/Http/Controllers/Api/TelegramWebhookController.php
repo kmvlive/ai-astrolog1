@@ -52,14 +52,23 @@ class TelegramWebhookController extends Controller
     private function handleStart(string $chatId, ?string $username, string $firstName, TelegramService $telegram, ?string $payload = null)
     {
         // Сохраняем chat_id как pending (без user_id) — подтвердим на сайте
-        TelegramSubscriber::updateOrCreate(
-            ['chat_id' => $chatId],
-            [
+        // Создаём pending подписчика (без user_id) — подтвердим на сайте
+        // НЕ трогаем is_active если подписчик уже существует и активен
+        $existing = TelegramSubscriber::where('chat_id', $chatId)->first();
+        if (!$existing) {
+            TelegramSubscriber::create([
+                'chat_id' => $chatId,
                 'username' => $username,
                 'first_name' => $firstName,
                 'is_active' => false,
-            ]
-        );
+            ]);
+        } else {
+            // Обновляем только username/first_name, не трогаем is_active
+            $existing->update([
+                'username' => $username,
+                'first_name' => $firstName,
+            ]);
+        }
 
         if ($payload && str_contains($payload, '-')) {
             // Есть payload — сразу привязываем
