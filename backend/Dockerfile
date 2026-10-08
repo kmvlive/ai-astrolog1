@@ -21,3 +21,9 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache || true
 
 EXPOSE 9000
 CMD ["/start.sh"]
+
+# Fix: Override DB and Redis host for host network mode
+ENV DB_HOST=127.0.0.1
+ENV DB_PORT=5433
+ENV REDIS_HOST=127.0.0.1
+ENV REDIS_PORT=6380

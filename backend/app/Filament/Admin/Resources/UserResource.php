@@ -138,7 +138,7 @@ class UserResource extends Resource
                                     ]);
                                     
                                     // SVG колесо
-                                    $svgUrl = 'http://astro-neiro-python:8000/natal-chart/svg?' . http_build_query([
+                                    $svgUrl = env('ASTRO_SERVICE_URL', 'http://127.0.0.1:8003') . '/natal-chart/svg?' . http_build_query([
                                         'name' => $record->name ?? 'User',
                                         'birth_date' => $record->profile->birth_date->format('Y-m-d'),
                                         'birth_time' => $record->profile->birth_time ?? '12:00',
@@ -156,7 +156,7 @@ class UserResource extends Resource
                                     // Данные планет
                                     $planetsData = null;
                                     try {
-                                        $planetsResp = \Illuminate\Support\Facades\Http::timeout(30)->post('http://astro-neiro-python:8000/natal-chart', [
+                                        $planetsResp = \Illuminate\Support\Facades\Http::timeout(30)->post(env('ASTRO_SERVICE_URL', 'http://127.0.0.1:8003') . '/natal-chart', [
                                             'name' => $record->name ?? 'User',
                                             'birth_date' => $record->profile->birth_date->format('Y-m-d'),
                                             'birth_time' => $record->profile->birth_time ?? '12:00',

@@ -53,7 +53,7 @@ services:
     depends_on:
       - redis
     environment:
-      - REDIS_HOST=127.0.0.1
+      - REDIS_HOST=redis
       - TIMEWEB_AI_BASE_URL=https://api.timeweb.ai/v1
       - TIMEWEB_AI_API_KEY=sk-PyIqBw7PvNPDaJp-kqv75w
       - TIMEWEB_AI_MODEL=dashscope/qwen3.5-flash
@@ -105,7 +105,8 @@ services:
       - db
       - redis
     environment:
-      - DB_HOST=172.18.0.2
+      - DB_HOST=127.0.0.1
+      - DB_PORT=5433
       - REDIS_HOST=127.0.0.1
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}

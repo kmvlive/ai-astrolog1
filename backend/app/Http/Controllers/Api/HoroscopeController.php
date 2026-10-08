@@ -67,7 +67,7 @@ class HoroscopeController extends Controller
 
         // Запрос к Python-сервису
         try {
-            $response = Http::timeout(30)->post('http://astro-neiro-python:8000/natal-chart', [
+            $response = Http::timeout(30)->post(env('ASTRO_SERVICE_URL', 'http://127.0.0.1:8003') . '/natal-chart', [
                 'name' => $user->name,
                 'birth_date' => $birthDate,
                 'birth_time' => $birthTime,

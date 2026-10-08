@@ -238,7 +238,7 @@ class NatalChartController extends Controller
                 dispatch(function () use ($chart) {
                     try {
                         // 1. Генерируем SVG-колесо через Python-сервис
-                        $svgUrl = 'http://astro-neiro-python:8000/natal-chart/svg?' . http_build_query([
+                        $svgUrl = env('ASTRO_SERVICE_URL', 'http://127.0.0.1:8003') . '/natal-chart/svg?' . http_build_query([
                             'name' => $chart->user->name ?? 'User',
                             'birth_date' => $chart->birth_date->format('Y-m-d'),
                             'birth_time' => $chart->birth_time ?? '12:00',
@@ -260,7 +260,7 @@ class NatalChartController extends Controller
                         // 1.5. Получаем данные планет для таблицы
                         $planetsData = null;
                         try {
-                            $planetsUrl = 'http://astro-neiro-python:8000/natal-chart';
+                            $planetsUrl = env('ASTRO_SERVICE_URL', 'http://127.0.0.1:8003') . '/natal-chart';
                             $planetsResponse = \Illuminate\Support\Facades\Http::timeout(30)->post($planetsUrl, [
                                 'name' => $chart->user->name ?? 'User',
                                 'birth_date' => $chart->birth_date->format('Y-m-d'),
@@ -352,7 +352,7 @@ class NatalChartController extends Controller
         $svgPath = $chart->chart_data['svg_path'] ?? null;
         if (!$svgPath || !\Illuminate\Support\Facades\Storage::disk('public')->exists($svgPath)) {
             // Генерируем на лету если нет сохранённого
-            $svgUrl = 'http://astro-neiro-python:8000/natal-chart/svg?' . http_build_query([
+            $svgUrl = env('ASTRO_SERVICE_URL', 'http://127.0.0.1:8003') . '/natal-chart/svg?' . http_build_query([
                 'name' => $chart->user->name ?? 'User',
                 'birth_date' => $chart->birth_date->format('Y-m-d'),
                 'birth_time' => $chart->birth_time ?? '12:00',
