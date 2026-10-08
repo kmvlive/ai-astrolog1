@@ -28,7 +28,7 @@ class SendSystemAlerts extends Command
         // 2. Python natal-chart сервис
         $urls = array_filter([
             env('PYTHON_HEALTH_URL'),
-            'http://astro-neiro-python:8000/health',
+            env('ASTRO_SERVICE_URL', 'http://127.0.0.1:8003') . '/health',
             'http://127.0.0.1:8003/health',
         ]);
         $pythonOk = false;
