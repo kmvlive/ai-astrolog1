@@ -97,6 +97,7 @@ export default function SignHoroscopePage() {
     } else {
       setSubStatus((s) => ({ ...s, loaded: true }));
     }
+    console.log('SubStatus check:', { isLoggedIn, subStatus });
   }, []);
 
   useEffect(() => {
@@ -285,7 +286,7 @@ export default function SignHoroscopePage() {
             {/* ⚙️ БЛОК: УПРАВЛЕНИЕ РАССЫЛКОЙ — только для подписанных */}
             {!isLoggedIn && <ManageSubscription />}
 
-            {!subStatus.has_plan && (
+            {(!isLoggedIn || (subStatus.loaded && !subStatus.has_plan)) && (
 <>
 {/* ✨ БЛОК: ПЕРСОНАЛЬНЫЙ ГОРОСКОП — апсейл */}
             <div className="bg-gradient-to-br from-violet-900/30 to-indigo-900/30 border border-violet-500/30 rounded-3xl p-8 text-center">
