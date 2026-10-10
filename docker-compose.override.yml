@@ -55,10 +55,6 @@ services:
     volumes:
       - astro-redisdata:/data
 
-volumes:
-  astro-pgdata:
-  astro-redisdata:
-
   scheduler:
     container_name: astro-scheduler
     environment:
@@ -66,3 +62,8 @@ volumes:
       - DB_PORT=5432
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+
+volumes:
+  astro-pgdata:
+  astro-redisdata:
+
