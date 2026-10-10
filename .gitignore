@@ -70,3 +70,6 @@ frontend/out/
 astro-service/venv/
 
 ```.env
+
+# Calendar submodule dependencies
+calendar/node_modules/
