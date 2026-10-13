@@ -49,7 +49,7 @@ Schedule::command('sitemap:generate')->dailyAt('06:30');
 Schedule::command('calendar:retry-failed')->cron('*/20 * * * *')->withoutOverlapping(5);
 
 // Генерация картинок
-Schedule::command('names:generate-images --limit=3')->everyTenMinutes()->withoutOverlapping();
+// Schedule::command('names:generate-images --limit=3')->everyTenMinutes()->withoutOverlapping();
 
 // Мониторинг здоровья системы — каждые 30 минут
 Schedule::command('system:health-check')->everyThirtyMinutes()->withoutOverlapping();
