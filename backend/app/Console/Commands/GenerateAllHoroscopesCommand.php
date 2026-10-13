@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\DailyHoroscope;
 use App\Services\AiService;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class GenerateAllHoroscopesCommand extends Command
@@ -32,7 +33,6 @@ class GenerateAllHoroscopesCommand extends Command
     {
         $periodOpt = $this->option('period');
         $signOpt = $this->option('sign');
-        $date = now()->startOfDay();
 
         $periods = $periodOpt === 'all'
             ? ['today', 'tomorrow', 'week', 'month', 'year']
@@ -47,6 +47,9 @@ class GenerateAllHoroscopesCommand extends Command
             }
 
             foreach ($periods as $period) {
+                // ВАЖНО: для каждого period своя дата!
+                $date = $this->resolveDateForPeriod($period);
+
                 foreach (self::TYPES as $type) {
                     if ($this->combinationExists($period, $sign['code'], $type, $date)) {
                         $skipped++;
@@ -66,12 +69,12 @@ class GenerateAllHoroscopesCommand extends Command
                             'content' => $content,
                         ]);
                         $generated++;
-                        $this->info("  ✓ {$sign['name']} / {$type} / {$period}");
+                        $this->info("  ✓ {$sign['name']} / {$type} / {$period} ({$date->toDateString()})");
                     } else {
                         $this->warn("  ✗ {$sign['name']} / {$type} / {$period} — ошибка AI");
                     }
 
-                    usleep(300000); // пауза 0.3с чтобы не превысить лимит API
+                    usleep(300000);
                 }
             }
         }
@@ -81,16 +84,31 @@ class GenerateAllHoroscopesCommand extends Command
     }
 
     /**
+     * Возвращает правильную дату для каждого period.
+     * Исправлено: раньше для всех period использовалась одна и та же дата (сегодня),
+     * из-за чего --period=tomorrow никогда не генерировал гороскопы на завтра.
+     */
+    private function resolveDateForPeriod(string $period): Carbon
+    {
+        return match ($period) {
+            'today' => now()->startOfDay(),
+            'tomorrow' => now()->addDay()->startOfDay(),
+            'week' => now()->startOfWeek(),
+            'month' => now()->startOfMonth(),
+            'year' => now()->startOfYear(),
+            default => now()->startOfDay(),
+        };
+    }
+
+    /**
      * Проверяет, есть ли актуальная запись для комбинации sign+type+period
      */
-    private function combinationExists(string $period, string $signCode, string $type, $date): bool
+    private function combinationExists(string $period, string $signCode, string $type, Carbon $date): bool
     {
         $q = DailyHoroscope::where('zodiac_sign', $signCode)
             ->where('type', $type)
             ->where('period', $period);
 
-        // Для week/month/year ищем запись за текущий период (любого дня внутри периода)
-        // Для today/tomorrow — на конкретную дату
         return match ($period) {
             'week' => $q->where('date', '>=', now()->startOfWeek())->exists(),
             'month' => $q->where('date', '>=', now()->startOfMonth())->exists(),

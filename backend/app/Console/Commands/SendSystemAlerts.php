@@ -88,7 +88,7 @@ class SendSystemAlerts extends Command
             ->whereDate('d.created_at', today())
             ->count();
         
-        if ($failed > 2) {  // алертим только если больше 2 ошибок
+        if ($failed > 5) {  // алертим только если больше 2 ошибок
             $redProblems[] = "🔴 Критичных ошибок доставки сегодня: {$failed}";
         } elseif ($failed > 0) {
             $yellowProblems[] = "🟡 Ошибок доставки сегодня: {$failed}";
