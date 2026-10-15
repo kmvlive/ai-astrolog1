@@ -22,14 +22,12 @@ class GenerateDailyBlogPost extends Command
     {
         $this->info('Генерация статьи блога...');
 
-        // Проверка: статья на сегодня уже есть?
         $today = now()->startOfDay();
         $existing = BlogPost::whereDate('published_at', $today)->where('author_type', 'ai')->first();
         if ($existing && $this->titleIsFresh($existing)) {
             $this->info("✓ Статья на сегодня уже есть: «{$existing->title}»");
             return 0;
         }
-        // Если есть, но с плохим заголовком — удаляем и перегенерируем
         if ($existing) {
             $this->warn("⚠ Удаляю статью с плохим заголовком: «{$existing->title}»");
             $existing->delete();
@@ -39,7 +37,8 @@ class GenerateDailyBlogPost extends Command
         $maxAttempts = 3;
 
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
-            $post = $ai->generateBlogPost();
+            // Генерируем статью БЕЗ обложки (экономим ~1.5₽ на попытку)
+            $post = $ai->generateBlogPostWithoutCover();
 
             if (!$post) {
                 $this->error('✗ Не удалось создать статью');
@@ -47,7 +46,11 @@ class GenerateDailyBlogPost extends Command
             }
 
             if ($this->titleIsFresh($post)) {
-                $this->info("✓ Статья создана: «{$post->title}»");
+                $this->info("✓ Заголовок прошёл валидацию: «{$post->title}»");
+                // Теперь генерируем обложку (только 1 раз!)
+                $this->info('  Генерирую обложку...');
+                $ai->generateCoverForPost($post);
+                $this->info("✓ Статья создана с обложкой: «{$post->title}»");
                 return 0;
             }
 
@@ -57,23 +60,17 @@ class GenerateDailyBlogPost extends Command
             sleep(2);
         }
 
-        // Финальная попытка — принимаем что есть
-        $post = $ai->generateBlogPost();
+        // Финальная попытка
+        $post = $ai->generateBlogPostWithoutCover();
         if (!$post) {
             $this->error('✗ Не удалось создать статью');
             return 1;
         }
+        $ai->generateCoverForPost($post);
         $this->warn("⚠ Статья с НЕидеальным заголовком после {$maxAttempts} попыток: «{$post->title}»");
         return 0;
     }
 
-    /**
-     * Заголовок свежий, если:
-     * - не начинается со слова-штампа
-     * - не построен по шаблону «... дня: ...»
-     * - первое слово отличается от первых слов 8 предыдущих заголовков
-     * ВАЖНО: исключаем ТЕКУЩУЮ статью из сравнения (иначе сравнивает сама с собой)
-     */
     private function titleIsFresh(BlogPost $post): bool
     {
         $title = $post->title;
@@ -89,7 +86,6 @@ class GenerateDailyBlogPost extends Command
             return false;
         }
 
-        // ИСКЛЮЧАЕМ текущую статью по ID!
         $recent = DB::table('blog_posts')
             ->where('id', '!=', $post->id)
             ->orderByDesc('id')
