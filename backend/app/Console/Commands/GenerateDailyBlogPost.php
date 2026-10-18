@@ -37,8 +37,7 @@ class GenerateDailyBlogPost extends Command
         $maxAttempts = 3;
 
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
-            // Генерируем статью БЕЗ обложки (экономим ~1.5₽ на попытку)
-            $post = $ai->generateBlogPostWithoutCover();
+            $post = $ai->generateBlogPost();
 
             if (!$post) {
                 $this->error('✗ Не удалось создать статью');
@@ -46,11 +45,8 @@ class GenerateDailyBlogPost extends Command
             }
 
             if ($this->titleIsFresh($post)) {
-                $this->info("✓ Заголовок прошёл валидацию: «{$post->title}»");
-                // Теперь генерируем обложку (только 1 раз!)
-                $this->info('  Генерирую обложку...');
-                $ai->generateCoverForPost($post);
-                $this->info("✓ Статья создана с обложкой: «{$post->title}»");
+                $this->info("✓ Статья создана: «{$post->title}»");
+                $this->generateCoverForPost($ai, $post);
                 return 0;
             }
 
@@ -60,15 +56,30 @@ class GenerateDailyBlogPost extends Command
             sleep(2);
         }
 
-        // Финальная попытка
-        $post = $ai->generateBlogPostWithoutCover();
+        $post = $ai->generateBlogPost();
         if (!$post) {
             $this->error('✗ Не удалось создать статью');
             return 1;
         }
-        $ai->generateCoverForPost($post);
         $this->warn("⚠ Статья с НЕидеальным заголовком после {$maxAttempts} попыток: «{$post->title}»");
+        $this->generateCoverForPost($ai, $post);
         return 0;
+    }
+
+    private function generateCoverForPost(AiService $ai, BlogPost $post): void
+    {
+        try {
+            $coverData = $ai->generateCover($post);
+            if ($coverData) {
+                $post->update([
+                    'cover_image' => $coverData['path'],
+                    'cover_subject' => $coverData['subject'],
+                ]);
+                $this->info("✓ Обложка сгенерирована: {$coverData['path']}");
+            }
+        } catch (\Throwable $e) {
+            $this->warn("⚠ Не удалось создать обложку: {$e->getMessage()}");
+        }
     }
 
     private function titleIsFresh(BlogPost $post): bool
