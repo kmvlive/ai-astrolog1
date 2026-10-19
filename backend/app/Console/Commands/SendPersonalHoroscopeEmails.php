@@ -96,6 +96,7 @@ class SendPersonalHoroscopeEmails extends Command
                 if (!$this->option('test')) {
                     // Используем updateOrCreate чтобы не было Unique violation
                     // когда delivery-audit перезапускает команду
+                    try {
                     \App\Models\DeliveryLog::updateOrCreate(
                         [
                             'user_id' => $user->id,
@@ -104,11 +105,19 @@ class SendPersonalHoroscopeEmails extends Command
                         ],
                         ['status' => 'sent', 'error_message' => null]
                     );
+                } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                    // Запись уже существует — обновляем статус
+                    \App\Models\DeliveryLog::where('user_id', $user->id)
+                        ->where('event_type', 'personal_daily')
+                        ->whereDate('created_at', now()->toDateString())
+                        ->update(['status' => 'sent', 'error_message' => null]);
+                }
                 }
                 $this->info("{$user->email}: отправлено (персональный)");
                 $sent++;
             } else {
                 if (!$this->option('test')) {
+                    try {
                     \App\Models\DeliveryLog::updateOrCreate(
                         [
                             'user_id' => $user->id,
@@ -117,6 +126,13 @@ class SendPersonalHoroscopeEmails extends Command
                         ],
                         ['status' => 'failed', 'error_message' => 'UniSender failed']
                     );
+                } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                    // Запись уже существует — обновляем статус
+                    \App\Models\DeliveryLog::where('user_id', $user->id)
+                        ->where('event_type', 'personal_daily')
+                        ->whereDate('created_at', now()->toDateString())
+                        ->update(['status' => 'failed', 'error_message' => 'UniSender failed']);
+                }
                     // Освобождаю lock при ошибке, чтобы audit мог переотправить
                     Cache::lock('email_personal_' . $user->id . '_' . $today)->forceRelease();
                 }
