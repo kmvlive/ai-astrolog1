@@ -189,14 +189,21 @@ class SendDailyHoroscopeEmails extends Command
             // Создаю запись ПЕРЕД отправкой — защита от дублей
             // Используем updateOrCreate чтобы не было Unique violation при перезапуске
             if (!$this->option('test')) {
-                \App\Models\DeliveryLog::updateOrCreate(
-                    [
-                        'user_id' => $user->id,
-                        'event_type' => 'daily',
-                        'created_at' => now()->startOfDay(),
-                    ],
-                    ['status' => 'sending']
-                );
+                try {
+                    \App\Models\DeliveryLog::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'event_type' => 'daily',
+                            'created_at' => now()->startOfDay(),
+                        ],
+                        ['status' => 'sending']
+                    );
+                } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                    \App\Models\DeliveryLog::where('user_id', $user->id)
+                        ->where('event_type', 'daily')
+                        ->whereDate('created_at', now()->toDateString())
+                        ->update(['status' => 'sending']);
+                }
             }
             
             $ok = $service->sendEmail($user->email, "✨ Ваш гороскоп на {$dateRu}", $html, $text);

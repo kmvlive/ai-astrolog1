@@ -89,6 +89,7 @@ class SendPersonalHoroscopeTelegram extends Command
 
             if ($ok) {
                 if (!$this->option('test')) {
+                    try {
                     \App\Models\DeliveryLog::updateOrCreate(
                         [
                             'user_id' => $user->id,
@@ -97,6 +98,12 @@ class SendPersonalHoroscopeTelegram extends Command
                         ],
                         ['status' => 'sent', 'error_message' => null]
                     );
+                } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                    \App\Models\DeliveryLog::where('user_id', $user->id)
+                        ->where('event_type', 'personal_daily_tg')
+                        ->whereDate('created_at', now()->toDateString())
+                        ->update(['status' => 'sent', 'error_message' => null]);
+                }
                 }
                 $this->info("✓ {$sub->chat_id}");
                 $sent++;

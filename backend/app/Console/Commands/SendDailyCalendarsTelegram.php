@@ -62,26 +62,40 @@ class SendDailyCalendarsTelegram extends Command
             $ok = $telegram->sendCalendar($sub->chat_id, $dateRu, $calendars);
             if ($ok) {
                 $sub->update(['last_sent_at' => now()]);
-                \App\Models\DeliveryLog::updateOrCreate(
-                    [
-                        'user_id' => $user->id,
-                        'event_type' => 'daily_calendars_tg',
-                        'created_at' => now()->startOfDay(),
-                    ],
-                    ['status' => 'sent']
-                );
+                try {
+                    \App\Models\DeliveryLog::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'event_type' => 'daily_calendars_tg',
+                            'created_at' => now()->startOfDay(),
+                        ],
+                        ['status' => 'sent']
+                    );
+                } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                    \App\Models\DeliveryLog::where('user_id', $user->id)
+                        ->where('event_type', 'daily_calendars_tg')
+                        ->whereDate('created_at', now()->toDateString())
+                        ->update(['status' => 'sent']);
+                }
                 $sent++;
                 $this->info("✓ {$sub->chat_id}");
             } else {
                 // Записываем фейл для последующего ретрая
-                \App\Models\DeliveryLog::updateOrCreate(
-                    [
-                        'user_id' => $user->id,
-                        'event_type' => 'daily_calendars_tg',
-                        'created_at' => now()->startOfDay(),
-                    ],
-                    ['status' => 'failed']
-                );
+                try {
+                    \App\Models\DeliveryLog::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'event_type' => 'daily_calendars_tg',
+                            'created_at' => now()->startOfDay(),
+                        ],
+                        ['status' => 'failed']
+                    );
+                } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                    \App\Models\DeliveryLog::where('user_id', $user->id)
+                        ->where('event_type', 'daily_calendars_tg')
+                        ->whereDate('created_at', now()->toDateString())
+                        ->update(['status' => 'failed']);
+                }
                 $this->error("✗ {$sub->chat_id}");
             }
         }
