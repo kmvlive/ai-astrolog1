@@ -89,11 +89,14 @@ class SendPersonalHoroscopeTelegram extends Command
 
             if ($ok) {
                 if (!$this->option('test')) {
-                    \App\Models\DeliveryLog::create([
-                        'user_id' => $user->id,
-                        'event_type' => 'personal_daily_tg',
-                        'status' => 'sent',
-                    ]);
+                    \App\Models\DeliveryLog::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'event_type' => 'personal_daily_tg',
+                            'created_at' => now()->startOfDay(),
+                        ],
+                        ['status' => 'sent', 'error_message' => null]
+                    );
                 }
                 $this->info("✓ {$sub->chat_id}");
                 $sent++;

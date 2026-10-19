@@ -63,7 +63,14 @@ class SendDailyCalendarsMax extends Command
             $ok = $max->sendCalendar($sub->user_id, $dateRu, $calendars);
             if ($ok) {
                 $sub->update(['last_activity_at' => now()]);
-                \App\Models\DeliveryLog::create(['user_id' => $user->id, 'event_type' => 'daily_calendars_max', 'status' => 'sent']);
+                \App\Models\DeliveryLog::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'event_type' => 'daily_calendars_max',
+                        'created_at' => now()->startOfDay(),
+                    ],
+                    ['status' => 'sent']
+                );
                 $sent++;
                 $this->info("✓ {$sub->user_id}");
             } else {

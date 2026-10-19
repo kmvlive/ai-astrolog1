@@ -62,12 +62,26 @@ class SendDailyCalendarsTelegram extends Command
             $ok = $telegram->sendCalendar($sub->chat_id, $dateRu, $calendars);
             if ($ok) {
                 $sub->update(['last_sent_at' => now()]);
-                \App\Models\DeliveryLog::create(['user_id' => $user->id, 'event_type' => 'daily_calendars_tg', 'status' => 'sent']);
+                \App\Models\DeliveryLog::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'event_type' => 'daily_calendars_tg',
+                        'created_at' => now()->startOfDay(),
+                    ],
+                    ['status' => 'sent']
+                );
                 $sent++;
                 $this->info("✓ {$sub->chat_id}");
             } else {
                 // Записываем фейл для последующего ретрая
-                \App\Models\DeliveryLog::create(['user_id' => $user->id, 'event_type' => 'daily_calendars_tg', 'status' => 'failed']);
+                \App\Models\DeliveryLog::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'event_type' => 'daily_calendars_tg',
+                        'created_at' => now()->startOfDay(),
+                    ],
+                    ['status' => 'failed']
+                );
                 $this->error("✗ {$sub->chat_id}");
             }
         }

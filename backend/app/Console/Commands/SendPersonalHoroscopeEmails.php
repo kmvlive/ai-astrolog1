@@ -94,22 +94,30 @@ class SendPersonalHoroscopeEmails extends Command
 
             if ($ok) {
                 if (!$this->option('test')) {
-                    \App\Models\DeliveryLog::create([
-                        'user_id' => $user->id,
-                        'event_type' => 'personal_daily',
-                        'status' => 'sent',
-                    ]);
+                    // Используем updateOrCreate чтобы не было Unique violation
+                    // когда delivery-audit перезапускает команду
+                    \App\Models\DeliveryLog::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'event_type' => 'personal_daily',
+                            'created_at' => now()->startOfDay(),
+                        ],
+                        ['status' => 'sent', 'error_message' => null]
+                    );
                 }
                 $this->info("{$user->email}: отправлено (персональный)");
                 $sent++;
             } else {
                 if (!$this->option('test')) {
-                    \App\Models\DeliveryLog::create([
-                        'user_id' => $user->id,
-                        'event_type' => 'personal_daily',
-                        'status' => 'failed',
-                    ]);
-                    // Освобождаю lock при ошибке
+                    \App\Models\DeliveryLog::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'event_type' => 'personal_daily',
+                            'created_at' => now()->startOfDay(),
+                        ],
+                        ['status' => 'failed', 'error_message' => 'UniSender failed']
+                    );
+                    // Освобождаю lock при ошибке, чтобы audit мог переотправить
                     Cache::lock('email_personal_' . $user->id . '_' . $today)->forceRelease();
                 }
                 $this->error("{$user->email}: ошибка отправки");

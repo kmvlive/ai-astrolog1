@@ -126,7 +126,14 @@ class SendDailyTelegramHoroscopes extends Command
             $ok = $telegram->sendHoroscope($sub->chat_id, $signEmoji, $signName, $dateRu, $sections, $button);
             if ($ok) {
                 $sub->update(['last_sent_at' => now()]);
-                \App\Models\DeliveryLog::create(['user_id' => $user->id, 'event_type' => 'daily_tg', 'status' => 'sent']);
+                \App\Models\DeliveryLog::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'event_type' => 'daily_tg',
+                        'created_at' => now()->startOfDay(),
+                    ],
+                    ['status' => 'sent']
+                );
                 $sent++;
                 $this->info("✓ Отправлено: {$sub->chat_id} ({$signName})");
                 if ($blogPost) {
